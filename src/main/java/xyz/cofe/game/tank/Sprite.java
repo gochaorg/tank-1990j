@@ -26,20 +26,20 @@ public class Sprite implements Drawing {
      */
     protected final BufferedImage image;
 
-    private Size2DInt size;
+    private Size2D size;
 
     /**
      * Размеры кадра
      * @return размеры кадра
      */
-    public Size2DInt size(){
+    public Size2D size(){
         if( size!=null )return size;
-        size = Size2DInt.of( image.getWidth(), image.getHeight() );
+        size = Size2D.of( image.getWidth(), image.getHeight() );
         return size;
     }
 
-    private RectInt bounds;
-    private RectInt bounds(){
+    private Rect bounds;
+    private Rect bounds(){
         if( bounds!=null )return bounds;
 
         WritableRaster raster = image.getRaster();
@@ -61,7 +61,7 @@ public class Sprite implements Drawing {
             y1 = linesHorz_yAxis.get(linesHorz_yAxis.size()-1);
         }
 
-        bounds = RectInt.rect(x0,y0,x1,y1);
+        bounds = Rect.rect(x0,y0,x1,y1);
         return bounds;
     }
     private List<Integer> transparentVert(WritableRaster raster){

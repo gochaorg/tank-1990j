@@ -1,19 +1,17 @@
 package xyz.cofe.game.tank;
 
-public interface Size2D<N extends Number> {
-    N width();
-    N height();
-    public static <N extends Number> Size2D<N> of(N width, N height ){
-        if( width==null )throw new IllegalArgumentException( "width==null" );
-        if( height==null )throw new IllegalArgumentException( "height==null" );
-        return new Size2D<N>() {
+public interface Size2D {
+    double width();
+    double height();
+    public static Size2D of(double width, double height ){
+        return new Size2D() {
             @Override
-            public N width(){
+            public double width(){
                 return width;
             }
 
             @Override
-            public N height(){
+            public double height(){
                 return height;
             }
         };
