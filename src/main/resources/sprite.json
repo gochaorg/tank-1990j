@@ -1,0 +1,803 @@
+{
+  "player_one_up_0" : {
+    "frames": 2,
+    "duration": 0.05,
+    "left": 0,
+    "top": 0,
+    "width": 32,
+    "height": 32,
+    "loop": true
+  }
+,"player_one_right_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 32,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_down_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 64,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_left_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 96,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_up_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 0,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_right_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 32,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_down_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 64,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_left_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 96,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_up_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 0,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_right_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 32,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_down_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 64,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_left_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 96,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_up_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 0,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_right_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 32,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_down_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 64,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_one_left_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 96,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_up_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 128,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_right_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 160,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_down_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 192,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_left_0" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 0,
+  "top": 224,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_up_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 128,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_right_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 160,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_down_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 192,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_left_1" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 64,
+  "top": 224,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_up_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 128,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_right_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 160,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_down_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 192,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_left_2" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 128,
+  "top": 224,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_up_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 128,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_right_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 160,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_down_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 192,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_two_left_3" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 192,
+  "top": 224,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"lvl_brick" : {
+  "frames": 2,
+  "duration": 1.0,
+  "left": 0,
+  "top": 256,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"lvl_white" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 0,
+  "top": 272,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"lvl_slide" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 0,
+  "top": 288,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"lvl_bush" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 0,
+  "top": 304,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"lvl_water" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 0,
+  "top": 320,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"lvl_background" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 3,
+  "top": 346,
+  "width": 1,
+  "height": 1,
+  "loop": false
+}
+,"lvl_eagle" : {
+  "frames": 2,
+  "duration": 1.0,
+  "left": 0,
+  "top": 360,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_star" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 0,
+  "top": 392,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_life" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 32,
+  "top": 392,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_invincibility" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 64,
+  "top": 392,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_protect" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 96,
+  "top": 392,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_time" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 64,
+  "top": 360,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"item_granade" : {
+  "frames": 1,
+  "duration": 0.15,
+  "left": 96,
+  "top": 360,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"enemy_slow_up" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 424,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_right" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 456,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_down" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 488,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_left" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 520,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_bonus_up" : {
+  "frames": 4,
+  "duration": 0.1,
+  "left": 64,
+  "top": 424,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_bonus_right" : {
+  "frames": 4,
+  "duration": 0.1,
+  "left": 64,
+  "top": 456,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_bonus_down" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 488,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_slow_bonus_left" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 520,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_up" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 552,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_right" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 584,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_down" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 616,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_left" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 648,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_bonus_up" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 552,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_bonus_right" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 584,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_bonus_down" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 616,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_fast_bonus_left" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 648,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_up" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 680,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_right" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 712,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_down" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 744,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_left" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 776,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_bonus_up" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 680,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_bonus_right" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 712,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_bonus_down" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 744,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_medium_bonus_left" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 776,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_up" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 808,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_right" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 840,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_down" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 872,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_left" : {
+  "frames": 2,
+  "duration": 0.15,
+  "left": 0,
+  "top": 904,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_bonus_up" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 808,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_bonus_right" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 840,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_bonus_down" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 872,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"enemy_big_bonus_left" : {
+  "frames": 4,
+  "duration": 0.15,
+  "left": 64,
+  "top": 904,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"effect_spawn" : {
+  "frames": 6,
+  "duration": 0.05,
+  "left": 256,
+  "top": 32,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"effect_explode" : {
+  "frames": 3,
+  "duration": 0.05,
+  "left": 256,
+  "top": 64,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"bullet" : {
+  "frames": 4,
+  "duration": 1.0,
+  "left": 0,
+  "top": 352,
+  "width": 8,
+  "height": 8,
+  "loop": false
+}
+,"editor" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 462,
+  "top": 0,
+  "width": 50,
+  "height": 223,
+  "loop": false
+}
+,"menu_logo" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 135,
+  "top": 273,
+  "width": 376,
+  "height": 136,
+  "loop": false
+}
+,"menu_options" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 324,
+  "top": 422,
+  "width": 188,
+  "height": 78,
+  "loop": false
+}
+,"player_border" : {
+  "frames": 2,
+  "duration": 0.05,
+  "left": 256,
+  "top": 0,
+  "width": 32,
+  "height": 32,
+  "loop": true
+}
+,"player_stat" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 32,
+  "top": 272,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"enemy_stat" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 48,
+  "top": 272,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"flag" : {
+  "frames": 1,
+  "duration": 1.0,
+  "left": 64,
+  "top": 272,
+  "width": 32,
+  "height": 32,
+  "loop": false
+}
+,"chars" : {
+  "frames": 26,
+  "duration": 1.0,
+  "left": 0,
+  "top": 992,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+,"signs" : {
+  "frames": 18,
+  "duration": 1.0,
+  "left": 0,
+  "top": 1008,
+  "width": 16,
+  "height": 16,
+  "loop": false
+}
+}
