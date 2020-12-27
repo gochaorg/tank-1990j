@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * Спрайт / кадр
  */
-public class Sprite implements Drawing {
+public class Sprite implements PositionalDrawing {
     /**
      * Конструктор
      * @param image кадр
@@ -26,6 +26,7 @@ public class Sprite implements Drawing {
      */
     protected final BufferedImage image;
 
+    //region size : Size2D - размеры кадра
     private Size2D size;
 
     /**
@@ -37,9 +38,15 @@ public class Sprite implements Drawing {
         size = Size2D.of( image.getWidth(), image.getHeight() );
         return size;
     }
-
+    //endregion
+    //region bounds() : Rect - границы объекта, границы не пустых пикселей
     private Rect bounds;
-    private Rect bounds(){
+
+    /**
+     * Возвращает границы объекта, границы не пустых пикселей
+     * @return границы объекта
+     */
+    public Rect bounds(){
         if( bounds!=null )return bounds;
 
         WritableRaster raster = image.getRaster();
@@ -66,9 +73,6 @@ public class Sprite implements Drawing {
     }
     private List<Integer> transparentVert(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
-        int r = 0;
-        int g = 1;
-        int b = 2;
         int a = 3;
 
         int w = raster.getWidth();
@@ -76,9 +80,7 @@ public class Sprite implements Drawing {
         AtomicLong alphaSum = new AtomicLong();
         for( int x=0; x<w; x++ ){
             alphaSum.set(0);
-            horizPixels(raster, x, rgba -> {
-                alphaSum.addAndGet(rgba[a]);
-            });
+            vertPixels(raster, x, rgba -> alphaSum.addAndGet(rgba[a]));
             if( alphaSum.get()==0 ){
                 lines.add(x);
             }
@@ -88,9 +90,6 @@ public class Sprite implements Drawing {
     }
     private List<Integer> transparentHoriz(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
-        int r = 0;
-        int g = 1;
-        int b = 2;
         int a = 3;
 
         int h = raster.getHeight();
@@ -98,9 +97,7 @@ public class Sprite implements Drawing {
         AtomicLong alphaSum = new AtomicLong();
         for( int y=0; y<h; y++ ){
             alphaSum.set(0);
-            horizPixels(raster, y, rgba -> {
-                alphaSum.addAndGet(rgba[a]);
-            });
+            horizPixels(raster, y, rgba -> alphaSum.addAndGet(rgba[a]));
             if( alphaSum.get()==0 ){
                 lines.add(y);
             }
@@ -124,6 +121,7 @@ public class Sprite implements Drawing {
             pixel.accept(pixelData);
         }
     }
+    //endregion
 
     /**
      * отрисовка спрайта
@@ -131,8 +129,8 @@ public class Sprite implements Drawing {
      * @param x координаты отображения
      * @param y координаты отображения
      */
-    public void draw( Graphics2D gs, int x, int y ){
+    public void draw( Graphics2D gs, double x, double y ){
         if( gs==null )throw new IllegalArgumentException( "gs==null" );
-        gs.drawImage(image, x, y, null);
+        gs.drawImage(image, (int)x, (int)y, null);
     }
 }
