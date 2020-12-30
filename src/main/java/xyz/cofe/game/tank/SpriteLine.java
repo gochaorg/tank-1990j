@@ -1,9 +1,12 @@
 package xyz.cofe.game.tank;
 
+import xyz.cofe.game.tank.unt.SpriteFigura;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -12,7 +15,7 @@ import java.util.stream.Stream;
  * "Раскадровка" - последовательность спрайтов
  */
 @SuppressWarnings("UnusedReturnValue")
-public class SpriteLine implements PositionalDrawing {
+public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
     /**
      * Конструктор по умолчанию
      */
@@ -35,6 +38,13 @@ public class SpriteLine implements PositionalDrawing {
      */
     public SpriteLine(Iterable<Sprite> sprites, double duration){
         if( sprites==null )throw new IllegalArgumentException( "sprites==null" );
+        int i=-1;
+        for(Sprite s:sprites){
+            i++;
+            if( s==null ){
+                throw new IllegalArgumentException("sprites["+i+"]==null");
+            }
+        }
         sprites.forEach( this.sprites::add );
         this.duration = duration;
     }
@@ -56,6 +66,7 @@ public class SpriteLine implements PositionalDrawing {
      * Клонирование
      * @return клон
      */
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public SpriteLine clone(){
         return new SpriteLine(this);
     }
@@ -69,6 +80,11 @@ public class SpriteLine implements PositionalDrawing {
     //region sprites : List<Sprite> - набор спрайтов
     private final List<Sprite> sprites = new ArrayList<>();
 
+    private void onSpritesChanged(){
+        sizes = null;
+        maxSize = null;
+    }
+
     /**
      * Возвращает набор спрайтов
      * @return набор спрайтов
@@ -81,31 +97,26 @@ public class SpriteLine implements PositionalDrawing {
      */
     public void setSprites(List<Sprite> sprites){
         if( sprites==null )throw new IllegalArgumentException( "sprites==null" );
-        this.sprites.clear();
-        this.sprites.addAll(sprites);
+        int i=-1;
+        List<Sprite> newSprites = new ArrayList<>();
+        for(Sprite s:sprites){
+            i++;
+            if( s==null ){
+                throw new IllegalArgumentException("sprites["+i+"]==null");
+            }else{
+                newSprites.add(s);
+            }
+        }
+        synchronized( this ){
+            this.sprites.clear();
+            this.sprites.addAll(newSprites);
+            onSpritesChanged();
+        }
     }
 
-    /**
-     * Указывает набор спрайтов
-     * @param sprites набор спрайтов
-     * @return Self ссылка
-     */
-    public SpriteLine sprites(Iterable<Sprite> sprites){
+    public SpriteLine sprites(List<Sprite> sprites){
         if( sprites==null )throw new IllegalArgumentException( "sprites==null" );
-        this.sprites.clear();
-        sprites.forEach(this.sprites::add);
-        return this;
-    }
-
-    /**
-     * Указывает набор спрайтов
-     * @param sprites набор спрайтов
-     * @return Self ссылка
-     */
-    public SpriteLine sprites(Stream<Sprite> sprites){
-        if( sprites==null )throw new IllegalArgumentException( "sprites==null" );
-        this.sprites.clear();
-        sprites.forEach(this.sprites::add);
+        setSprites(sprites);
         return this;
     }
 
@@ -116,13 +127,80 @@ public class SpriteLine implements PositionalDrawing {
      */
     public SpriteLine images(Iterable<BufferedImage> images){
         if( images==null )throw new IllegalArgumentException( "images==null" );
-        sprites.clear();
-        images.forEach( im -> {
-            sprites.add(new Sprite(im));
-        });
+        List<Sprite> newSprites = new ArrayList<>();
+        int i=-1;
+        for( var im : images ){
+            i++;
+            if( im==null )throw new IllegalArgumentException("images["+i+"]==null");
+            newSprites.add(new Sprite(im));
+        }
+        setSprites(newSprites);
         return this;
     }
     //endregion
+    //region getSizes() : List<Size2D> - размеры кадров
+    private volatile List<Size2D> sizes;
+
+    /**
+     * Размеры кадров
+     * @return размеры кадров
+     */
+    protected List<Size2D> sizes(){
+        if( sizes!=null )return sizes;
+        synchronized( this ){
+            if( sizes!=null )return sizes;
+            return sizes;
+        }
+    }
+    //endregion
+
+    //region maxSize() - Максимальный размер кадра
+    protected volatile Size2D maxSize;
+
+    /**
+     * Возвращает максимальный размер кадра
+     * @return Максимальный размер кадра
+     */
+    public Size2D maxSize(){
+        if( maxSize!=null )return maxSize;
+        synchronized( this ){
+            if( maxSize!=null )return maxSize;
+            List<Size2D> sizes = sizes();
+            if( sizes.isEmpty() ){
+                maxSize = new MutableRect();
+            }else if( sizes.size()==1 ){
+                maxSize = sizes.get(0);
+            }else{
+                maxSize = sizes.stream().max(Comparator.comparingDouble(Size2D::area)).get();
+            }
+            return maxSize;
+        }
+    }
+    //endregion
+    //region minSize() - Минимальный размер кадра
+    protected volatile Size2D minSize;
+
+    /**
+     * Возвращает минимальный размер кадра
+     * @return Минимальный размер кадра
+     */
+    public Size2D minSize(){
+        if( minSize!=null )return minSize;
+        synchronized( this ){
+            if( minSize!=null )return minSize;
+            List<Size2D> sizes = sizes();
+            if( sizes.isEmpty() ){
+                minSize = new MutableRect();
+            }else if( sizes.size()==1 ){
+                minSize = sizes.get(0);
+            }else{
+                minSize = sizes.stream().min(Comparator.comparingDouble(Size2D::area)).get();
+            }
+            return minSize;
+        }
+    }
+    //endregion
+
     //region duration : double - продолжительность смены кадров
     private double duration;
 
@@ -174,11 +252,12 @@ public class SpriteLine implements PositionalDrawing {
     }
     //endregion
 
+    //region start()/stop()/isRunning()
     /**
      * В режиме анимации
      * @return true - режим анимации, присуствует смена кадров
      */
-    public boolean isRunning(){
+    public boolean isAnimationRunning(){
         if( started==0 )return false;
         return stopped == 0;
     }
@@ -187,7 +266,7 @@ public class SpriteLine implements PositionalDrawing {
      * Запуск анимации
      * @return Self ссылка
      */
-    public SpriteLine start(){
+    public SpriteLine startAnimation(){
         stopped = 0;
         started = System.nanoTime();
         return this;
@@ -197,7 +276,7 @@ public class SpriteLine implements PositionalDrawing {
      * Остановка анимации
      * @return Self ссылка
      */
-    public SpriteLine stop(){
+    public SpriteLine stopAnimation(){
         stopped = System.nanoTime();
         return this;
     }
@@ -229,6 +308,7 @@ public class SpriteLine implements PositionalDrawing {
 
         return frame;
     }
+    //endregion
 
     @Override
     public void draw(Graphics2D gs, double x, double y){
@@ -245,5 +325,9 @@ public class SpriteLine implements PositionalDrawing {
         if( s==null )return;
 
         s.draw(gs,x,y);
+    }
+
+    public SpriteFigura toFigure(){
+        return new SpriteFigura(this);
     }
 }

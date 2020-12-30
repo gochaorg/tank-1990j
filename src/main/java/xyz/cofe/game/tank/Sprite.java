@@ -26,6 +26,12 @@ public class Sprite implements PositionalDrawing {
      */
     protected final BufferedImage image;
 
+    /**
+     * Кадр
+     * @return кадр
+     */
+    public BufferedImage image(){ return image; }
+
     //region size : Size2D - размеры кадра
     private Size2D size;
 

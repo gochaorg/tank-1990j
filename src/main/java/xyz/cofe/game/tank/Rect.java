@@ -2,11 +2,42 @@ package xyz.cofe.game.tank;
 
 import xyz.cofe.num.BaseNumbers;
 
+/**
+ * Прямоугольная рамка с началом координат в левом,верхнем углу
+ */
 public interface Rect extends Size2D {
+    /**
+     * Левый край объекта
+     * @return Левый край объекта
+     */
     double left();
+
+    /**
+     * Верхний край объекта
+     * @return Верхний край объекта
+     */
     double top();
+
+    /**
+     * Правый край объекта
+     * @return Правый край объекта
+     */
     double right();
+
+    /**
+     * Нижний край объекта
+     * @return Нижний край объекта
+     */
     double bottom();
+
+    /**
+     * Создаение прямоугольника
+     * @param left Левый край объекта
+     * @param top Верхний край объекта
+     * @param right Правый край объекта
+     * @param bottom ижний край объекта
+     * @return прямоугольник
+     */
     public static Rect rect( double left, double top, double right, double bottom ){
         var swapLeftRight = right < left;
         var swapTopDown = bottom < top;
@@ -50,6 +81,15 @@ public interface Rect extends Size2D {
             }
         };
     }
+
+    /**
+     * Создаение прямоугольника
+     * @param left Левый край объекта
+     * @param top Верхний край объекта
+     * @param width ширина
+     * @param height высота
+     * @return прямоугольник
+     */
     public static Rect of( double left, double top, double width, double height ){
         var rgt = left + width;
         var btm = top + height;
