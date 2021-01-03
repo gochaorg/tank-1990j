@@ -40,7 +40,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     //region render player
     protected abstract Map<PlayerState, Map<Direction, SpriteLine>> sprites();
 
-    protected SpriteLine currentSpriteLine(){
+    public SpriteLine currentSpriteLine(){
         return sprites().get(getPlayerState()).get(getDirection());
     }
 

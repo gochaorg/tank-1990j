@@ -4,9 +4,7 @@ import xyz.cofe.game.tank.unt.SpriteFigura;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -282,6 +280,7 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
         stopped = System.nanoTime();
         return this;
     }
+    //endregion
 
     /**
      * Возвращает индекс текущего кадра
@@ -310,7 +309,14 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
 
         return frame;
     }
-    //endregion
+
+    public Optional<Sprite> sprite(){
+        int frame = frame();
+        if( frame<0 )return Optional.empty();
+        if( frame>=sprites.size() )return Optional.empty();
+        Sprite s = sprites.get(frame);
+        return s!=null ? Optional.of(s) : Optional.empty();
+    }
 
     @Override
     public void draw(Graphics2D gs, double x, double y){

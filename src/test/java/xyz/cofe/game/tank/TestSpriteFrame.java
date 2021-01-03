@@ -72,6 +72,8 @@ public class TestSpriteFrame extends JFrame {
 
         { playerOne.collision(bricks); }
 
+        Figura bullet = SpritesData.bullet.toSpriteLine().toFigure().location(10,300).startAnimation();
+
         protected void render(Graphics2D gs){
             gs.setPaint(Color.black);
             gs.fillRect(0,0,getWidth(),getHeight());
@@ -79,6 +81,22 @@ public class TestSpriteFrame extends JFrame {
             playerOne.run();
             playerOne.draw(gs);
             bricks.forEach(b->b.draw(gs));
+
+            bullet.draw(gs);
+            //draw(gs,playerOne,Color.red);
+            playerOne.currentSpriteLine().sprite().ifPresent( sp -> {
+                var r = new MutableRect(sp.bounds());
+                r.location(r.left()+playerOne.left(), r.top()+playerOne.top());
+                draw(gs,r,Color.green);
+            });
+        }
+
+        public static void draw(Graphics2D gs, Rect rect, Paint color){
+            if( gs==null )throw new IllegalArgumentException( "gs==null" );
+            if( rect==null )throw new IllegalArgumentException( "rect==null" );
+            if( color==null )throw new IllegalArgumentException( "color==null" );
+            gs.setPaint(color);
+            gs.drawRect( (int)rect.left(), (int)rect.top(), (int)rect.width(), (int)rect.height() );
         }
     }
 

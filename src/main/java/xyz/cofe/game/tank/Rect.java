@@ -146,27 +146,27 @@ public interface Rect extends Size2D {
         Double iY0 = null;
         Double iY1 = null;
 
-        if( b_x0 <= a_x0 && a_x0 < b_x1 ){
+        if( b_x0 <= a_x0 && a_x0 <= b_x1 ){
             iX0 = a_x0;
-        }else if( a_x0 <= b_x0 && b_x0 < a_x1 ){
+        }else if( a_x0 <= b_x0 && b_x0 <= a_x1 ){
             iX0 = b_x0;
         }
 
-        if( b_x0 <= a_x1 && a_x1 < b_x1 ){
+        if( b_x0 <= a_x1 && a_x1 <= b_x1 ){
             iX1 = a_x1;
-        }else if( a_x0 <= b_x1 && b_x1 < a_x1 ){
+        }else if( a_x0 <= b_x1 && b_x1 <= a_x1 ){
             iX1 = b_x1;
         }
 
-        if( b_y0 <= a_y0 && a_y0 < b_y1 ){
+        if( b_y0 <= a_y0 && a_y0 <= b_y1 ){
             iY0 = a_y0;
-        }else if( a_y0 <= b_y0 && b_y0 < a_y1 ){
+        }else if( a_y0 <= b_y0 && b_y0 <= a_y1 ){
             iY0 = b_y0;
         }
 
-        if( b_y0 <= a_y1 && a_y1 < b_y1 ){
+        if( b_y0 <= a_y1 && a_y1 <= b_y1 ){
             iY1 = a_y1;
-        }else if( a_y0 <= b_y1 && b_y1 < a_y1 ){
+        }else if( a_y0 <= b_y1 && b_y1 <= a_y1 ){
             iY1 = b_y1;
         }
 

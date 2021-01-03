@@ -122,4 +122,9 @@ public class MutableRect implements Rect, Moveable<MutableRect> {
     public double height(){
         return Math.abs(top - bottom);
     }
+
+    @Override
+    public String toString(){
+        return "MutableRect{ left="+left()+" top="+top()+" right="+right()+" bottom="+bottom()+" w="+width()+" h="+height()+" }";
+    }
 }
