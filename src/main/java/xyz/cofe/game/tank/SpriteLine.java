@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -149,6 +150,7 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
         if( sizes!=null )return sizes;
         synchronized( this ){
             if( sizes!=null )return sizes;
+            sizes = sprites.stream().map(Sprite::size).collect(Collectors.toList());
             return sizes;
         }
     }

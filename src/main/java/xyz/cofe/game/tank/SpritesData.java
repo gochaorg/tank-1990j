@@ -213,4 +213,8 @@ public class SpritesData {
         return image;
     }
     //endregion
+
+    public SpriteLine toSpriteLine(){
+        return new SpriteLine().images(images()).duration(duration);
+    }
 }

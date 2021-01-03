@@ -51,7 +51,7 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
      */
     @Override
     public double width(){
-        return sprite().image().getWidth();
+        return sprite().image().getWidth() * 2;
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
      */
     @Override
     public double height(){
-        return sprite().image().getHeight();
+        return sprite().image().getHeight() * 2;
     }
     //endregion
 
@@ -68,8 +68,13 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
     public void draw(Graphics2D gs){
         if( gs==null )throw new IllegalArgumentException( "gs==null" );
         if( isUpLeft() ) sprite().draw(gs, left(), top());
-        if( isUpRight() ) sprite().draw(gs, left()+width(), top());
-        if( isBottomLeft() ) sprite().draw(gs, left(), top()+height());
-        if( isBottomRight() ) sprite().draw(gs, left()+width(), top()+height());
+        if( isUpRight() ) sprite().draw(gs, left()+sprite().image().getWidth(), top());
+        if( isBottomLeft() ) sprite().draw(gs, left(), top()+sprite().image().getHeight());
+        if( isBottomRight() ) sprite().draw(gs, left()+sprite().image().getWidth(), top()+sprite().image().getHeight());
+    }
+
+    @Override
+    public String toString(){
+        return this.getClass().getSimpleName()+"{ x0="+left()+" y0="+top()+" x1="+right()+" y1="+bottom()+" w="+width()+" h="+height()+"}";
     }
 }

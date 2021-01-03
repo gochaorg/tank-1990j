@@ -1,5 +1,6 @@
 package xyz.cofe.game.tank.unt;
 
+import xyz.cofe.game.tank.Animated;
 import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.Moveable;
 import xyz.cofe.game.tank.Rect;
