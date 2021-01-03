@@ -56,8 +56,8 @@ public class Sprite implements PositionalDrawing {
         if( bounds!=null )return bounds;
 
         WritableRaster raster = image.getRaster();
-        List<Integer> linesVert_xAxis = transparentVert(raster);
-        List<Integer> linesHorz_yAxis = transparentHoriz(raster);
+        List<Integer> linesVert_xAxis = nonTransparentVert(raster);
+        List<Integer> linesHorz_yAxis = nonTransparentHoriz(raster);
 
         int x0 = 0;
         int y0 = 0;
@@ -77,7 +77,7 @@ public class Sprite implements PositionalDrawing {
         bounds = Rect.rect(x0,y0,x1,y1);
         return bounds;
     }
-    private List<Integer> transparentVert(WritableRaster raster){
+    private List<Integer> nonTransparentVert(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
         int a = 3;
 
@@ -87,14 +87,14 @@ public class Sprite implements PositionalDrawing {
         for( int x=0; x<w; x++ ){
             alphaSum.set(0);
             vertPixels(raster, x, rgba -> alphaSum.addAndGet(rgba[a]));
-            if( alphaSum.get()==0 ){
+            if( alphaSum.get()>0 ){
                 lines.add(x);
             }
         }
 
         return lines;
     }
-    private List<Integer> transparentHoriz(WritableRaster raster){
+    private List<Integer> nonTransparentHoriz(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
         int a = 3;
 
@@ -104,7 +104,7 @@ public class Sprite implements PositionalDrawing {
         for( int y=0; y<h; y++ ){
             alphaSum.set(0);
             horizPixels(raster, y, rgba -> alphaSum.addAndGet(rgba[a]));
-            if( alphaSum.get()==0 ){
+            if( alphaSum.get()>0 ){
                 lines.add(y);
             }
         }
