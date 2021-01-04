@@ -77,6 +77,12 @@ public class Sprite implements PositionalDrawing {
         bounds = Rect.rect(x0,y0,x1,y1);
         return bounds;
     }
+
+    /**
+     * Возвращает индексы вертикальных линий (ось X) чьи значение alpha канала отличны от 0
+     * @param raster изображение
+     * @return индексы верт. линий (ось X)
+     */
     private List<Integer> nonTransparentVert(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
         int a = 3;
@@ -94,6 +100,12 @@ public class Sprite implements PositionalDrawing {
 
         return lines;
     }
+
+    /**
+     * Возвращает индексы горизонтальных линий (ось Y) чьи значение alpha канала отличны от 0
+     * @param raster изображение
+     * @return индексы горизонтальных линий (ось Y)
+     */
     private List<Integer> nonTransparentHoriz(WritableRaster raster){
         List<Integer> lines = new ArrayList<>();
         int a = 3;

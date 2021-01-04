@@ -95,23 +95,51 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         }
     }
 
+    public void stop(){
+        stopAnimation();
+        job = null;
+    }
+
+    //region collision - Список объектов возможных коллизий
     protected Iterable<? extends Figura<?>> collision;
     public Iterable<? extends Figura<?>> collision(){ return collision; }
-    @SuppressWarnings({"unchecked", "SpellCheckingInspection"})
+    @SuppressWarnings({"unchecked", "SpellCheckingInspection", "UnusedReturnValue"})
     public SELF collision(Iterable<? extends Figura<?>> collizion){
         this.collision = collizion;
         return (SELF) this;
     }
+    //endregion
 
+    //region Переммещение
+    /**
+     * Время начала движения, момент вызова move() - System.currentTimeMillis()
+     */
     protected long moveStartedTime;
+
+    /**
+     * Следущее время когда необходимо передвинуть объект - System.currentTimeMillis()
+     */
     protected long moveNextTime;
+
+    /**
+     * Через какой промежуток времени необходимо передвинуть момент (moveNextTime = moveNextTime + moveDuration)
+     */
     protected long moveDuration;
     protected double moveStartedX;
     protected double moveStartedY;
     protected double moveStartedSpeedPixelPerSec;
+
+    /**
+     * Смещение на которое необходимо передвинуть объект, спустя заданное время {@link #moveNextTime}, {@link #moveDuration}
+     */
     protected double moveOffset;
     protected Consumer1<Moveable<?>> movingFn;
 
+    /**
+     * Перемещение объекта
+     * @param direction направление движения
+     * @param speedPixelPerSec скорость - кол-во пикселей в секунду
+     */
     public void move(Direction direction, double speedPixelPerSec){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
         setDirection(direction);
@@ -122,9 +150,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
 
         // Движение не чаще 40 мс
         moveDuration = 40;
-        double addPerSec = speedPixelPerSec;
-        double addPer20MSec = addPerSec * 0.001 * ((double)moveDuration);
-        moveOffset = addPer20MSec;
+        moveOffset = speedPixelPerSec * 0.001 * ((double)moveDuration);
         moveNextTime = moveStartedTime + moveDuration;
         switch( direction ){
             case UP:
@@ -168,13 +194,14 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         };
     }
 
-    public void stop(){
-        stopAnimation();
-        job = null;
-    }
-
+    /**
+     * Произошла коллизия
+     * @param collision где произошла коллизия
+     * @param withObject с кем произошла коллизия
+     */
     protected void collision( Rect collision, Moveable<?> withObject ){
         System.out.println("collision detect at "+collision+" with "+withObject);
         stop();
     }
+    //endregion
 }
