@@ -6,6 +6,7 @@ import xyz.cofe.gui.swing.SwingListener;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestSpriteFrame extends JFrame {
@@ -32,6 +33,8 @@ public class TestSpriteFrame extends JFrame {
             }
         }
 
+        List<Bullet> bullets = new ArrayList<>();
+
         private PlayerOne playerOne = new PlayerOne().location(10,50 ).startAnimation();
 
         {
@@ -54,6 +57,9 @@ public class TestSpriteFrame extends JFrame {
                     case KeyEvent.VK_3: playerOne.setPlayerState(PlayerState.Level2); break;
                     case KeyEvent.VK_4: playerOne.setPlayerState(PlayerState.Level3); break;
                     case KeyEvent.VK_Z: playerOne.stop(); break;
+                    case KeyEvent.VK_SPACE:
+                        bullets.add(playerOne.createBullet());
+                        break;
                     default:
                 }
             });
@@ -72,8 +78,6 @@ public class TestSpriteFrame extends JFrame {
 
         { playerOne.collision(bricks); }
 
-        Figura bullet = SpritesData.bullet.toSpriteLine().toFigure().location(10,300).startAnimation();
-
         protected void render(Graphics2D gs){
             gs.setPaint(Color.black);
             gs.fillRect(0,0,getWidth(),getHeight());
@@ -82,13 +86,13 @@ public class TestSpriteFrame extends JFrame {
             playerOne.draw(gs);
             bricks.forEach(b->b.draw(gs));
 
-            bullet.draw(gs);
+            bullets.forEach(b->b.draw(gs));
             //draw(gs,playerOne,Color.red);
-            playerOne.currentSpriteLine().sprite().ifPresent( sp -> {
-                var r = new MutableRect(sp.bounds());
-                r.location(r.left()+playerOne.left(), r.top()+playerOne.top());
-                draw(gs,r,Color.green);
-            });
+//            playerOne.currentSpriteLine().sprite().ifPresent( sp -> {
+//                var r = new MutableRect(sp.bounds());
+//                r.location(r.left()+playerOne.left(), r.top()+playerOne.top());
+//                draw(gs,r,Color.green);
+//            });
         }
 
         public static void draw(Graphics2D gs, Rect rect, Paint color){

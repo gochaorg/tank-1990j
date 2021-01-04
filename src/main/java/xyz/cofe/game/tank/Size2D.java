@@ -35,6 +35,11 @@ public interface Size2D {
             public double height(){
                 return height;
             }
+
+            @Override
+            public String toString(){
+                return "Size{ w="+width+" h="+height+" }";
+            }
         };
     }
 }

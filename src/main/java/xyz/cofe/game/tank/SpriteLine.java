@@ -59,6 +59,12 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
         started = samples.getStarted();
         stopped = samples.getStopped();
         loop = samples.isLoop();
+        frame = samples.frame();
+        startedFrame = samples.startedFrame;
+        maxSize = samples.maxSize;
+        minSize = samples.minSize;
+        sizes = samples.sizes;
+
     }
 
     /**
@@ -82,6 +88,11 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
     private void onSpritesChanged(){
         sizes = null;
         maxSize = null;
+        minSize = null;
+        started = 0;
+        startedFrame = 0;
+        stopped = 0;
+        frame = 0;
     }
 
     /**
@@ -117,6 +128,16 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
         if( sprites==null )throw new IllegalArgumentException( "sprites==null" );
         setSprites(sprites);
         return this;
+    }
+
+    public List<Sprite> sprites(){
+        return getSprites();
+    }
+
+    public Sprite sprite(int index){
+        if( index<0 )throw new IllegalArgumentException( "index<0" );
+        if( index>=sprites.size() )throw new IllegalArgumentException( "index>=sprites.size()" );
+        return sprites.get(index);
     }
 
     /**
@@ -252,6 +273,9 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
     }
     //endregion
 
+    private int frame = 0;
+    private int startedFrame = 0;
+
     //region start()/stop()/isRunning()
     /**
      * В режиме анимации
@@ -268,6 +292,7 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
      */
     public SpriteLine startAnimation(){
         stopped = 0;
+        startedFrame = 0;
         started = System.nanoTime();
         return this;
     }
@@ -289,25 +314,39 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
     public int frame(){
         int spriteCount = sprites.size();
         if( spriteCount<1 )return -1;
-        if( spriteCount==1 || started==0 ){
-            return 0;
+        if( spriteCount==1 )return 0;
+        if( started==0 ){
+            if( frame>spriteCount )return frame%spriteCount;
+            return frame;
         }
 
         long tnow = System.nanoTime();
         if( stopped>0 ){
-            tnow = stopped;
+            return frame;
         }
 
         long tdiff = Math.abs(tnow - started);
         long sec = 1_000_000_000;
         long frameDuration = (long)(sec * duration);
-        int frame = frameDuration>0 ? ((int)( tdiff / frameDuration )) : 0;
+
+        frame = frameDuration>0 ? ((int)( tdiff / frameDuration )) : 0;
+        frame += startedFrame;
 
         if( frame>=spriteCount ){
             frame = loop ? frame % spriteCount : spriteCount-1;
         }
 
         return frame;
+    }
+
+    public SpriteLine frame(int frame){
+        if( frame<0 )throw new IllegalArgumentException( "frame(="+frame+")<0" );
+        if( frame>= sprites.size() )throw new IllegalArgumentException( "frame(="+frame+")>=sprites.size()="+sprites.size() );
+        if( isAnimationRunning() ){
+            throw new IllegalStateException("animation is runnig, call stopAnimation() before");
+        }
+        this.frame = frame;
+        return this;
     }
 
     public Optional<Sprite> sprite(){

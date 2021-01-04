@@ -84,7 +84,7 @@ public interface Rect extends Size2D {
 
             @Override
             public String toString(){
-                return "Rect{ left="+x0+" right="+x1+" top="+y0+" bottom="+y1+" w="+w+" h="+h+" }";
+                return "Rect{ left="+x0+" top="+y0+" right="+x1+" bottom="+y1+" w="+w+" h="+h+" }";
             }
         };
     }

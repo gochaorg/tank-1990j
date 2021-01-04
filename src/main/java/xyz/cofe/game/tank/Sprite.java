@@ -66,7 +66,7 @@ public class Sprite implements PositionalDrawing {
 
         if( linesVert_xAxis.size()>0 ){
             x0 = linesVert_xAxis.get(0);
-            x1 = linesVert_xAxis.get(linesHorz_yAxis.size()-1);
+            x1 = linesVert_xAxis.get(linesVert_xAxis.size()-1);
         }
 
         if( linesHorz_yAxis.size()>0 ){

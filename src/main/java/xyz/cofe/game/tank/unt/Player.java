@@ -1,7 +1,6 @@
 package xyz.cofe.game.tank.unt;
 
 import xyz.cofe.fn.Consumer1;
-import xyz.cofe.fn.Fn1;
 import xyz.cofe.game.tank.*;
 import xyz.cofe.iter.Eterable;
 
@@ -27,21 +26,23 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     //endregion
     //region direction
     protected Direction direction = Direction.RIGHT;
-    public Direction getDirection(){
+    public Direction direction(){
         return direction;
     }
-    public void setDirection(Direction direction){
+    @SuppressWarnings({"unchecked", "UnusedReturnValue"})
+    public SELF direction(Direction direction){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
         currentSpriteLine().stopAnimation();
         this.direction = direction;
         currentSpriteLine().startAnimation();
+        return (SELF) this;
     }
     //endregion
     //region render player
     protected abstract Map<PlayerState, Map<Direction, SpriteLine>> sprites();
 
     public SpriteLine currentSpriteLine(){
-        return sprites().get(getPlayerState()).get(getDirection());
+        return sprites().get(getPlayerState()).get(direction());
     }
 
     protected Eterable<SpriteLine> spriteLines(){
@@ -85,6 +86,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     }
     //endregion
 
+    //region run()
     protected Runnable job;
 
     @Override
@@ -94,7 +96,11 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
             r.run();
         }
     }
+    //endregion
 
+    /**
+     * Остановка танка
+     */
     public void stop(){
         stopAnimation();
         job = null;
@@ -142,7 +148,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
      */
     public void move(Direction direction, double speedPixelPerSec){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
-        setDirection(direction);
+        direction(direction);
         moveStartedTime = System.currentTimeMillis();
         moveStartedX = left();
         moveStartedY = top();
@@ -204,4 +210,28 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         stop();
     }
     //endregion
+
+    public Bullet createBullet(){
+        var blt = new Bullet().direction(direction());
+
+        var myXCenter = width() / 2 + left();
+        var myYCenter = height() / 2 + top();
+
+        switch( direction() ){
+            case UP:
+                blt.location( myXCenter-blt.width()/2, myYCenter-height()/2-blt.height() );
+                break;
+            case DOWN:
+                blt.location( myXCenter-blt.width()/2, myYCenter+height()/2+blt.height()*0 );
+                break;
+            case LEFT:
+                blt.location( myXCenter-width()/2-blt.width(), myYCenter-blt.height()/2 );
+                break;
+            case RIGHT:
+                blt.location( myXCenter+width()/2+blt.width()*0, myYCenter-blt.height()/2 );
+                break;
+        }
+
+        return blt;
+    }
 }
