@@ -49,15 +49,15 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
         listeners.removeAllListeners();
     }
 
-    public void fireJobEvent(JobEvent<SELF> event){
+    protected void fireJobEvent(JobEvent<SELF> event){
         listeners.fireEvent(event);
     }
 
-    public void addJobEvent(JobEvent<SELF> ev){
+    protected void addJobEvent(JobEvent<SELF> ev){
         listeners.addEvent(ev);
     }
 
-    public void runJobEventQueue(){
+    protected void runJobEventQueue(){
         listeners.runEventQueue();
     }
 
@@ -89,4 +89,19 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
 
     @Override
     public abstract void run();
+
+    @SuppressWarnings("unchecked")
+    protected void fireStarted(){
+        fireJobEvent(new JobStarted<>((SELF) this));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void fireStopped(){
+        fireJobEvent(new JobStopped<>((SELF) this));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void fireExecuted(){
+        fireJobEvent(new JobExecuted<>((SELF) this));
+    }
 }

@@ -124,12 +124,14 @@ public class Moving extends AbstractJob<Moving> {
         offset = speed * 0.001 * ((double) duration);
         runNextTime = startedTime + duration;
 
+        fireStarted();
         return this;
     }
 
     @Override
     public Moving stop(){
         this.stoppedTime = System.currentTimeMillis();
+        fireStopped();
         return this;
     }
 
@@ -167,9 +169,11 @@ public class Moving extends AbstractJob<Moving> {
 
             if( collisionCount<1 ){
                 move(gu);
+                fireExecuted();
             }
         }else{
             move(gu);
+            fireExecuted();
         }
     }
 
