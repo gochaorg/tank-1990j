@@ -2,6 +2,8 @@ package xyz.cofe.game.tank.unt;
 
 import xyz.cofe.fn.Consumer1;
 import xyz.cofe.game.tank.*;
+import xyz.cofe.game.tank.geom.MutableRect;
+import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.iter.Eterable;
 
 import java.awt.Graphics2D;
@@ -205,7 +207,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
      * @param collision где произошла коллизия
      * @param withObject с кем произошла коллизия
      */
-    protected void collision( Rect collision, Moveable<?> withObject ){
+    protected void collision(Rect collision, Moveable<?> withObject ){
         System.out.println("collision detect at "+collision+" with "+withObject);
         stop();
     }

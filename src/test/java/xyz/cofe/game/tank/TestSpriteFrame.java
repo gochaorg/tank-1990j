@@ -1,5 +1,6 @@
 package xyz.cofe.game.tank;
 
+import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.unt.*;
 import xyz.cofe.gui.swing.SwingListener;
 

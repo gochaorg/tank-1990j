@@ -1,7 +1,7 @@
 package xyz.cofe.game.tank.unt;
 
-import xyz.cofe.game.tank.MutableRect;
-import xyz.cofe.game.tank.Rect;
+import xyz.cofe.game.tank.geom.MutableRect;
+import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.SpriteLine;
 import xyz.cofe.game.tank.SpritesData;
 

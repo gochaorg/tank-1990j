@@ -1,6 +1,4 @@
-package xyz.cofe.game.tank;
-
-import xyz.cofe.num.BaseNumbers;
+package xyz.cofe.game.tank.geom;
 
 import java.util.Optional;
 

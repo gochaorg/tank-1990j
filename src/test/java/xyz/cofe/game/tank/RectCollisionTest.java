@@ -1,8 +1,8 @@
 package xyz.cofe.game.tank;
 
-import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import xyz.cofe.game.tank.geom.Rect;
 
 public class RectCollisionTest {
     @Test

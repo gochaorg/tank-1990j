@@ -1,4 +1,6 @@
-package xyz.cofe.game.tank;
+package xyz.cofe.game.tank.geom;
+
+import xyz.cofe.game.tank.Moveable;
 
 /**
  * Рамка которую можно двигать

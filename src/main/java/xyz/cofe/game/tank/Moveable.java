@@ -1,5 +1,7 @@
 package xyz.cofe.game.tank;
 
+import xyz.cofe.game.tank.geom.Rect;
+
 /**
  * Размещение объекта
  */

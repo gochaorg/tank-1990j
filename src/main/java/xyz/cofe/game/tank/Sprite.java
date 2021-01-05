@@ -1,5 +1,8 @@
 package xyz.cofe.game.tank;
 
+import xyz.cofe.game.tank.geom.Rect;
+import xyz.cofe.game.tank.geom.Size2D;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;

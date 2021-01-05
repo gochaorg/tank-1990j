@@ -1,4 +1,4 @@
-package xyz.cofe.game.tank;
+package xyz.cofe.game.tank.geom;
 
 /**
  * Возвращает размер объекта

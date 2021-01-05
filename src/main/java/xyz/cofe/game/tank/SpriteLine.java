@@ -1,5 +1,7 @@
 package xyz.cofe.game.tank;
 
+import xyz.cofe.game.tank.geom.MutableRect;
+import xyz.cofe.game.tank.geom.Size2D;
 import xyz.cofe.game.tank.unt.SpriteFigura;
 
 import java.awt.*;
@@ -8,7 +10,6 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * "Раскадровка" - последовательность спрайтов
