@@ -8,7 +8,7 @@ import xyz.cofe.game.tank.SpritesData;
 import java.awt.Graphics2D;
 import java.util.Map;
 
-public class Bullet extends Figura<Bullet> {
+public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
     private static final int UP_FRAME = 0;
     private static final int DOWN_FRAME = 2;
     private static final int LEFT_FRAME = 3;

@@ -13,7 +13,7 @@ import java.util.Map;
  * Некий игрок
  * @param <SELF> дочерний класс
  */
-public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> implements GameUnit<SELF> {
+public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> implements GameUnit<SELF>, Directed<SELF> {
     //region playerState
     protected PlayerState playerState = PlayerState.Level0;
     public PlayerState getPlayerState(){
