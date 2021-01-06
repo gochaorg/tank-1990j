@@ -5,7 +5,7 @@ import xyz.cofe.ecolls.Closeables;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public interface Job<SELF extends Job<SELF>> {
+public interface Job<SELF extends Job<SELF>> extends Runnable {
     SELF start();
     SELF stop();
     boolean isRunning();

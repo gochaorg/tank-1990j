@@ -10,6 +10,7 @@ import xyz.cofe.game.tank.unt.Direction;
 import xyz.cofe.game.tank.unt.Figura;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Задача перемещения игрового объекта
@@ -18,6 +19,12 @@ public class Moving extends AbstractJob<Moving> {
     public Moving(GameUnit<?> gameUnit){
         if( gameUnit==null )throw new IllegalArgumentException( "gameUnit==null" );
         this.gameUnit = gameUnit;
+    }
+
+    public Moving configure(Consumer<Moving> conf){
+        if( conf==null )throw new IllegalArgumentException( "conf==null" );
+        conf.accept(this);
+        return this;
     }
 
     private GameUnit<?> gameUnit;
@@ -130,8 +137,10 @@ public class Moving extends AbstractJob<Moving> {
 
     @Override
     public Moving stop(){
-        this.stoppedTime = System.currentTimeMillis();
-        fireStopped();
+        if( isRunning() ){
+            this.stoppedTime = System.currentTimeMillis();
+            fireStopped();
+        }
         return this;
     }
 

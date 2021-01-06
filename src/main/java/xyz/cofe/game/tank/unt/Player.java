@@ -4,6 +4,8 @@ import xyz.cofe.fn.Consumer1;
 import xyz.cofe.game.tank.*;
 import xyz.cofe.game.tank.geom.MutableRect;
 import xyz.cofe.game.tank.geom.Rect;
+import xyz.cofe.game.tank.job.Job;
+import xyz.cofe.game.tank.job.Moving;
 import xyz.cofe.iter.Eterable;
 
 import java.awt.Graphics2D;
@@ -89,7 +91,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     //endregion
 
     //region run()
-    protected Runnable job;
+    protected Job<?> job;
 
     @Override
     public void run(){
@@ -105,44 +107,25 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
      */
     public void stop(){
         stopAnimation();
+        if( job!=null ){
+            job.stop();
+        }
         job = null;
     }
 
-    //region collision - Список объектов возможных коллизий
-    protected Iterable<? extends Figura<?>> collision;
-    public Iterable<? extends Figura<?>> collision(){ return collision; }
-    @SuppressWarnings({"unchecked", "SpellCheckingInspection", "UnusedReturnValue"})
-    public SELF collision(Iterable<? extends Figura<?>> collizion){
-        this.collision = collizion;
-        return (SELF) this;
+    protected final Moving moving = new Moving(this).onStopped(
+        ev -> {
+            System.out.println("stopped event");
+            stop();
+        }
+    );
+
+    public Player<SELF> collision(Iterable<? extends Figura<?>> collizion){
+        moving.collision(collizion);
+        return this;
     }
-    //endregion
 
     //region Переммещение
-    /**
-     * Время начала движения, момент вызова move() - System.currentTimeMillis()
-     */
-    protected long moveStartedTime;
-
-    /**
-     * Следущее время когда необходимо передвинуть объект - System.currentTimeMillis()
-     */
-    protected long moveNextTime;
-
-    /**
-     * Через какой промежуток времени необходимо передвинуть момент (moveNextTime = moveNextTime + moveDuration)
-     */
-    protected long moveDuration;
-    protected double moveStartedX;
-    protected double moveStartedY;
-    protected double moveStartedSpeedPixelPerSec;
-
-    /**
-     * Смещение на которое необходимо передвинуть объект, спустя заданное время {@link #moveNextTime}, {@link #moveDuration}
-     */
-    protected double moveOffset;
-    protected Consumer1<Moveable<?>> movingFn;
-
     /**
      * Перемещение объекта
      * @param direction направление движения
@@ -151,66 +134,10 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     public void move(Direction direction, double speedPixelPerSec){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
         direction(direction);
-        moveStartedTime = System.currentTimeMillis();
-        moveStartedX = left();
-        moveStartedY = top();
-        moveStartedSpeedPixelPerSec = speedPixelPerSec;
 
-        // Движение не чаще 40 мс
-        moveDuration = 40;
-        moveOffset = speedPixelPerSec * 0.001 * ((double)moveDuration);
-        moveNextTime = moveStartedTime + moveDuration;
-        switch( direction ){
-            case UP:
-                movingFn = m -> m.location( m.left(), m.top()-moveOffset ); break;
-            case DOWN:
-                movingFn = m -> m.location( m.left(), m.top()+moveOffset ); break;
-            case LEFT:
-                movingFn = m -> m.location( m.left()-moveOffset, m.top() ); break;
-            case RIGHT:
-                movingFn = m -> m.location( m.left()+moveOffset, m.top() ); break;
-        }
-
-        job = () -> {
-            long now = System.currentTimeMillis();
-            if( moveNextTime>now )return;
-            moveNextTime = now + moveDuration;
-
-            if( movingFn!=null ){
-                if( collision!=null ){
-                    var target = new MutableRect(this);
-                    movingFn.accept(target);
-
-                    int collisionCount = 0;
-                    for( var crect : collision ){
-                        if( crect!=null ){
-                            var collsn = target.intersection(crect);
-                            if( collsn.isPresent() ){
-                                collision(collsn.get(), crect);
-                                collisionCount++;
-                            }
-                        }
-                    }
-
-                    if( collisionCount<1 ){
-                        movingFn.accept(this);
-                    }
-                }else{
-                    movingFn.accept(this);
-                }
-            }
-        };
+        job = moving.direction(direction).speed(speedPixelPerSec).start();
     }
 
-    /**
-     * Произошла коллизия
-     * @param collision где произошла коллизия
-     * @param withObject с кем произошла коллизия
-     */
-    protected void collision(Rect collision, Moveable<?> withObject ){
-        System.out.println("collision detect at "+collision+" with "+withObject);
-        stop();
-    }
     //endregion
 
     public Bullet createBullet(){

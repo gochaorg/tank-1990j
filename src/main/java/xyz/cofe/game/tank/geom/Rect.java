@@ -111,6 +111,11 @@ public interface Rect extends Size2D {
         return left() <= x && x < right() && top() <= y && y< bottom();
     }
 
+    public default boolean contains( Point p ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        return contains(p.x(), p.y());
+    }
+
     /**
      * Пересечение квадратов
      * @param rect кавдрат

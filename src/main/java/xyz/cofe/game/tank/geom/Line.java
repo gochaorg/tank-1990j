@@ -41,6 +41,14 @@ public interface Line {
      */
     double y1();
 
+    default Point firstPoint(){
+        return Point.of(x0(),y0());
+    }
+
+    default Point secondPoint(){
+        return Point.of(x1(),y1());
+    }
+
     /**
      * Создание линии
      * @param x0 Начало линии, координаты
@@ -124,6 +132,50 @@ public interface Line {
     }
 
     /**
+     * Пересечение прямых
+     * @param line вторая прямая
+     * @param asSegments линии являются ограничеными сегментами
+     * @return точка пересечения, если есть
+     */
+    public default Optional<Point> intersection( Line line, boolean asSegments ){
+        if( line==null )throw new IllegalArgumentException( "line==null" );
+        // https://ru.wikipedia.org/wiki/%D0%9F%D0%B5%D1%80%D0%B5%D1%81%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%BF%D1%80%D1%8F%D0%BC%D1%8B%D1%85
+
+        // Делимое (dividend, numerator)
+        double numerator;
+
+        // Если две прямые параллельны или совпадают, знаменатель обращается в нуль:
+        // Знаменатель
+        double x1 = x0();
+        double x2 = x1();
+        double x3 = line.x0();
+        double x4 = line.x1();
+
+        double y1 = y0();
+        double y2 = y1();
+        double y3 = line.y0();
+        double y4 = line.y1();
+
+        double divider = ((x1- x2)*(y3-y4))-((y1-y2)*(x3-x4));
+        if( divider==0 )return Optional.empty();
+
+        double x = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / divider;
+        double y = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / divider;
+
+        var pt = Point.of(x,y);
+
+        if( asSegments ){
+            var r1 = toRect();
+            if( !r1.contains(pt) )return Optional.empty();
+
+            var r2 = line.toRect();
+            if( !r2.contains(pt) )return Optional.empty();
+        }
+
+        return Optional.of(pt);
+    }
+
+    /**
      * Получение коэффициентов прямой A,B,C
      * @return кооэфициенты: A*x+B*y+C = 0
      */
@@ -192,5 +244,61 @@ public interface Line {
         // x = (-C - B*y) / A
         var x = (-factrs.c() - factrs.b()*y) / factrs.a();
         return Optional.of(Point.of(x,y));
+    }
+
+    public default Rect toRect(){
+        return Rect.rect( x0(), y0(), x1(), y1() );
+    }
+
+    public default Point nearestPoint( Point p, boolean asSegment ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        var f = factors();
+
+        if( f.a()==0 && f.b()==0 ){
+            return Point.of(
+                (x0()-x1())/2,
+                (y0()-y1())/2
+            );
+        }
+
+        double d = f.a()*f.a() + f.b()*f.b();
+        double x = ( f.b() * ( f.b()*p.x() - f.a()*p.y() ) - f.a()*f.c() ) / d;
+        double y = ( f.a() * ( -f.b()*p.x() + f.a()*p.y() ) - f.b()*f.c() ) / d;
+        var pt = Point.of(x,y);
+
+        if( asSegment ){
+            if( toRect().contains(pt) ){
+                return pt;
+            }else{
+                var p1 = firstPoint();
+                var p2 = secondPoint();
+
+                var d1x = (pt.x() - p1.x());
+                var d1y = (pt.x() - p1.x());
+
+                var d2x = (pt.x() - p2.x());
+                var d2y = (pt.x() - p2.x());
+
+                var d1 = d1x*d1x + d1y*d1y;
+                var d2 = d2x*d2x + d2y*d2y;
+
+                if( d1<d2 ){
+                    return p1;
+                }else{
+                    return p2;
+                }
+            }
+        }
+
+        return pt;
+    }
+
+    public default double length(){
+        double xd = x0() - x1();
+        double yd = y0() - y1();
+        if( xd==0 && yd==0 ){
+            return 0;
+        }
+        return Math.sqrt( xd*xd + yd*yd );
     }
 }

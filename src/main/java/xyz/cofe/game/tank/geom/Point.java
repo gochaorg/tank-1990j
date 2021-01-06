@@ -40,4 +40,32 @@ public interface Point {
             }
         };
     }
+
+    default Line toLine( double x, double y ){
+        return Line.of(x(), y(), x, y);
+    }
+
+    default Line toLine( Point p ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        return Line.of(x(), y(), p.x(), p.y() );
+    }
+
+    default double distance( double x, double y ){
+        double xd = x() - x;
+        double yd = y() - y;
+        if( xd==0 && yd==0 ){
+            return 0;
+        }
+        return Math.sqrt( xd*xd + yd*yd );
+    }
+
+    default double distance( Point p ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        double xd = x() - p.x();
+        double yd = y() - p.y();
+        if( xd==0 && yd==0 ){
+            return 0;
+        }
+        return Math.sqrt( xd*xd + yd*yd );
+    }
 }
