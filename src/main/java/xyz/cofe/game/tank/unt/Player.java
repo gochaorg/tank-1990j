@@ -113,12 +113,14 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         job = null;
     }
 
-    protected final Moving moving = new Moving(this).onStopped(
-        ev -> {
+    protected final Moving<SELF> moving = new Moving<SELF>((SELF) this)
+        .onStopped( ev -> {
             System.out.println("stopped event");
             stop();
-        }
-    );
+        })
+        .onCollision( ev -> {
+            System.out.println("collision "+ev.getRect()+" with "+ev.getWithFigura());
+        });
 
     public Player<SELF> collision(Iterable<? extends Figura<?>> collizion){
         moving.collision(collizion);

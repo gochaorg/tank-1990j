@@ -1,6 +1,6 @@
 package xyz.cofe.game.tank.job;
 
-import xyz.cofe.ecolls.ListenersHelper;
+import xyz.cofe.ecolls.Closeables;
 import xyz.cofe.game.tank.GameUnit;
 import xyz.cofe.game.tank.Moveable;
 import xyz.cofe.game.tank.geom.MutableRect;
@@ -9,26 +9,34 @@ import xyz.cofe.game.tank.unt.Directed;
 import xyz.cofe.game.tank.unt.Direction;
 import xyz.cofe.game.tank.unt.Figura;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
  * Задача перемещения игрового объекта
  */
-public class Moving extends AbstractJob<Moving> {
-    public Moving(GameUnit<?> gameUnit){
+public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> {
+    /**
+     * Создание задачи передвижения игрового объекта
+     * @param gameUnit игровой объект
+     */
+    public Moving(UNT gameUnit){
         if( gameUnit==null )throw new IllegalArgumentException( "gameUnit==null" );
         this.gameUnit = gameUnit;
     }
 
-    public Moving configure(Consumer<Moving> conf){
+    public Moving<UNT> configure(Consumer<Moving<UNT>> conf){
         if( conf==null )throw new IllegalArgumentException( "conf==null" );
         conf.accept(this);
         return this;
     }
 
-    private GameUnit<?> gameUnit;
-    public GameUnit<?> gameUnit(){ return gameUnit; }
+    private UNT gameUnit;
+
+    /**
+     * Возвращает игровой объект
+     * @return Игровой объект
+     */
+    public UNT gameUnit(){ return gameUnit; }
 
     //region speed - Скорость - кол-во пикселей в секунду
     /**
@@ -36,14 +44,27 @@ public class Moving extends AbstractJob<Moving> {
      */
     protected double speed = 10;
 
+    /**
+     * Возвращает скорость - кол-во пикселей в секунду
+     * @return скорость
+     */
     public double getSpeed(){ return speed; }
 
+    /**
+     * Указывает скорость - кол-во пикселей в секунду
+     * @param speed скорость
+     */
     public void setSpeed(double speed){
         if( isRunning() )throw new AlreadyRunnedError();
         this.speed = speed;
     }
 
-    public Moving speed(double speed){
+    /**
+     * Указывает скорость - кол-во пикселей в секунду
+     * @param speed скорость
+     * @return SELF ссылка
+     */
+    public Moving<UNT> speed(double speed){
         setSpeed(speed);
         return this;
     }
@@ -55,6 +76,10 @@ public class Moving extends AbstractJob<Moving> {
      */
     protected double offset;
 
+    /**
+     * Смещение на которое необходимо передвинуть объект, спустя заданное время {@link #runNextTime}, {@link #duration}
+     * @return Смещение на которое необходимо передвинуть объект
+     */
     public double getOffset(){ return offset; }
     //endregion
 
@@ -75,7 +100,7 @@ public class Moving extends AbstractJob<Moving> {
      * @param direction направление перемещения
      * @return SELF ссылка
      */
-    public Moving direction(Direction direction){
+    public Moving<UNT> direction(Direction direction){
         setDirection(direction);
         return this;
     }
@@ -97,11 +122,22 @@ public class Moving extends AbstractJob<Moving> {
     }
     //endregion
 
-    //region collision
+    //region collision - коллизии
     protected Iterable<? extends Figura<?>> collision;
+
+    /**
+     * Возвращает список объектов с которыми возможны коллизии
+     * @return список объектов
+     */
     public Iterable<? extends Figura<?>> collision(){ return collision; }
+
+    /**
+     * Указывает список объектов с которыми возможны коллизии
+     * @param collizion список объектов
+     * @return SELF ссылка
+     */
     @SuppressWarnings({"SpellCheckingInspection", "UnusedReturnValue"})
-    public Moving collision(Iterable<? extends Figura<?>> collizion){
+    public Moving<UNT> collision(Iterable<? extends Figura<?>> collizion){
         this.collision = collizion;
         return this;
     }
@@ -115,51 +151,27 @@ public class Moving extends AbstractJob<Moving> {
     }
 
     @Override
-    public Moving start(){
+    protected DoStart doStart(){
         if( gameUnit==null )throw new IllegalStateException("gameUnit==null");
-        if( isRunning() )throw new AlreadyRunnedError();
 
-        this.startedTime = System.currentTimeMillis();
-        this.stoppedTime = 0;
+        var dstart = new DoStart(40);
+        offset = speed * 0.001 * ((double) dstart.duration);
 
         if( gameUnit instanceof Directed ){
             //noinspection rawtypes
             ((Directed)gameUnit).direction(direction);
         }
 
-        duration = 40;
-        offset = speed * 0.001 * ((double) duration);
-        runNextTime = startedTime + duration;
-
-        fireStarted();
-        return this;
+        return dstart;
     }
 
     @Override
-    public Moving stop(){
-        if( isRunning() ){
-            this.stoppedTime = System.currentTimeMillis();
-            fireStopped();
-        }
-        return this;
-    }
-
-    @Override
-    public void run(){
-        if( !isRunning() ){
-            return;
-        }
-
+    protected boolean doRun(){
         var gu = gameUnit();
         if( gu==null ){
             stop();
-            return;
+            return false;
         }
-
-        long now = System.currentTimeMillis();
-        if( runNextTime >now )return;
-
-        runNextTime = now + duration;
 
         if( collision!=null ){
             var target = new MutableRect(gu);
@@ -178,12 +190,14 @@ public class Moving extends AbstractJob<Moving> {
 
             if( collisionCount<1 ){
                 move(gu);
-                fireExecuted();
+                return true;
             }
         }else{
             move(gu);
-            fireExecuted();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -191,8 +205,31 @@ public class Moving extends AbstractJob<Moving> {
      * @param collision где произошла коллизия
      * @param withObject с кем произошла коллизия
      */
-    protected void collision(Rect collision, Moveable<?> withObject ){
-        System.out.println("collision detect at "+collision+" with "+withObject);
+    protected void collision(Rect collision, Figura<?> withObject ){
         stop();
+        fireJobEvent(new CollisionDetected(this,withObject,collision));
+    }
+
+    public Moving<UNT> onCollision( Consumer<CollisionDetected<UNT>> listener ){
+        if( listener==null )throw new IllegalArgumentException( "listener==null" );
+        listeners.addListener( e -> {
+            if( e instanceof CollisionDetected ){
+                listener.accept((CollisionDetected<UNT>)e);
+            }
+        });
+        return this;
+    }
+
+    public Moving<UNT> onCollision(Closeables closeables, Consumer<CollisionDetected<UNT>> listener ){
+        if( listener==null )throw new IllegalArgumentException( "listener==null" );
+        var u = listeners.addListener( e -> {
+            if( e instanceof CollisionDetected ){
+                listener.accept((CollisionDetected<UNT>)e);
+            }
+        });
+        if( closeables!=null ){
+            closeables.add(u);
+        }
+        return this;
     }
 }

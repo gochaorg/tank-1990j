@@ -186,6 +186,11 @@ public interface Line {
         return Tuple3.of(a,b,c);
     }
 
+    /**
+     * Проекция точки по одной координате
+     * @param x координата
+     * @return парная координата точки на прямой
+     */
     public default Optional<Point> projectionOfX( double x ){
         double xdiff = x1() - x0();
         if( xdiff==0 ){
@@ -216,6 +221,11 @@ public interface Line {
         return Optional.of(Point.of(x,y));
     }
 
+    /**
+     * Проекция точки по одной координате
+     * @param y координата
+     * @return парная координата точки на прямой
+     */
     public default Optional<Point> projectionOfY( double y ){
         double xdiff = x1() - x0();
         if( xdiff==0 ){
@@ -246,10 +256,20 @@ public interface Line {
         return Optional.of(Point.of(x,y));
     }
 
+    /**
+     * Преобразование к прямоугольнику
+     * @return прямоугольник
+     */
     public default Rect toRect(){
         return Rect.rect( x0(), y0(), x1(), y1() );
     }
 
+    /**
+     * Поиск ближайшей точки на линии
+     * @param p точка
+     * @param asSegment воспринимать линию как ограниченный сегмент
+     * @return ближайшая точка на линии
+     */
     public default Point nearestPoint( Point p, boolean asSegment ){
         if( p==null )throw new IllegalArgumentException( "p==null" );
         var f = factors();
@@ -293,6 +313,10 @@ public interface Line {
         return pt;
     }
 
+    /**
+     * Расчет длинны линии
+     * @return длина линии
+     */
     public default double length(){
         double xd = x0() - x1();
         double yd = y0() - y1();
