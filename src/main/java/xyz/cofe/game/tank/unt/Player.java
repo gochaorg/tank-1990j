@@ -1,11 +1,9 @@
 package xyz.cofe.game.tank.unt;
 
-import xyz.cofe.fn.Consumer1;
 import xyz.cofe.game.tank.*;
-import xyz.cofe.game.tank.geom.MutableRect;
-import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.job.Job;
 import xyz.cofe.game.tank.job.Moving;
+import xyz.cofe.game.tank.sprite.SpriteLine;
 import xyz.cofe.iter.Eterable;
 
 import java.awt.Graphics2D;

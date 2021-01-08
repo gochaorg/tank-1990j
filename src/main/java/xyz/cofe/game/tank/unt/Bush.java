@@ -1,7 +1,7 @@
 package xyz.cofe.game.tank.unt;
 
-import xyz.cofe.game.tank.Sprite;
-import xyz.cofe.game.tank.SpritesData;
+import xyz.cofe.game.tank.sprite.Sprite;
+import xyz.cofe.game.tank.sprite.SpritesData;
 
 /**
  * Куст

@@ -1,12 +1,11 @@
 package xyz.cofe.game.tank.unt;
 
-import xyz.cofe.game.tank.*;
-
-import java.awt.Graphics2D;
 import java.util.Map;
+import xyz.cofe.game.tank.sprite.SpriteLine;
+import xyz.cofe.game.tank.sprite.SpritesData;
 
 public class PlayerOne extends Player<PlayerOne> {
-    private static final Map<PlayerState,Map<Direction,SpriteLine>> sprites =
+    private static final Map<PlayerState,Map<Direction, SpriteLine>> sprites =
         Map.of(
             PlayerState.Level0,
             Map.of(

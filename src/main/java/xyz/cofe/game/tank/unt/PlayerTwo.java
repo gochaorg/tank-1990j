@@ -1,7 +1,7 @@
 package xyz.cofe.game.tank.unt;
 
-import xyz.cofe.game.tank.SpriteLine;
-import xyz.cofe.game.tank.SpritesData;
+import xyz.cofe.game.tank.sprite.SpriteLine;
+import xyz.cofe.game.tank.sprite.SpritesData;
 
 import java.util.Map;
 

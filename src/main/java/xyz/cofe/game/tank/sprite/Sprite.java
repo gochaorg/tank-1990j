@@ -1,5 +1,6 @@
-package xyz.cofe.game.tank;
+package xyz.cofe.game.tank.sprite;
 
+import xyz.cofe.game.tank.PositionalDrawing;
 import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.geom.Size2D;
 

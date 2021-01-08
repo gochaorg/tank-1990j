@@ -1,11 +1,10 @@
 package xyz.cofe.game.tank.unt;
 
 import xyz.cofe.game.tank.Animated;
-import xyz.cofe.game.tank.Sprite;
-import xyz.cofe.game.tank.SpriteLine;
+import xyz.cofe.game.tank.sprite.Sprite;
+import xyz.cofe.game.tank.sprite.SpriteLine;
 
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SpriteFigura extends Figura<SpriteFigura> implements Animated<SpriteFigura> {
