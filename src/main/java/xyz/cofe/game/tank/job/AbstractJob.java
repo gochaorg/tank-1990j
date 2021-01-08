@@ -25,7 +25,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
 
         var starting = doStart();
 
-        runNextTime = startedTime + starting.duration;
+        nextRunTime = startedTime + starting.duration;
         duration = starting.duration;
 
         fireStarted();
@@ -66,9 +66,9 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
         }
 
         long now = System.currentTimeMillis();
-        if( runNextTime >now )return;
+        if( nextRunTime >now )return;
 
-        runNextTime = now + getDuration();
+        nextRunTime = now + getDuration();
 
         var succ = doRun();
         if( succ ){
@@ -131,14 +131,14 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     /**
      * Следующее время выполнения задания - System.currentTimeMillis()
      */
-    protected long runNextTime;
+    protected long nextRunTime;
 
     /**
      * Следующее время выполнения задания - System.currentTimeMillis()
      * @return следующее время выполнения
      */
     public long getNextRun(){
-        return runNextTime;
+        return nextRunTime;
     }
     //endregion
 

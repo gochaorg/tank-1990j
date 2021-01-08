@@ -21,7 +21,7 @@ public class CollisionDetected<UNT extends GameUnit<UNT>> implements JobEvent<Mo
         return job;
     }
 
-    public UNT getGameUnit(){ return job.gameUnit(); }
+    public UNT getGameUnit(){ return job.getGameUnit(); }
 
     protected final Figura<?> withObject;
     public Figura<?> getWithFigura(){ return withObject; }

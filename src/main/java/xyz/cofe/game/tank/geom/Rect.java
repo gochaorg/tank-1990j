@@ -111,6 +111,11 @@ public interface Rect extends Size2D {
         return left() <= x && x < right() && top() <= y && y< bottom();
     }
 
+    /**
+     * Проверка наличия координат в прямоугольнике
+     * @param p координата
+     * @return true = left &lt;= x < right &amp;&amp; top &lt;= y &lt; bottom
+     */
     public default boolean contains( Point p ){
         if( p==null )throw new IllegalArgumentException( "p==null" );
         return contains(p.x(), p.y());
@@ -183,5 +188,19 @@ public interface Rect extends Size2D {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Вычисляет общую рамку, объединяющую текущую и указанную
+     * @param rect рамка
+     * @return общая рамка
+     */
+    public default Rect bounds( Rect rect ){
+        if( rect==null )throw new IllegalArgumentException( "rect==null" );
+        double x0 = Math.min( left(), rect.left() );
+        double y0 = Math.min( top(), rect.top() );
+        double x1 = Math.max( right(), rect.right() );
+        double y1 = Math.max( bottom(), rect.bottom() );
+        return Rect.rect(x0,y0,x1,y1);
     }
 }
