@@ -5,7 +5,7 @@ import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.unt.Figura;
 
 public class CollisionDetected<UNT extends GameUnit<UNT>> implements JobEvent<Moving<UNT>> {
-    public CollisionDetected(Moving<UNT> job, Figura<?> withObject, Rect rect){
+    public CollisionDetected(Moving<UNT> job, Rect withObject, Rect rect){
         if( job==null )throw new IllegalArgumentException( "job==null" );
         if( withObject==null )throw new IllegalArgumentException( "withObject==null" );
         if( rect==null )throw new IllegalArgumentException( "rect==null" );
@@ -23,8 +23,8 @@ public class CollisionDetected<UNT extends GameUnit<UNT>> implements JobEvent<Mo
 
     public UNT getGameUnit(){ return job.getGameUnit(); }
 
-    protected final Figura<?> withObject;
-    public Figura<?> getWithFigura(){ return withObject; }
+    protected final Rect withObject;
+    public Rect getWithFigura(){ return withObject; }
 
     protected final Rect rect;
     public Rect getRect(){ return rect; }

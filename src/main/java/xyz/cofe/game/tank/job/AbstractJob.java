@@ -12,6 +12,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     protected final ListenersHelper<JobListener<SELF>, JobEvent<SELF>> listeners
         = new ListenersHelper<>(JobListener::jobEvent);
 
+    //region start(), doStart()
     /**
      * Запуск планового выполнения задачи
      * @return SELF ссылка
@@ -41,7 +42,9 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     }
 
     protected abstract DoStart doStart();
+    //endregion
 
+    //region stop()
     /**
      * Остановка планового выполнения задачи
      * @return SELF ссылка
@@ -55,7 +58,9 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
 
         return (SELF) this;
     }
+    //endregion
 
+    //region run() / doRun()
     /**
      * Выполнение задания
      */
@@ -81,6 +86,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
      * @return true - успешное выполнение
      */
     protected abstract boolean doRun();
+    //endregion
 
     //region duration - промежуток времени между выполнении задания (мс)
     /**
@@ -107,7 +113,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
      * Время начала задания - System.currentTimeMillis()
      * @return Время начала задания
      */
-    public long getStarted(){
+    public long getStartedTime(){
         return startedTime;
     }
     //endregion
@@ -122,7 +128,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
      * Время завершения задания, System.currentTimeMillis()
      * @return Время завершения задания
      */
-    public long getStopped(){
+    public long getStoppedTime(){
         return stoppedTime;
     }
     //endregion
@@ -152,6 +158,9 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
         return stoppedTime <= 0;
     }
     //endregion
+
+    public boolean isStarted(){ return startedTime>0; }
+    public boolean isStopped(){ return stoppedTime>0; }
 
     //region listeners / Уведомления
     /**

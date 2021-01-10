@@ -20,6 +20,7 @@ public interface Job<SELF extends Job<SELF>> extends Runnable {
      * Остановка планового выполнения задачи
      * @return SELF ссылка
      */
+    @SuppressWarnings("UnusedReturnValue")
     SELF stop();
 
     /**
@@ -27,6 +28,22 @@ public interface Job<SELF extends Job<SELF>> extends Runnable {
      * @return true - запущена и еще пока не остановлена, false - задача или остановлена, или не была запущена
      */
     boolean isRunning();
+
+    public boolean isStarted();
+
+    /**
+     * Время начала задания - System.currentTimeMillis()
+     * @return Время начала задания
+     */
+    public long getStartedTime();
+
+    public boolean isStopped();
+
+    /**
+     * Время завершения задания, System.currentTimeMillis()
+     * @return Время завершения задания
+     */
+    public long getStoppedTime();
 
     //region Подписчики / Listeners
     /**

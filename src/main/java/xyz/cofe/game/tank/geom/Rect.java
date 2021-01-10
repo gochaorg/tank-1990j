@@ -203,4 +203,8 @@ public interface Rect extends Size2D {
         double y1 = Math.max( bottom(), rect.bottom() );
         return Rect.rect(x0,y0,x1,y1);
     }
+
+    public default Point centralPoint(){
+        return Point.of(left()+width()/2, top()+height()/2);
+    }
 }

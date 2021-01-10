@@ -92,6 +92,16 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     protected Job<?> job;
 
     @Override
+    public Job<?> getJob(){
+        return job;
+    }
+
+    @Override
+    public void setJob(Job<?> newJob){
+        this.job = newJob;
+    }
+
+    @Override
     public void run(){
         Runnable r = job;
         if( r!=null ){

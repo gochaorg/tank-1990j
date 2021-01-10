@@ -31,6 +31,11 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return this;
     }
 
+    public static <A extends GameUnit<A>> Moving<A> create(A unit){
+        if( unit==null )throw new IllegalArgumentException( "unit==null" );
+        return new Moving<>(unit);
+    }
+
     //region gameUnit - игровой объект
     protected UNT gameUnit;
 
@@ -126,13 +131,13 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
     //endregion
 
     //region collision - коллизии
-    protected Iterable<? extends Figura<?>> collision;
+    protected Iterable<? extends Rect> collision;
 
     /**
      * Возвращает список объектов с которыми возможны коллизии
      * @return список объектов
      */
-    public Iterable<? extends Figura<?>> collision(){ return collision; }
+    public Iterable<? extends Rect> collision(){ return collision; }
 
     /**
      * Указывает список объектов с которыми возможны коллизии
@@ -146,17 +151,21 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
     }
     //endregion
 
+    //region move()
     /**
      * Функция перемещения
      */
     private void move(Moveable<?> m){
         direction().move(m, offset);
     }
+    //endregion
 
+    //region getScn()
     protected volatile long scn = 0;
     public long getScn(){
         return scn;
     }
+    //endregion
 
     @Override
     protected DoStart doStart(){
@@ -173,6 +182,14 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return dstart;
     }
 
+    //region estimationOnly
+    protected boolean estimationOnly = false;
+    public boolean isEstimationOnly(){ return estimationOnly; }
+    public void setEstimationOnly(boolean v){
+        estimationOnly = v;
+    }
+    //endregion
+
     @Override
     protected boolean doRun(){
         var gu = getGameUnit();
@@ -180,6 +197,8 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
             stop();
             return false;
         }
+
+        if( isEstimationOnly() )return false;
 
         if( collision!=null ){
             var target = new MutableRect(gu);
@@ -208,7 +227,8 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return false;
     }
 
-    public Optional<Estimation<UNT>> estimate(){
+    //region estimation
+    public Optional<UnitMoveEstimation<UNT>> estimate(){
         if( !isRunning() )return Optional.empty();
 
         long now = System.currentTimeMillis();
@@ -222,55 +242,15 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         var target = new MutableRect(gu);
         move(target);
 
-        return Optional.of( new Estimation<>(this, target, nextRunTime1) );
+        return Optional.of( new UnitMoveEstimation<>(this, target, nextRunTime1, this::apply) );
     }
 
-    /**
-     * Предварительный расчет
-     */
-    public static class Estimation<UNT extends GameUnit<UNT>> {
-        public Estimation( Moving<UNT> moving, Rect to, long nextRunTime ){
-            if( moving==null )throw new IllegalArgumentException( "moving==null" );
-            if( to==null )throw new IllegalArgumentException( "to==null" );
-
-            this.moving = moving;
-            this.to = to;
-
-            var gu = moving.getGameUnit();
-            if( gu==null )throw new IllegalArgumentException("moving.getGameUnit() == null");
-
-            from = gu;
-            scn = moving.getScn();
-            this.nextRunTime = nextRunTime;
-        }
-
-        protected long nextRunTime;
-        public long getNextRun(){ return nextRunTime; }
-
-        protected Moving<UNT> moving;
-        public Moving<UNT> getMoving(){ return moving; }
-
-        protected long scn;
-        public long getScn(){ return scn; }
-
-        protected Rect from;
-        public Rect getFrom(){
-            return from;
-        }
-
-        protected Rect to;
-        public Rect getTo(){
-            return to;
-        }
-
-        public void apply(){
-            moving.apply(this);
-        }
-    }
-
-    protected synchronized void apply( Estimation<UNT> est ){
+    protected synchronized void apply( UnitMoveEstimation<UNT> est ){
         if( est==null )throw new IllegalArgumentException( "est==null" );
         if( scn!=est.getScn() )throw new IllegalStateException("scn not matched");
+        if( !isRunning() ){
+            return;
+        }
 
         var gu = getGameUnit();
         if( gu==null )throw new IllegalStateException("gameUnit is null");
@@ -279,14 +259,17 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
 
         gu.location( est.getTo().left(), est.getTo().top() );
         nextRunTime = est.getNextRun();
+
+        fireExecuted();
     }
+    //endregion
 
     /**
      * Произошла коллизия
      * @param collision где произошла коллизия
      * @param withObject с кем произошла коллизия
      */
-    protected void collision(Rect collision, Figura<?> withObject ){
+    protected void collision(Rect collision, Rect withObject ){
         stop();
         fireJobEvent(new CollisionDetected<>(this,withObject,collision));
     }
@@ -312,4 +295,6 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         }
         return this;
     }
+
+
 }

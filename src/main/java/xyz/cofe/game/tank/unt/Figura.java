@@ -1,7 +1,10 @@
 package xyz.cofe.game.tank.unt;
 
+import java.util.Set;
+import xyz.cofe.ecolls.ListenersHelper;
 import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.Moveable;
+import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
 
 /**
@@ -9,27 +12,27 @@ import xyz.cofe.game.tank.geom.Rect;
  */
 public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect, Moveable<SELF> {
     //region left : double - Левый край объекта
-    protected double left;
+    private double left;
     /**
      * Левый край объекта
      * @return Левый край объекта
      */
     public double left(){ return left; }
     @SuppressWarnings("unchecked")
-    public SELF left(double left){
+    private SELF left(double left){
         this.left = left;
         return (SELF)this;
     }
     //endregion
     //region top : double - Верхний край объекта
-    protected double top;
+    private double top;
     /**
      * Верхний край объекта
      * @return Верхний край объекта
      */
     public double top(){ return top; }
     @SuppressWarnings("unchecked")
-    public SELF top(double top){
+    private SELF top(double top){
         this.top = top;
         return (SELF)this;
     }
@@ -77,10 +80,91 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
      * @return self ссылка
      */
     @SuppressWarnings("unchecked")
-    public SELF location(double left, double top ){
+    public SELF location( double left, double top ){
+        double x0 = left();
+        double y0 = top();
+
         left(left);
         top(top);
+
+        fireMoved(Point.of(x0,y0), Point.of(left,top));
+
         return (SELF) this;
     }
     //endregion
+
+    protected final ListenersHelper<FiguraListener<SELF>, FiguraEvent<SELF>> figuraListeners
+        = new ListenersHelper<>(FiguraListener::figuraEvent);
+
+    @SuppressWarnings("unchecked")
+    protected void fireMoved(Point from, Point to){
+        fireFiguraEvent(new FiguraMoved<SELF>((SELF) this,from,to));
+    }
+
+    /**
+     * Проверка наличия подписчика в списке обработки
+     * @param listener подписчик
+     * @return true - есть в списке обработки
+     */
+    public boolean hasFiguraListener(FiguraListener<SELF> listener){
+        return figuraListeners.hasListener(listener);
+    }
+
+    /**
+     * Получение списка подписчиков
+     * @return подписчики
+     */
+    public Set<FiguraListener<SELF>> getFiguraListeners(){
+        return figuraListeners.getListeners();
+    }
+
+    /**
+     * Добавление подписчика.
+     * @param listener Подписчик.
+     * @return Интерфес для отсоединения подписчика
+     */
+    public AutoCloseable addFiguraListener(FiguraListener<SELF> listener){
+        return figuraListeners.addListener(listener);
+    }
+
+    /**
+     * Добавление подписчика.
+     * @param listener Подписчик.
+     * @param weakLink true - добавить как weak ссылку / false - как hard ссылку
+     * @return Интерфес для отсоединения подписчика
+     */
+    public AutoCloseable addFiguraListener(FiguraListener<SELF> listener, boolean weakLink){
+        return figuraListeners.addListener(listener, weakLink);
+    }
+
+    /**
+     * Добавление подписчика.
+     * @param listener Подписчик.
+     * @param weakLink true - добавить как weak ссылку / false - как hard ссылку
+     * @param limitCalls Ограничение кол-ва вызовов, 0 или меньше - нет ограничений
+     * @return Интерфес для отсоединения подписчика
+     */
+    public AutoCloseable addFiguraListener(FiguraListener<SELF> listener, boolean weakLink, int limitCalls){
+        return figuraListeners.addListener(listener, weakLink, limitCalls);
+    }
+
+    /**
+     * Удаление подписчика из списка обработки
+     * @param listener подписчик
+     */
+    public void removeFiguraListener(FiguraListener<SELF> listener){
+        figuraListeners.removeListener(listener);
+    }
+
+    public void removeAllFiguraListeners(){
+        figuraListeners.removeAllListeners();
+    }
+
+    /**
+     * Рассылка уведомления подписчикам
+     * @param event уведомление
+     */
+    protected void fireFiguraEvent(FiguraEvent<SELF> event){
+        figuraListeners.fireEvent(event);
+    }
 }
