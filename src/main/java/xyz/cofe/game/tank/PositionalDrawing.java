@@ -14,6 +14,10 @@ public interface PositionalDrawing extends Drawing {
      */
     void draw(Graphics2D gs, double x, double y );
 
+    /**
+     * Отображение объекта в координатах 0,0
+     * @param gs интерфейс
+     */
     @Override
     default void draw(Graphics2D gs){
         draw(gs, 0, 0);

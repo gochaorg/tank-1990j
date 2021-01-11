@@ -1,5 +1,8 @@
 package xyz.cofe.game.tank.job;
 
+/**
+ * Ошибка изменения задания, задание уже запущено и измеенение его работы не предусмотрено, необходимо остановить задание
+ */
 public class AlreadyRunnedError extends IllegalStateException {
     public AlreadyRunnedError(){
         super("already runned");

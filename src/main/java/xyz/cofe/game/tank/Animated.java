@@ -21,5 +21,6 @@ public interface Animated<SELF extends Animated<SELF>> {
      * Остановка анимации
      * @return Self ссылка
      */
+    @SuppressWarnings("UnusedReturnValue")
     public SELF stopAnimation();
 }

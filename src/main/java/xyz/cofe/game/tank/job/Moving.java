@@ -162,6 +162,11 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
 
     //region getScn()
     protected volatile long scn = 0;
+
+    /**
+     * Возвращает текущий номер изменения, используется чтоб не применять повторно {@link UnitMoveEstimation}
+     * @return Номер SCN
+     */
     public long getScn(){
         return scn;
     }
@@ -184,7 +189,17 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
 
     //region estimationOnly
     protected boolean estimationOnly = false;
+
+    /**
+     * Указывает - передвижение объекта только при предварительно расчете {@link #estimate()}
+     * @return true - передвижение объекта только при предварительно расчете
+     */
     public boolean isEstimationOnly(){ return estimationOnly; }
+
+    /**
+     * Указывает - передвижение объекта только при предварительно расчете {@link #estimate()}
+     * @param v true - передвижение объекта только при предварительно расчете
+     */
     public void setEstimationOnly(boolean v){
         estimationOnly = v;
     }
@@ -295,6 +310,4 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         }
         return this;
     }
-
-
 }

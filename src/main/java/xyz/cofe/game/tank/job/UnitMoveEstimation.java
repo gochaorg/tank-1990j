@@ -5,9 +5,16 @@ import xyz.cofe.game.tank.GameUnit;
 import xyz.cofe.game.tank.geom.Rect;
 
 /**
- * Предварительный расчет
+ * Предварительный расчет передвижения объекта
  */
 public class UnitMoveEstimation<UNT extends GameUnit<UNT>> {
+    /**
+     * Конструктор
+     * @param moving задание передвижения
+     * @param to Куда будет передвинут объект в текущий игровой цикл
+     * @param nextRunTime Время следующего передвижения
+     * @param appling Функция перемещения - непосредственное перемещение
+     */
     public UnitMoveEstimation(Moving<UNT> moving, Rect to, long nextRunTime, Consumer<UnitMoveEstimation<UNT>> appling){
         if( moving == null ) throw new IllegalArgumentException("moving==null");
         if( to == null ) throw new IllegalArgumentException("to==null");
@@ -28,6 +35,10 @@ public class UnitMoveEstimation<UNT extends GameUnit<UNT>> {
     //region nextRun
     protected long nextRunTime;
 
+    /**
+     * Время следующего передвижения
+     * @return Время следующего передвижения
+     */
     public long getNextRun(){
         return nextRunTime;
     }
@@ -35,6 +46,10 @@ public class UnitMoveEstimation<UNT extends GameUnit<UNT>> {
     //region moving
     protected Moving<UNT> moving;
 
+    /**
+     * Возвращает задание передвижения
+     * @return задание передвижения
+     */
     public Moving<UNT> getMoving(){
         return moving;
     }

@@ -10,6 +10,7 @@ import java.util.function.Consumer;
  * @param <SELF> Дочерний класс реализующий задачу
  */
 public interface Job<SELF extends Job<SELF>> extends Runnable {
+    //region start() / stop() / isRunning()
     /**
      * Запуск планового выполнения задачи
      * @return SELF ссылка
@@ -28,22 +29,35 @@ public interface Job<SELF extends Job<SELF>> extends Runnable {
      * @return true - запущена и еще пока не остановлена, false - задача или остановлена, или не была запущена
      */
     boolean isRunning();
+    //endregion
 
+    //region started, startedTime
+    /**
+     * Флаг - задание запущенно
+     * @return true - задание запущенно; false - не было запущено.
+     */
     public boolean isStarted();
 
     /**
      * Время начала задания - System.currentTimeMillis()
-     * @return Время начала задания
+     * @return Время начала задания; 0 - не было завершено или не было запущено
      */
     public long getStartedTime();
+    //endregion
 
+    //region stopped, stoppedTime
+    /**
+     * Флаг - задание завершено
+     * @return true - задание завершено; false - не было запущено или еще не завершено.
+     */
     public boolean isStopped();
 
     /**
      * Время завершения задания, System.currentTimeMillis()
-     * @return Время завершения задания
+     * @return Время завершения задания; 0 - не было завершено или не было запущено
      */
     public long getStoppedTime();
+    //endregion
 
     //region Подписчики / Listeners
     /**
@@ -163,6 +177,7 @@ public interface Job<SELF extends Job<SELF>> extends Runnable {
      * @param listener подписчик
      * @return SELF ссылки
      */
+    @SuppressWarnings("UnusedReturnValue")
     public default SELF onExecuted(Consumer<JobExecuted<SELF>> listener){
         return onExecuted(null, listener);
     }

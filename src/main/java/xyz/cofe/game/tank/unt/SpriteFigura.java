@@ -7,6 +7,9 @@ import xyz.cofe.game.tank.sprite.SpriteLine;
 import java.awt.Graphics2D;
 import java.util.List;
 
+/**
+ * Фигура представляющая спрайт {@link Sprite} или последовательность спрайтов {@link SpriteLine}
+ */
 public class SpriteFigura extends Figura<SpriteFigura> implements Animated<SpriteFigura> {
     protected SpriteLine sprites;
 

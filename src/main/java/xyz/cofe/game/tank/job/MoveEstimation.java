@@ -18,6 +18,7 @@ import xyz.cofe.game.tank.geom.Rect;
  * Расчет коллизий
  */
 public class MoveEstimation {
+    //region moving - кто и куда перемещается
     protected Map<Moving<?>, UnitMoveEstimation<?>> moving = new LinkedHashMap<>();
 
     /**
@@ -27,7 +28,8 @@ public class MoveEstimation {
     public Map<Moving<?>, UnitMoveEstimation<?>> getMoving(){
         return moving;
     }
-
+    //endregion
+    //region collisions, computeCollisions() - Расчет коллизий
     protected Map<Moving<?>, List<Rect>> collisions = new LinkedHashMap<>();
 
     /**
@@ -67,7 +69,8 @@ public class MoveEstimation {
     public Map<Moving<?>, List<Rect>> getCollisions(){
         return collisions;
     }
-
+    //endregion
+    //region uncollisiedMovings - Объекты не имеющие коллизий
     @SuppressWarnings("SpellCheckingInspection")
     protected Set<Moving<?>> uncollisiedMovings;
 
@@ -81,7 +84,8 @@ public class MoveEstimation {
         moving.keySet().stream().filter( mv -> !getCollisions().containsKey(mv) ).forEach( uncollisiedMovings::add );
         return uncollisiedMovings;
     }
-
+    //endregion
+    //region apply() - Применение расчетов передвижения
     /**
      * Применение расчетов передвижения
      * @param limitCollPerUnit Лимит пересечений на unit; или -1 - без ограничения
@@ -105,4 +109,5 @@ public class MoveEstimation {
             }
         });
     }
+    //endregion
 }

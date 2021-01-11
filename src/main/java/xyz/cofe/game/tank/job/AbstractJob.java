@@ -116,6 +116,8 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     public long getStartedTime(){
         return startedTime;
     }
+
+    public boolean isStarted(){ return startedTime>0; }
     //endregion
 
     //region stoppedTime - Время завершения задания
@@ -131,6 +133,8 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     public long getStoppedTime(){
         return stoppedTime;
     }
+
+    public boolean isStopped(){ return stoppedTime>0; }
     //endregion
 
     //region runNextTime - Следующее время выполнения задания
@@ -158,9 +162,6 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
         return stoppedTime <= 0;
     }
     //endregion
-
-    public boolean isStarted(){ return startedTime>0; }
-    public boolean isStopped(){ return stoppedTime>0; }
 
     //region listeners / Уведомления
     /**
