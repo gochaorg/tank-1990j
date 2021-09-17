@@ -1,5 +1,6 @@
 package xyz.cofe.game.tank.geom;
 
+import java.awt.event.MouseEvent;
 import java.util.Optional;
 
 /**
@@ -87,6 +88,12 @@ public interface Rect extends Size2D {
         };
     }
 
+    public static Rect rect( Point p0, Point p1 ){
+        if( p0==null )throw new IllegalArgumentException( "p0==null" );
+        if( p1==null )throw new IllegalArgumentException( "p1==null" );
+        return rect(p0.x(), p0.y(), p1.x(), p1.y());
+    }
+
     /**
      * Создаение прямоугольника
      * @param left Левый край объекта
@@ -119,6 +126,26 @@ public interface Rect extends Size2D {
     public default boolean contains( Point p ){
         if( p==null )throw new IllegalArgumentException( "p==null" );
         return contains(p.x(), p.y());
+    }
+
+    /**
+     * Проверка наличия координат в прямоугольнике
+     * @param p координата
+     * @return true = left &lt;= x < right &amp;&amp; top &lt;= y &lt; bottom
+     */
+    public default boolean contains( java.awt.Point p ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        return contains( p.getX(), p.getY() );
+    }
+
+    /**
+     * Проверка наличия координат в прямоугольнике
+     * @param ev координата
+     * @return true = left &lt;= x < right &amp;&amp; top &lt;= y &lt; bottom
+     */
+    public default boolean contains( MouseEvent ev ){
+        if( ev==null )throw new IllegalArgumentException( "ev==null" );
+        return contains( ev.getPoint() );
     }
 
     /**
@@ -204,7 +231,43 @@ public interface Rect extends Size2D {
         return Rect.rect(x0,y0,x1,y1);
     }
 
-    public default Point centralPoint(){
-        return Point.of(left()+width()/2, top()+height()/2);
+    /**
+     * Возвращает центральную точку
+     * @return центральная точка
+     */
+    public default Point getCentralPoint(){
+        return Point.of(left()+ width()/2, top()+ height()/2);
+    }
+
+    /**
+     * Возвращает левую верхнюю точку
+     * @return точка
+     */
+    public default Point leftTopPoint(){
+        return Point.of(left(), top());
+    }
+
+    /**
+     * Возвращает правую верхнюю точку
+     * @return точка
+     */
+    public default Point rightTopPoint(){
+        return Point.of(right(), top());
+    }
+
+    /**
+     * Возвращает левую нижнюю точку
+     * @return точка
+     */
+    public default Point leftBottomPoint(){
+        return Point.of(left(), bottom());
+    }
+
+    /**
+     * Возвращает правую нижнюю точку
+     * @return точка
+     */
+    public default Point rightBottomPoint(){
+        return Point.of(right(), bottom());
     }
 }

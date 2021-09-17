@@ -91,6 +91,16 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
 
         return (SELF) this;
     }
+
+    /**
+     * Указание левого верхнего угла объекта
+     * @param p координаты левого, верхнего угла
+     * @return self ссылка
+     */
+    public SELF location( Point p ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        return location(p.x(), p.y());
+    }
     //endregion
 
     protected final ListenersHelper<FiguraListener<SELF>, FiguraEvent<SELF>> figuraListeners

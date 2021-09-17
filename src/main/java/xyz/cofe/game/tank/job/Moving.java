@@ -243,6 +243,11 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
     }
 
     //region estimation
+
+    /**
+     * Расчет дальнейшего перемещения
+     * @return дальнейшее перемещение
+     */
     public Optional<UnitMoveEstimation<UNT>> estimate(){
         if( !isRunning() )return Optional.empty();
 

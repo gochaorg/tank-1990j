@@ -1,17 +1,14 @@
 package xyz.cofe.game.tank.job;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import xyz.cofe.fn.Consumer2;
+
 import xyz.cofe.fn.Consumer3;
 import xyz.cofe.game.tank.GameUnit;
-import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
 
 /**
@@ -53,10 +50,10 @@ public class MoveEstimation {
         } );
 
         this.collisions.forEach( (mv, colls) -> {
-            var p0 = mv.getGameUnit().centralPoint();
+            var p0 = mv.getGameUnit().getCentralPoint();
             colls.sort((a, b) -> {
-                var da = p0.distance(a.centralPoint());
-                var db = p0.distance(b.centralPoint());
+                var da = p0.distance(a.getCentralPoint());
+                var db = p0.distance(b.getCentralPoint());
                 return Double.compare(da, db);
             });
         });
