@@ -1,6 +1,7 @@
 package xyz.cofe.game.tank.geom;
 
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
 
 /**
  * Точка на плоскости
@@ -38,7 +39,7 @@ public interface Point {
 
             @Override
             public String toString(){
-                return "Point{ x="+x+" y="+y+" }";
+                return Point.toString(this);
             }
         };
     }
@@ -119,5 +120,20 @@ public interface Point {
             return 0;
         }
         return Math.sqrt( xd*xd + yd*yd );
+    }
+
+    public static String toString(Point p){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        StringBuilder sb = new StringBuilder();
+        sb.append(p.x()).append(";").append(p.y());
+        return sb.toString();
+    }
+    public static Point parse(String txt){
+        if( txt==null )throw new IllegalArgumentException( "txt==null" );
+        String[] xy = txt.split(";",2);
+        if( xy.length!=2 )throw new Error("can't parse "+txt+" expect: <num> ';' <num>");
+        var x = Double.parseDouble(xy[0]);
+        var y = Double.parseDouble(xy[1]);
+        return of(x,y);
     }
 }

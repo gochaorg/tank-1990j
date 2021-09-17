@@ -133,6 +133,12 @@ public class EditorFrame extends JFrame {
     private final PropertySheet propsPanel;
     {
         propsPanel = new PropertySheet();
+        selectTool.addListener( ev -> {
+            if( ev instanceof SelectTool.LastSelectChanged ){
+                var e = ((SelectTool.LastSelectChanged)ev);
+                if( e.figura!=null )propsPanel.edit(e.figura);
+            }
+        });
 //        PropertySheet.extend(Figura.class, ext -> {
 //            ext.property("x", double.class, f -> f.left(), (f,v)->{
 //                f.location(v,f.top());

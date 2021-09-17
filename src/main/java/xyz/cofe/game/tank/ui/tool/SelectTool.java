@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SelectTool implements Tool, SceneProperty {
+public class SelectTool extends AbstractTool implements Tool, SceneProperty {
     //region image, name
     @Override
     public String name() {
@@ -53,6 +53,21 @@ public class SelectTool implements Tool, SceneProperty {
     protected final EventSet<Figura<?>> selection = new BasicEventSet<>(new LinkedHashSet<>());
     public EventSet<Figura<?>> getSelection(){ return selection; }
     //endregion
+    //region lastSelected : Figura<?>
+    protected Figura<?> lastSelected;
+    public Figura<?> getLastSelected() { return lastSelected; }
+    public void setLastSelected(Figura<?> lastSelected) {
+        var ch = this.lastSelected != lastSelected;
+        this.lastSelected = lastSelected;
+        if( ch )fireEvent(new LastSelectChanged(lastSelected));
+    }
+    public static class LastSelectChanged implements ToolEvent {
+        public final Figura<?> figura;
+        public LastSelectChanged(Figura<?> figura) {
+            this.figura = figura;
+        }
+    }
+    //endregion
     //region origin : Point
     protected Supplier<Point> origin;
     public Point getOrigin(){
@@ -75,7 +90,7 @@ public class SelectTool implements Tool, SceneProperty {
     }
     //endregion
 
-    //region grid
+    //region grid : Supplier<Grid>
     protected Supplier<Grid> grid;
     public Grid getGrid() {
         return grid!=null ? grid.get() : null;
@@ -88,6 +103,7 @@ public class SelectTool implements Tool, SceneProperty {
         this.grid = ()->grid;
     }
     //endregion
+    //region snapToGrid : boolean
     protected boolean snapToGrid = false;
 
     public boolean isSnapToGrid() {
@@ -97,6 +113,7 @@ public class SelectTool implements Tool, SceneProperty {
     public void setSnapToGrid(boolean snapToGrid) {
         this.snapToGrid = snapToGrid;
     }
+    //endregion
 
     protected Shape bounds(Figura<?> f, double indent ){
         return new Rectangle2D.Double(
@@ -163,6 +180,10 @@ public class SelectTool implements Tool, SceneProperty {
             getSelection().clear();
             scene.getFigures().stream().filter(f -> f.contains(p)).forEach( hits::add );
             getSelection().addAll(hits);
+        }
+
+        if( !hits.isEmpty() ){
+            setLastSelected(hits.get(hits.size()-1));
         }
 
         if( p.getComponent()!=null ){
@@ -283,6 +304,10 @@ public class SelectTool implements Tool, SceneProperty {
         }else {
             getSelection().clear();
             getSelection().addAll(hits);
+        }
+
+        if( !hits.isEmpty() ){
+            setLastSelected(hits.get(hits.size()-1));
         }
     }
 }

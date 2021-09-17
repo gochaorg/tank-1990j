@@ -8,7 +8,7 @@ import xyz.cofe.game.tank.unt.Scene;
 
 import java.awt.image.BufferedImage;
 
-public abstract class LevelBrickTool<SELF extends LevelBrickTool<SELF>> implements Tool, SceneProperty {
+public abstract class LevelBrickTool<SELF extends LevelBrickTool<SELF>> extends AbstractTool implements Tool, SceneProperty {
     public LevelBrickTool(String name, BufferedImage image){
         if( name==null )throw new IllegalArgumentException( "name==null" );
         if( image==null )throw new IllegalArgumentException( "image==null" );

@@ -6,6 +6,7 @@ import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.Moveable;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
+import xyz.cofe.gui.swing.bean.UiBean;
 
 /**
  * Абстрактная фигура, с координатами
@@ -101,6 +102,12 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
         if( p==null )throw new IllegalArgumentException( "p==null" );
         return location(p.x(), p.y());
     }
+
+    public Point getLocation(){ return leftTopPoint(); }
+    public void setLocation(Point p){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        location(p);
+    }
     //endregion
 
     protected final ListenersHelper<FiguraListener<SELF>, FiguraEvent<SELF>> figuraListeners
@@ -124,6 +131,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
      * Получение списка подписчиков
      * @return подписчики
      */
+    @UiBean(forceHidden = true)
     public Set<FiguraListener<SELF>> getFiguraListeners(){
         return figuraListeners.getListeners();
     }
