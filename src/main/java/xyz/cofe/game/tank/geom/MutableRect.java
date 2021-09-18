@@ -2,6 +2,8 @@ package xyz.cofe.game.tank.geom;
 
 import xyz.cofe.game.tank.Moveable;
 
+import java.io.Serializable;
+
 /**
  * Рамка которую можно двигать
  */

@@ -2,6 +2,7 @@ package xyz.cofe.game.tank.geom;
 
 import xyz.cofe.fn.Tuple3;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 /**

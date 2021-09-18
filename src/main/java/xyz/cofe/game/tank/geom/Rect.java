@@ -1,6 +1,7 @@
 package xyz.cofe.game.tank.geom;
 
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**

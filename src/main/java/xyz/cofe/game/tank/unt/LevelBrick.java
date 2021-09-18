@@ -30,7 +30,7 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
     protected int state = 15;
     public int state(){ return state; }
     @SuppressWarnings("unchecked")
-    protected SELF state(int state){
+    public SELF state(int state){
         return (SELF)this;
     }
     //endregion
