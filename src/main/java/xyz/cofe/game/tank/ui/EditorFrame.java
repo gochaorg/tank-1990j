@@ -5,30 +5,20 @@ package xyz.cofe.game.tank.ui;
 import bibliothek.gui.dock.common.*;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.location.CBaseLocation;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import com.formdev.flatlaf.FlatLightLaf;
 import xyz.cofe.game.tank.ui.cmd.AlignByGridAction;
-import xyz.cofe.game.tank.ui.cmd.DeleteSelectedAction;
-import xyz.cofe.game.tank.ui.tool.BrickTool;
-import xyz.cofe.game.tank.ui.tool.SelectTool;
-import xyz.cofe.game.tank.ui.tool.WaterTool;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.ui.cmd.DeleteAction;
+import xyz.cofe.game.tank.ui.tool.*;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.gui.swing.SwingListener;
-import xyz.cofe.gui.swing.bean.UiBean;
-import xyz.cofe.gui.swing.properties.Property;
-import xyz.cofe.iter.Eterable;
-import xyz.cofe.text.Text;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
-import java.util.function.Predicate;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -38,11 +28,14 @@ import javax.swing.Timer;
  */
 public class EditorFrame extends JFrame {
     //region tools - инструменты
+    private final SelectTool selectTool = new SelectTool();
+
     private final BrickTool brickTool = new BrickTool();
     private final WaterTool waterTool = new WaterTool();
-    private final SelectTool selectTool = new SelectTool();
+    private final SlideTool slideTool = new SlideTool();
+    private final BushTool bushTool = new BushTool();
     private final Tool[] tools = new Tool[]{
-        selectTool, brickTool, waterTool
+        selectTool, brickTool, waterTool, slideTool, bushTool
     };
     {
         for( var t : tools ){
@@ -69,7 +62,7 @@ public class EditorFrame extends JFrame {
     }
     //endregion
 
-    private final SelectAction deleteSelectedAction = new DeleteSelectedAction();
+    private final SelectAction deleteSelectedAction = new DeleteAction();
     private final AlignByGridAction alignByGridAction = new AlignByGridAction();
     private final SelectAction[] selectActions = new SelectAction[]{ deleteSelectedAction, alignByGridAction };
 
