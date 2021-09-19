@@ -7,6 +7,11 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Куст
  */
 public class Bush extends LevelBrick<Bush> {
+    public Bush(){}
+    public Bush(Bush sample){
+        super(sample);
+    }
+
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_bush;

@@ -7,6 +7,11 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Кирпичная стена
  */
 public class Brick extends LevelBrick<Brick> {
+    public Brick(){}
+    public Brick(Brick sample){
+        super(sample);
+    }
+
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_brick;

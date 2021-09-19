@@ -7,6 +7,10 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Вода
  */
 public class Water extends LevelBrick<Water> {
+    public Water(){}
+    public Water(Water sample){
+        super(sample);
+    }
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_water;

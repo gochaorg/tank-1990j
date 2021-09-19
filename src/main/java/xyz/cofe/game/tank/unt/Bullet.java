@@ -12,6 +12,13 @@ import java.util.Map;
  * Пуля
  */
 public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
+    public Bullet(){
+    }
+    public Bullet(Bullet sample){
+        super(sample);
+        direction = sample.direction;
+    }
+
     private static final int UP_FRAME = 0;
     private static final int DOWN_FRAME = 2;
     private static final int LEFT_FRAME = 3;

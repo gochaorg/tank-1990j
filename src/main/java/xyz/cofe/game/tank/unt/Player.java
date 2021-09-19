@@ -14,6 +14,14 @@ import java.util.Map;
  * @param <SELF> дочерний класс
  */
 public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> implements GameUnit<SELF>, Directed<SELF> {
+    public Player(){}
+    public Player(Player<?> sample){
+        super(sample);
+        playerState = sample.playerState;
+        direction = sample.direction;
+        job = null;
+    }
+
     //region playerState
     protected PlayerState playerState = PlayerState.Level0;
     public PlayerState getPlayerState(){
@@ -42,11 +50,9 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     //endregion
     //region render player
     protected abstract Map<PlayerState, Map<Direction, SpriteLine>> sprites();
-
     public SpriteLine currentSpriteLine(){
         return sprites().get(getPlayerState()).get(direction());
     }
-
     protected Eterable<SpriteLine> spriteLines(){
         Iterable<Iterable<SpriteLine>> x = Eterable.of(sprites().values()).map(m -> (Iterable<SpriteLine>)m.values() ).toList();
         return Eterable.<SpriteLine>empty().union(x);

@@ -7,6 +7,10 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Стальная стена
  */
 public class Steel extends LevelBrick<Steel> {
+    public Steel(){}
+    public Steel(Steel sample){
+        super(sample);
+    }
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_white;

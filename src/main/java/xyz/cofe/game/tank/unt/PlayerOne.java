@@ -5,6 +5,11 @@ import xyz.cofe.game.tank.sprite.SpriteLine;
 import xyz.cofe.game.tank.sprite.SpritesData;
 
 public class PlayerOne extends Player<PlayerOne> {
+    public PlayerOne(){}
+    public PlayerOne( PlayerOne sample ){
+        super(sample);
+    }
+
     private static final Map<PlayerState,Map<Direction, SpriteLine>> sprites =
         Map.of(
             PlayerState.Level0,

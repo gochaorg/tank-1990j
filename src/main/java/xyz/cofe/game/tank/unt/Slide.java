@@ -7,6 +7,10 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Лед/скользящаяя поверхность
  */
 public class Slide extends LevelBrick<Slide> {
+    public Slide(){}
+    public Slide(Slide sample){
+        super(sample);
+    }
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_slide;

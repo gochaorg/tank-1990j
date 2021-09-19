@@ -12,6 +12,13 @@ import xyz.cofe.gui.swing.bean.UiBean;
  * Абстрактная фигура, с координатами
  */
 public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect, Moveable<SELF> {
+    public Figura(){}
+    public Figura(Figura<?> sample){
+        if( sample==null )throw new IllegalArgumentException( "sample==null" );
+        left = sample.left();
+        top = sample.top();
+    }
+
     //region left : double - Левый край объекта
     private double left;
     /**
@@ -19,7 +26,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
      * @return Левый край объекта
      */
     public double left(){ return left; }
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "UnusedReturnValue"})
     private SELF left(double left){
         this.left = left;
         return (SELF)this;
@@ -32,7 +39,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
      * @return Верхний край объекта
      */
     public double top(){ return top; }
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "UnusedReturnValue"})
     private SELF top(double top){
         this.top = top;
         return (SELF)this;
@@ -110,6 +117,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
     }
     //endregion
 
+    //region listeners
     protected final ListenersHelper<FiguraListener<SELF>, FiguraEvent<SELF>> figuraListeners
         = new ListenersHelper<>(FiguraListener::figuraEvent);
 
@@ -141,6 +149,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
      * @param listener Подписчик.
      * @return Интерфес для отсоединения подписчика
      */
+    @SuppressWarnings("UnusedReturnValue")
     public AutoCloseable addFiguraListener(FiguraListener<SELF> listener){
         return figuraListeners.addListener(listener);
     }
@@ -185,4 +194,5 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
     protected void fireFiguraEvent(FiguraEvent<SELF> event){
         figuraListeners.fireEvent(event);
     }
+    //endregion
 }

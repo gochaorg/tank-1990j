@@ -6,6 +6,11 @@ import xyz.cofe.game.tank.sprite.SpritesData;
 import java.util.Map;
 
 public class PlayerTwo extends Player<PlayerTwo> {
+    public PlayerTwo(){}
+    public PlayerTwo(PlayerTwo sample){
+        super(sample);
+    }
+
     private static final Map<PlayerState,Map<Direction,SpriteLine>> sprites =
         Map.of(
             PlayerState.Level0,

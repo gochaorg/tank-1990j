@@ -11,6 +11,12 @@ import java.awt.*;
  * Строительный блок уровня из комбинации спрайтов 2x2
  */
 public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<SELF> implements Drawing, Rect, Moveable<SELF> {
+    public LevelBrick(){}
+    public LevelBrick(LevelBrick<?> sample){
+        super(sample);
+        this.state = sample.state;
+    }
+
     /**
      * Спрайт (16x16) изображающий строительный блок
      * @return спрайт
@@ -31,9 +37,10 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
     public int state(){ return state; }
     @SuppressWarnings("unchecked")
     public SELF state(int state){
+        if( state<0 )throw new IllegalStateException("state<0");
+        if( state>15 )throw new IllegalArgumentException( "state>15" );
         return (SELF)this;
     }
-    //endregion
 
     protected final int UL_BRICK = 0b0001;
     protected final int UR_BRICK = 0b0010;
@@ -43,7 +50,7 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<S
     protected boolean isUpRight(){ return (state & UR_BRICK) == UR_BRICK; }
     protected boolean isBottomLeft(){ return (state & BL_BRICK) == BL_BRICK; }
     protected boolean isBottomRight(){ return (state & BR_BRICK) == BR_BRICK; }
-
+    //endregion
     //region width, height
     /**
      * Ширина объекта

@@ -23,6 +23,13 @@ public class SpriteFigura extends Figura<SpriteFigura> implements Animated<Sprit
         sprites = sprite;
     }
 
+    public SpriteFigura(SpriteFigura sample){
+        if( sample==null )throw new IllegalArgumentException( "sample==null" );
+        if( sample.sprites!=null ){
+            sprites = sample.sprites.clone();
+        }
+    }
+
     @Override
     public void draw(Graphics2D gs){
         if( gs==null )throw new IllegalArgumentException( "gs==null" );
