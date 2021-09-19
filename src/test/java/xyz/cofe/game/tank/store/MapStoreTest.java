@@ -9,6 +9,7 @@ import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.unt.Brick;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
+import xyz.cofe.game.tank.unt.Water;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -98,6 +99,33 @@ public class MapStoreTest {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void sceneFig01(){
+        var scene = new Scene();
+        scene.getFigures().add(new Brick().location(1,1));
+        scene.getFigures().add(new Water().location(10,1));
+
+        var map = new MapStore().store(scene);
+
+        var om = new ObjectMapper();
+        om.enable(SerializationFeature.INDENT_OUTPUT);
+
+        try {
+            System.out.println(om.writeValueAsString(map));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        var scene01 = new MapStore().restore(map);
+        Assertions.assertTrue(scene01 instanceof Scene);
+
+        scene = (Scene)scene01;
+        Assertions.assertTrue(scene.getFigures().size()==2);
+        Assertions.assertTrue(scene.getFigures().stream().filter(f -> f instanceof Brick).count()>0);
+        Assertions.assertTrue(scene.getFigures().stream().filter(f -> f instanceof Water).count()>0);
     }
 }
 

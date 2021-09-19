@@ -94,12 +94,29 @@ public class MapStore {
             if( SimpleTypes.isSimple(value.getClass()) ) {
                 m.put(key.name, key.get(obj));
             }else{
-                //noinspection rawtypes
-                OBJ view = viewOf(value.getClass()); //OBJ.objectMappers.fetch( value.getClass() );
-                if( view!=null ) {
+                if( key instanceof OBJ.ListKey ){
+                    //noinspection rawtypes
+                    OBJ.ListKey lkey = (OBJ.ListKey)key;
                     //noinspection unchecked
-                    var mo = store(value, view);
-                    m.put(key.name, mo);
+                    var listObj = lkey.get(obj);
+                    List<Object> resultLst = new ArrayList<>();
+                    if( listObj instanceof List ){
+                        ((List<?>) listObj).forEach( item -> {
+                            if( item!=null ) {
+                                var itemMap = store(item);
+                                resultLst.add(itemMap);
+                            }
+                        });
+                    }
+                    m.put(key.name, resultLst);
+                }else {
+                    //noinspection rawtypes
+                    OBJ view = viewOf(value.getClass()); //OBJ.objectMappers.fetch( value.getClass() );
+                    if (view != null) {
+                        //noinspection unchecked
+                        var mo = store(value, view);
+                        m.put(key.name, mo);
+                    }
                 }
             }
         });
@@ -179,6 +196,15 @@ public class MapStore {
                     if (ninst != null) {
                         inst = ninst;
                     }
+                }else if( v instanceof List && key instanceof OBJ.ListKey ){
+                    ArrayList<Object> resultList = restoreList(typeName, key.name, (List) v);
+                    //noinspection unchecked,rawtypes,rawtypes
+                    var ninst = ((BiFunction) key.write).apply(inst, resultList);
+                    if (ninst != null) {
+                        inst = ninst;
+                    }
+                }else {
+                    throw new IllegalStateException("can't restore "+key.name+" for "+typeName+", accept "+v);
                 }
             }
         }
@@ -190,6 +216,30 @@ public class MapStore {
 
         //noinspection unchecked
         return (B)inst;
+    }
+
+    private ArrayList<Object> restoreList(Object typeName, String keyName, List v) {
+        var resultList = new ArrayList<>();
+        //noinspection unchecked
+        v.forEach(itemView -> {
+            if( itemView==null )return;
+            if( SimpleTypes.isSimple(itemView.getClass()) ){
+                resultList.add(itemView);
+            }else if( itemView instanceof Map ){
+                //noinspection unchecked
+                var item = restore((Map<String, Object>) itemView);
+                if( item!=null ){
+                    resultList.add(item);
+                }
+            }else if( itemView instanceof List ){
+                //noinspectionrawtypes,rawtypes
+                var nested = restoreList(typeName, keyName, (List)itemView);
+                resultList.add(nested);
+            }else {
+                throw new IllegalStateException("can't restore item "+itemView+" for "+ keyName+" of "+ typeName);
+            }
+        });
+        return resultList;
     }
     //endregion
 }
