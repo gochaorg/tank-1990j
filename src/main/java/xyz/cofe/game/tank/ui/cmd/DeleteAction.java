@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Удаление выделенных объектов со сцены
  */
-public class DeleteSelectedAction implements SelectAction {
+public class DeleteAction implements SelectAction {
     @Override
     public String name() {
         return "Delete selected";
