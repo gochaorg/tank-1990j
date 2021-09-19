@@ -9,6 +9,7 @@ public class PlayerOne extends Player<PlayerOne> {
     public PlayerOne( PlayerOne sample ){
         super(sample);
     }
+    public PlayerOne clone(){ return new PlayerOne(this); }
 
     private static final Map<PlayerState,Map<Direction, SpriteLine>> sprites =
         Map.of(

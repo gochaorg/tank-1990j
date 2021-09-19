@@ -18,6 +18,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
         left = sample.left();
         top = sample.top();
     }
+    public abstract Figura<SELF> clone();
 
     //region left : double - Левый край объекта
     private double left;

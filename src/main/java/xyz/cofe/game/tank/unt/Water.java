@@ -11,6 +11,8 @@ public class Water extends LevelBrick<Water> {
     public Water(Water sample){
         super(sample);
     }
+    public Water clone(){ return new Water(this); }
+
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_water;

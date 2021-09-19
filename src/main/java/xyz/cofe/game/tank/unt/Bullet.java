@@ -18,6 +18,7 @@ public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
         super(sample);
         direction = sample.direction;
     }
+    public Bullet clone(){ return new Bullet(this); }
 
     private static final int UP_FRAME = 0;
     private static final int DOWN_FRAME = 2;

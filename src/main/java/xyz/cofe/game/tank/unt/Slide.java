@@ -11,6 +11,7 @@ public class Slide extends LevelBrick<Slide> {
     public Slide(Slide sample){
         super(sample);
     }
+    public Slide clone(){ return new Slide(this); }
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_slide;

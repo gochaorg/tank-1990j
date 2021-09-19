@@ -11,6 +11,10 @@ public class Steel extends LevelBrick<Steel> {
     public Steel(Steel sample){
         super(sample);
     }
+    public Steel clone(){
+        return new Steel(this);
+    }
+
     private static final Sprite sprite;
     static {
         var sd = SpritesData.lvl_white;

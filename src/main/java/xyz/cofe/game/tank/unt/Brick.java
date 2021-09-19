@@ -11,6 +11,7 @@ public class Brick extends LevelBrick<Brick> {
     public Brick(Brick sample){
         super(sample);
     }
+    public Brick clone(){ return new Brick(this); }
 
     private static final Sprite sprite;
     static {

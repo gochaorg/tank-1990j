@@ -30,6 +30,10 @@ public class SpriteFigura extends Figura<SpriteFigura> implements Animated<Sprit
         }
     }
 
+    public SpriteFigura clone(){
+        return new SpriteFigura(this);
+    }
+
     @Override
     public void draw(Graphics2D gs){
         if( gs==null )throw new IllegalArgumentException( "gs==null" );
