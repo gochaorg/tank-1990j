@@ -4,11 +4,9 @@ import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.simpletypes.SimpleTypes;
 import static xyz.cofe.game.tank.store.ObjectMappers.mappers;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
 public class MapStore {
@@ -70,12 +68,26 @@ public class MapStore {
         return null;
     }
     //endregion
+
+    protected final AtomicInteger storeIdGen = new AtomicInteger(0);
+    protected final Map<Object,Integer> storeIdRefs = new HashMap<>();
+
     //region store()
     public <B> Map<String, Object> store( B obj, OBJ<B> objView ) {
         if (obj == null) return null;
 
         LinkedHashMap<String, Object> m = new LinkedHashMap<>();
         m.put("@type", objView.clazz.getName());
+        var ref = storeIdRefs.get(obj);
+        if( ref!=null ){
+            m.put("@ref", ref);
+            return m;
+        }
+
+        var oid = storeIdGen.incrementAndGet();
+        m.put("@oid", oid);
+        storeIdRefs.put(obj, oid);
+
         objView.keys.forEach(key -> {
             var value = key.get(obj);
             if( value==null )return;
@@ -99,14 +111,14 @@ public class MapStore {
     public Map<String, Object> store(Object obj){
         if( obj==null )return null;
 
-        //noinspection SuspiciousMethodCalls
-        var view = mappers.get( obj.getClass().getName() );
+        var view = viewOf(obj.getClass());
         if( view==null )throw new IllegalStateException( "view for "+obj.getClass().getName() );
 
         //noinspection unchecked,rawtypes,rawtypes
         return store(obj, (OBJ) view);
     }
     //endregion
+
     //region restore()
     private static final Map<String,Class<?>> classByName = new ConcurrentHashMap<>();
     private Class<?> loadClass(String cname) {
@@ -118,11 +130,23 @@ public class MapStore {
         }
         return cl;
     }
+
+    protected final Map<Integer,Object> restoreRefs = new HashMap<>();
     public <B> B restore( Map<String,Object> map ){
         if( map==null )return null;
 
         var typeName = map.get("@type");
         if( typeName==null )throw new IllegalArgumentException("undefined type");
+
+        var refAtrr = map.get("@ref");
+        if( refAtrr instanceof Number ){
+            var refId = ((Number) refAtrr).intValue();
+            var ref = restoreRefs.get(refId);
+            if( ref!=null ){
+                //noinspection unchecked
+                return (B)ref;
+            }
+        }
 
         var objMap = mappers.get(
             classByName.computeIfAbsent(typeName.toString(), this::loadClass)
@@ -159,10 +183,13 @@ public class MapStore {
             }
         }
 
+        var oidAttr = map.get("@oid");
+        if( oidAttr instanceof Number ){
+            restoreRefs.put(((Number) oidAttr).intValue(), inst);
+        }
+
         //noinspection unchecked
         return (B)inst;
-
-//        return null;
     }
     //endregion
 }

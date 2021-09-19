@@ -10,6 +10,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * mapping/отображение объекта на простые структуры для сериализации/десериализации
+ * @param <B>
+ */
 public abstract class OBJ<B> {
     public final Class<B> clazz;
     public final Supplier<B> newInstance;
