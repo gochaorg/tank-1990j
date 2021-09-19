@@ -11,8 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class OBJ<B> {
-    public static final Map<Class<?>,OBJ<?>> objectMappers = new LinkedHashMap<>();
-
     public final Class<B> clazz;
     public final Supplier<B> newInstance;
     public final List<Key<?>> keys = new ArrayList<>();
@@ -22,7 +20,6 @@ public abstract class OBJ<B> {
         if (newInst == null) throw new IllegalArgumentException("newInst==null");
         clazz = cls;
         newInstance = newInst;
-        objectMappers.put(clazz, this);
     }
     public abstract class Key<V> {
         public final String name;

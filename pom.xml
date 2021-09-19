@@ -133,7 +133,7 @@
                 <configuration>
                     <services>
                         <param>xyz.cofe.gui.swing.properties.PropertyDBService</param>
-                        <!-- <param>com.foo.Operation</param> -->
+                        <param>xyz.cofe.game.tank.store.ObjectMapper</param>
                     </services>
                 </configuration>
                 <executions>

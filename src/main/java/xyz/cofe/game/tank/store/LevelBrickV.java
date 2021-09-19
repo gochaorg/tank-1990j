@@ -11,11 +11,6 @@ public abstract class LevelBrickV<B extends LevelBrick<B>> extends OBJ<B> {
         super(cls, newInst);
     }
 
-    static {
-        // init nested type view
-        var x = new Object[]{ PointV.instance };
-    }
-
     public final ObjKey<Point> location = new ObjKey<Point>("location", Figura::getLocation, Figura::location);
     public final IntKey state = new IntKey("state", LevelBrick::state, LevelBrick::state);
 }

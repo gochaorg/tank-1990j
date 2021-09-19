@@ -2,9 +2,12 @@ package xyz.cofe.game.tank.store;
 
 import xyz.cofe.game.tank.geom.Point;
 
-public class PointV extends OBJ<Point> {
+public class PointV extends OBJ<Point> implements ObjectMapper {
     public static final PointV instance = new PointV();
-    private PointV() {
+    @Override public void registry(ObjectMappers om) {
+        ObjectMappers.mappers.put(instance.clazz, instance);
+    }
+    public PointV() {
         super(Point.class, () -> Point.of(0, 0));
     }
 

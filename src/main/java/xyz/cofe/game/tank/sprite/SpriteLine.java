@@ -67,7 +67,6 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
         maxSize = samples.maxSize;
         minSize = samples.minSize;
         sizes = samples.sizes;
-
     }
 
     /**

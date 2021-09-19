@@ -9,6 +9,7 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import com.formdev.flatlaf.FlatLightLaf;
 import xyz.cofe.game.tank.ui.cmd.AlignByGridAction;
 import xyz.cofe.game.tank.ui.cmd.DeleteAction;
+import xyz.cofe.game.tank.ui.cmd.DuplicateAction;
 import xyz.cofe.game.tank.ui.tool.*;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
@@ -64,7 +65,15 @@ public class EditorFrame extends JFrame {
 
     private final SelectAction deleteSelectedAction = new DeleteAction();
     private final AlignByGridAction alignByGridAction = new AlignByGridAction();
-    private final SelectAction[] selectActions = new SelectAction[]{ deleteSelectedAction, alignByGridAction };
+    private final DuplicateAction duplicateAction = new DuplicateAction();
+    {
+        duplicateAction.setSelectTool(selectTool);
+    }
+    private final SelectAction[] selectActions = new SelectAction[]{
+        duplicateAction,
+        alignByGridAction,
+        deleteSelectedAction,
+    };
 
     //region scene : Scene
     private Scene scene;

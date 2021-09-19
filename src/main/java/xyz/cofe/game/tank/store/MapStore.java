@@ -1,8 +1,8 @@
 package xyz.cofe.game.tank.store;
 
-import xyz.cofe.collection.ClassMap;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.simpletypes.SimpleTypes;
+import static xyz.cofe.game.tank.store.ObjectMappers.mappers;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -12,12 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 public class MapStore {
+    //region views
+    @SuppressWarnings("rawtypes")
+    private static final Map<Class,OBJ> views = new LinkedHashMap<>();
+    @SuppressWarnings("rawtypes")
     private static OBJ viewOf(Class c){
-        OBJ view1 = OBJ.objectMappers.get(c);
+        return views.computeIfAbsent(c, MapStore::viewOf0);
+    }
+    @SuppressWarnings("rawtypes")
+    private static OBJ viewOf0(Class c){
+        OBJ view1 = mappers.get(c);
         if( view1!=null )return view1;
 
         Set<Class<?>> prefer = new LinkedHashSet<>();
-        for( var cls : OBJ.objectMappers.keySet() ){
+        for( var cls : mappers.keySet() ){
             if(cls.isAssignableFrom(c) ){
                 prefer.add(cls);
             }
@@ -56,11 +64,13 @@ public class MapStore {
 
         if( prefer.size()==1 ){
             var c1 = prefer.iterator().next();
-            return OBJ.objectMappers.get(c1);
+            return mappers.get(c1);
         }
 
         return null;
     }
+    //endregion
+    //region store()
     public <B> Map<String, Object> store( B obj, OBJ<B> objView ) {
         if (obj == null) return null;
 
@@ -89,22 +99,32 @@ public class MapStore {
     public Map<String, Object> store(Object obj){
         if( obj==null )return null;
 
-        var view = OBJ.objectMappers.get( obj.getClass().getName() );
+        //noinspection SuspiciousMethodCalls
+        var view = mappers.get( obj.getClass().getName() );
         if( view==null )throw new IllegalStateException( "view for "+obj.getClass().getName() );
 
         //noinspection unchecked,rawtypes,rawtypes
         return store(obj, (OBJ) view);
     }
-
+    //endregion
+    //region restore()
     private static final Map<String,Class<?>> classByName = new ConcurrentHashMap<>();
-
+    private Class<?> loadClass(String cname) {
+        Class<?> cl = null;
+        try {
+            cl = Class.forName(cname, false, this.getClass().getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new Error(e);
+        }
+        return cl;
+    }
     public <B> B restore( Map<String,Object> map ){
         if( map==null )return null;
 
         var typeName = map.get("@type");
         if( typeName==null )throw new IllegalArgumentException("undefined type");
 
-        var objMap = OBJ.objectMappers.get(
+        var objMap = mappers.get(
             classByName.computeIfAbsent(typeName.toString(), this::loadClass)
         );
         if( objMap==null )throw new IllegalStateException("objectMapper with name="+typeName+" not found");
@@ -144,14 +164,5 @@ public class MapStore {
 
 //        return null;
     }
-
-    private Class<?> loadClass(String cname) {
-        Class<?> cl = null;
-        try {
-            cl = Class.forName(cname, false, this.getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
-            throw new Error(e);
-        }
-        return cl;
-    }
+    //endregion
 }
