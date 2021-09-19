@@ -71,4 +71,9 @@ public abstract class OBJ<B> {
             super(name, read, write);
         }
     }
+    public class ListKey<F> extends Key<List<F>> {
+        public ListKey(String name, Function<B,List<F>> read, BiFunction<B,List<F>,B> write){
+            super(name,read,write);
+        }
+    }
 }

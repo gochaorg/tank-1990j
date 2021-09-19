@@ -1,5 +1,8 @@
 package xyz.cofe.game.tank.store;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import xyz.cofe.game.tank.geom.Point;
@@ -87,6 +90,14 @@ public class MapStoreTest {
         Assertions.assertTrue(compaund1.getBrick1()!=null);
         Assertions.assertTrue(compaund1.getBrick2()!=null);
         Assertions.assertTrue(compaund1.getBrick1()==compaund1.getBrick2());
+
+        var om = new ObjectMapper();
+        om.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            System.out.println(om.writeValueAsString(map));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }
 
