@@ -6,7 +6,11 @@ import bibliothek.gui.dock.common.*;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.formdev.flatlaf.FlatLightLaf;
+import xyz.cofe.game.tank.store.MapStore;
 import xyz.cofe.game.tank.ui.cmd.AlignByGridAction;
 import xyz.cofe.game.tank.ui.cmd.DeleteAction;
 import xyz.cofe.game.tank.ui.cmd.DuplicateAction;
@@ -19,7 +23,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -42,6 +49,7 @@ public class EditorFrame extends JFrame {
         for( var t : tools ){
             if( t instanceof SceneProperty){
                 ((SceneProperty) t).setScene(getScene());
+                onSceneChanged(((SceneProperty) t)::setScene);
             }
         }
     }
@@ -76,6 +84,17 @@ public class EditorFrame extends JFrame {
     };
 
     //region scene : Scene
+    private final List<Consumer<Scene>> onSceneChanged = new ArrayList<>();
+    private void onSceneChanged( Consumer<Scene> changeListener ){
+        if( changeListener==null )throw new IllegalArgumentException( "changeListener==null" );
+        if( onSceneChanged==null ){
+            SwingUtilities.invokeLater(()->{
+                onSceneChanged(changeListener);
+            });
+        }else {
+            onSceneChanged.add(changeListener);
+        }
+    }
     private Scene scene;
     public Scene getScene(){
         if( scene!=null ){
@@ -85,7 +104,85 @@ public class EditorFrame extends JFrame {
         return scene;
     }
     public void setScene( Scene scene ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
         this.scene = scene;
+        onSceneChanged.forEach( l -> l.accept(this.scene));
+    }
+    //endregion
+    //region save/load scene
+    protected xyz.cofe.io.fs.File sceneFile;
+    protected void saveSceneAs( Scene scene, boolean forceSaveAs ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        var f = sceneFile;
+        if( f!=null && !forceSaveAs ){
+            saveSceneAs(scene, f);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        fileChooser.setDialogTitle("save scene");
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if( sceneFile!=null ){
+            var dir = sceneFile.getParent();
+            if( dir.exists() ){
+                fileChooser.setCurrentDirectory(dir.toFile());
+            }
+        }else{
+            fileChooser.setCurrentDirectory(new File("."));
+        }
+        if( fileChooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION ){
+            saveSceneAs(scene, new xyz.cofe.io.fs.File(fileChooser.getSelectedFile().toString()));
+        }
+    }
+    protected void saveSceneAs( Scene scene, xyz.cofe.io.fs.File file ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        if( file==null )throw new IllegalArgumentException( "file==null" );
+
+        var map = new MapStore().store(scene);
+        var om = new ObjectMapper();
+        om.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            var json = om.writeValueAsString(map);
+            file.writeText(json, StandardCharsets.UTF_8);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+    protected void loadScene(){
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        fileChooser.setDialogTitle("save scene");
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if( sceneFile!=null ){
+            var dir = sceneFile.getParent();
+            if( dir.exists() ){
+                fileChooser.setCurrentDirectory(dir.toFile());
+            }
+        }else{
+            fileChooser.setCurrentDirectory(new File("."));
+        }
+        if( fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ){
+            loadScene(new xyz.cofe.io.fs.File(fileChooser.getSelectedFile().toString()));
+        }
+    }
+    protected void loadScene( xyz.cofe.io.fs.File file ){
+        var om = new ObjectMapper();
+        om.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            var jsonData = om.readValue(file.readText(StandardCharsets.UTF_8),Object.class);
+            if( jsonData instanceof Map ){
+                //noinspection unchecked,rawtypes,rawtypes
+                var sceneObj = new MapStore().restore((Map)jsonData);
+                if( sceneObj instanceof Scene ){
+                    setScene((Scene) sceneObj);
+                }
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
     //endregion
 
@@ -157,6 +254,8 @@ public class EditorFrame extends JFrame {
     {
         editorPanel = new EditorPanel();
         editorPanel.setScene(getScene());
+        onSceneChanged(editorPanel::setScene);
+
         SwingListener.onMouseClicked(editorPanel, ev ->
             activeTool().ifPresent( tool ->
                 tool.onMouseClicked(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
@@ -200,6 +299,8 @@ public class EditorFrame extends JFrame {
     {
         objectBrowser = new ObjectBrowser();
         objectBrowser.setScene(getScene());
+        onSceneChanged( objectBrowser::setScene );
+
         objectBrowser.treeTable.onFocusedNodeChanged(node -> {
             propsPanel.edit(node.getData());
         });
@@ -324,6 +425,15 @@ public class EditorFrame extends JFrame {
 
             new MenuBuilder()
                 .menu( "File", fileMenu -> {
+                    fileMenu.action("Load scene", ()->{
+                        ef.loadScene();
+                    });
+                    fileMenu.action("Save scene", ()->{
+                        ef.saveSceneAs(ef.getScene(),false);
+                    });
+                    fileMenu.action("Save scene as", ()->{
+                        ef.saveSceneAs(ef.getScene(),true);
+                    });
                     fileMenu.action("Exit", ()->{
                         ef.setVisible(false);
                         ef.dispose();
@@ -360,6 +470,10 @@ public class EditorFrame extends JFrame {
 
             if( opts.containsKey("ui.docks.file") ) {
                 java.io.File docsFile = new File(opts.get("ui.docks.file"));
+                var prnt = docsFile.getParentFile();
+                if( prnt!=null && !prnt.exists() ){
+                    prnt.mkdirs();
+                }
                 SwingListener.onWindowClosing(ef, e -> {
                     try {
                         cc.writeXML(docsFile);
