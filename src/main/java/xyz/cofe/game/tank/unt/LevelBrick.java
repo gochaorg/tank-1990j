@@ -12,6 +12,12 @@ import java.awt.*;
  */
 public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figura<SELF> implements Drawing, Rect, Moveable<SELF> {
     public LevelBrick(){}
+    public LevelBrick(Figura<?> sample){
+        super(sample);
+        if( sample instanceof LevelBrick ){
+            this.state = ((LevelBrick<?>) sample).state;
+        }
+    }
     public LevelBrick(LevelBrick<?> sample){
         super(sample);
         this.state = sample.state;

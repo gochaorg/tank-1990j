@@ -8,6 +8,10 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  */
 public class Brick extends LevelBrick<Brick> {
     public Brick(){}
+    public Brick(Figura<?> sample){super(sample);}
+    public Brick(LevelBrick<?> sample){
+        super(sample);
+    }
     public Brick(Brick sample){
         super(sample);
     }

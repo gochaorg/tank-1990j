@@ -8,6 +8,10 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  */
 public class Water extends LevelBrick<Water> {
     public Water(){}
+    public Water(Figura<?> sample){super(sample);}
+    public Water(LevelBrick<?> sample){
+        super(sample);
+    }
     public Water(Water sample){
         super(sample);
     }

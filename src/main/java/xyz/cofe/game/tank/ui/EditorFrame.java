@@ -11,9 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.formdev.flatlaf.FlatLightLaf;
 import xyz.cofe.game.tank.store.MapStore;
-import xyz.cofe.game.tank.ui.cmd.AlignByGridAction;
-import xyz.cofe.game.tank.ui.cmd.DeleteAction;
-import xyz.cofe.game.tank.ui.cmd.DuplicateAction;
+import xyz.cofe.game.tank.ui.cmd.*;
 import xyz.cofe.game.tank.ui.tool.*;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
@@ -75,11 +73,20 @@ public class EditorFrame extends JFrame {
     private final SelectAction deleteSelectedAction = new DeleteAction();
     private final AlignByGridAction alignByGridAction = new AlignByGridAction();
     private final DuplicateAction duplicateAction = new DuplicateAction();
+    private final ConvertToBushAction convertToBushAction = new ConvertToBushAction();
+    private final ConvertToWaterAction convertToWaterAction = new ConvertToWaterAction();
+    private final ConvertToBrickAction convertToBrickAction = new ConvertToBrickAction();
+    private final ConvertToSlideAction convertToSlideAction = new ConvertToSlideAction();
     {
         duplicateAction.setSelectTool(selectTool);
+        convertToBushAction.setSelectTool(selectTool);
+        convertToWaterAction.setSelectTool(selectTool);
+        convertToBrickAction.setSelectTool(selectTool);
+        convertToSlideAction.setSelectTool(selectTool);
     }
     private final SelectAction[] selectActions = new SelectAction[]{
         duplicateAction,
+        convertToBushAction,convertToWaterAction,convertToBrickAction,convertToSlideAction,
         alignByGridAction,
         deleteSelectedAction,
     };
