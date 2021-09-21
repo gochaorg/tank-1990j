@@ -1,14 +1,11 @@
 package xyz.cofe.game.tank.ui;
 
-import xyz.cofe.collection.BasicEventMap;
-import xyz.cofe.collection.EventMap;
 import xyz.cofe.gui.swing.SwingListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.*;
-import javax.swing.event.MenuDragMouseEvent;
-import javax.swing.event.MenuDragMouseListener;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 
@@ -126,7 +121,7 @@ public class MenuBuilder {
 
         var settings = registrySettings.get(act);
 
-        var editor = new KeyStrokeEditor();
+        var editor = new ActionEditor();
         editor.setRegistry(registry);
         editor.setMenuItem(selectedMenuItem);
         editor.setActionSettings(settings);
@@ -234,6 +229,10 @@ public class MenuBuilder {
                         : menuBuilder.settings.computeIfAbsent(name, n -> new ActionSetting());
                 if( aset!=null ){
                     aset.toKeyStroke().ifPresent(mi::setAccelerator);
+                    if( aset.getText()!=null && aset.getText().length()>0 ){
+                        mi.setText(aset.getText());
+                    }
+
                     aset.addListener(ev -> {
                         if( ev instanceof ActionSetting.KeyStrokeChanged ){
                             var e = (ActionSetting.KeyStrokeChanged)ev;
@@ -244,7 +243,16 @@ public class MenuBuilder {
                                 }
                             );
                         }
+                        if( ev instanceof ActionSetting.TextChanged ){
+                            var txt = ((ActionSetting.TextChanged) ev).current;
+                            if( txt!=null && txt.length()>0 ){
+                                mi.setText(txt);
+                            }else {
+                                mi.setText(name);
+                            }
+                        }
                     });
+
                 }
             }
             for( var i : jMenuItems ){

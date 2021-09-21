@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings("UnusedReturnValue")
 public class ActionSetting {
     //region listeners
     public interface Listener {
@@ -49,6 +50,7 @@ public class ActionSetting {
     }
     //endregion
 
+    //region keyStroke : String
     public static class KeyStrokeChanged implements Event {
         public final ActionSetting actionSetting;
         public final String previous;
@@ -59,7 +61,6 @@ public class ActionSetting {
             this.current = current;
         }
     }
-    //region keyStroke
     protected String keyStroke;
     public String getKeyStroke() { return keyStroke; }
     public void setKeyStroke(String keyStroke) {
@@ -73,6 +74,27 @@ public class ActionSetting {
         String ks = keyStroke;
         if( ks==null )return Optional.empty();
         return Optional.of(KeyStroke.getKeyStroke(ks));
+    }
+    //endregion
+    //region text : String
+    public static class TextChanged implements Event {
+        public final ActionSetting actionSetting;
+        public final String previous;
+        public final String current;
+        public TextChanged(ActionSetting actionSetting, String previous, String current) {
+            this.actionSetting = actionSetting;
+            this.previous = previous;
+            this.current = current;
+        }
+    }
+    protected String text;
+    public String getText() { return text; }
+    public void setText(String text) {
+        var old = this.text;
+        this.text = text;
+        if( !Objects.equals(old,text) ){
+            fireEvent(new TextChanged(this,old,text));
+        }
     }
     //endregion
 }

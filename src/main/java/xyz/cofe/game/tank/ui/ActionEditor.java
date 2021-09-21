@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class KeyStrokeEditor {
+public class ActionEditor {
     //region actionSettings : Map<String,ActionSetting>
     private Map<String,ActionSetting> actionSettings;
     public Map<String, ActionSetting> getActionSettings() {
@@ -32,22 +32,8 @@ public class KeyStrokeEditor {
     private Map<MenuBuilder.ActionItem, JMenuItem> registry;
     public Map<MenuBuilder.ActionItem, JMenuItem> getRegistry() { return registry; }
     public void setRegistry(Map<MenuBuilder.ActionItem, JMenuItem> registry) {
-        backRegistry = new LinkedHashMap<>();
-
         this.registry = registry;
-        if( registry!=null ){
-            for( var e : registry.entrySet() ){
-                var k = e.getKey();
-                var v = e.getValue();
-                if( k!=null && v!=null ){
-                    backRegistry.put(v,k);
-                }
-            }
-        }
     }
-    //endregion
-    //region backRegistry : Map<JMenuItem, MenuBuilder.ActionItem>
-    private Map<JMenuItem, MenuBuilder.ActionItem> backRegistry;
     //endregion
     //region menuItem : JMenuItem
     private JMenuItem menuItem;
@@ -182,8 +168,12 @@ public class KeyStrokeEditor {
             keyStroke(ks);
         }
     }
+
+    public static class FrameSettings {
+        public boolean actionTextEditable = true;
+    }
     public class Frame extends JFrame {
-        public Frame(){
+        public Frame(FrameSettings settings){
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setTitle("edit key stroke");
 
@@ -193,7 +183,7 @@ public class KeyStrokeEditor {
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 1;
-            gbc.gridy = 1;
+            gbc.gridy = 3;
             gbc.weightx = 1;
             gbc.weighty = 0;
             gbc.fill = GridBagConstraints.BOTH;
@@ -202,31 +192,51 @@ public class KeyStrokeEditor {
 
             gbc = new GridBagConstraints();
             gbc.gridx = 10;
-            gbc.gridy = 1;
+            gbc.gridy = 3;
             gbc.insets = new Insets(0,3,0,0);
             getContentPane().add(setButton, gbc);
             setButton.setText("set");
 
             gbc = new GridBagConstraints();
             gbc.gridx = 12;
-            gbc.gridy = 1;
-            gbc.insets = new Insets(0,3,0,0);
+            gbc.gridy = 3;
+            gbc.insets = new Insets(0,3,0,3);
             getContentPane().add(resetButton, gbc);
             resetButton.setText("reset");
 
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
-            gbc.gridy = 1;
+            gbc.gridy = 3;
             gbc.insets = new Insets(0,0,0,3);
             getContentPane().add(readKeyStroke, gbc);
             readKeyStroke.setText("reading");
             readKeyStroke.setToolTipText("reading key stroke");
             readKeyStroke.setSelected(true);
 
+            if( settings!=null && settings.actionTextEditable ) {
+                gbc = new GridBagConstraints();
+                gbc.gridx = 1;
+                gbc.gridy = 1;
+                gbc.weightx = 1;
+                gbc.gridwidth = 12;
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.insets = new Insets(3, 0, 3, 3);
+                getContentPane().add(actionText, gbc);
+
+                gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 1;
+                //gbc.weightx = 1;
+                //gbc.gridwidth = 12;
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.insets = new Insets(3, 3, 3, 3);
+                getContentPane().add(new JLabel("text:"), gbc);
+            }
+
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
-            gbc.gridy = 2;
-            gbc.insets = new Insets(2,3,0,3);
+            gbc.gridy = 5;
+            gbc.insets = new Insets(2,3,5,3);
             gbc.weightx = 1;
             gbc.weighty = 1;
             gbc.gridwidth = 13;
@@ -318,6 +328,7 @@ public class KeyStrokeEditor {
         public final JButton resetButton = new JButton();
         public final JCheckBox readKeyStroke = new JCheckBox();
         public final JTextPane message = new JTextPane();
+        public final JTextField actionText = new JTextField();
 
         private Optional<KeyStroke> readKeyStroke(String str){
             var ks = KeyStroke.getKeyStroke(str);
@@ -387,7 +398,10 @@ public class KeyStrokeEditor {
 
         menuLocker.ifPresent(MenuLocker::lock);
 
-        Frame frame = new Frame();
+        FrameSettings fset = new FrameSettings();
+        fset.actionTextEditable = true;
+
+        Frame frame = new Frame(fset);
         frame.setTitle("Edit key stroke of "+actionItem.name);
         frame.editPanel.keyStroke(menuItem.getAccelerator());
         frame.setLocationRelativeTo(null);
@@ -409,5 +423,13 @@ public class KeyStrokeEditor {
         SwingListener.onWindowClosing(frame, ev ->{
             menuLocker.ifPresent(MenuLocker::unlock);
         });
+
+        var aset = actionSettings.get(actionItem.name);
+        if( aset!=null ){
+            frame.actionText.setText(aset.getText()!=null ? aset.getText() : "");
+            SwingListener.onTextChanged(frame.actionText, () -> {
+                aset.setText(frame.actionText.getText());
+            });
+        }
     }
 }
