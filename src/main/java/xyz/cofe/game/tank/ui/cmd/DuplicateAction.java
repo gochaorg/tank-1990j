@@ -15,6 +15,8 @@ public class DuplicateAction implements SelectAction {
 
     @Override
     public void execute(Scene scene, Set<Figura<?>> selection) {
+        System.out.println("duplicate");
+
         if( scene==null )return;
         if( selection==null || selection.isEmpty() )return;
 

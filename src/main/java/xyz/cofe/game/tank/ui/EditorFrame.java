@@ -64,6 +64,7 @@ public class EditorFrame extends JFrame {
             : Optional.empty();
     }
     public void setActiveTool( Tool tool ){
+        //System.out.println("setActiveTool "+tool);
         this.activeTool = tool;
         tool2toolbarButton.forEach( (t,b)->{
             b.setBorderPainted(t!=tool);
@@ -423,7 +424,36 @@ public class EditorFrame extends JFrame {
             cc.addSingleDockableFactory(DockId.properties.name(), f);
             cc.addSingleDockableFactory(DockId.objectBrowser.name(), f);
 
-            new MenuBuilder()
+            ActionsSettings asettings = new ActionsSettings();
+            if( opts.containsKey("ui.actions.file") ){
+                var file = new xyz.cofe.io.fs.File(opts.get("ui.actions.file"));
+                var dir = file.getParent();
+                if( dir!=null && !dir.exists() )dir.createDirectories();
+                if( file.isFile() ){
+                    ObjectMapper om = new ObjectMapper();
+                    try {
+                        asettings = om.readValue(file.readText(StandardCharsets.UTF_8),ActionsSettings.class);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                var f_settings = asettings;
+                SwingListener.onWindowClosing(ef, e->{
+                    ObjectMapper om = new ObjectMapper();
+                    om.enable(SerializationFeature.INDENT_OUTPUT);
+                    try {
+                        file.writeText(
+                            om.writeValueAsString(f_settings),
+                            StandardCharsets.UTF_8
+                            );
+                    } catch (JsonProcessingException err) {
+                        err.printStackTrace();
+                    }
+                });
+            }
+
+            new MenuBuilder(asettings)
                 .menu( "File", fileMenu -> {
                     fileMenu.action("Load scene", ()->{
                         ef.loadScene();
