@@ -4,12 +4,9 @@ import xyz.cofe.collection.BasicEventSet;
 import xyz.cofe.collection.EventSet;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
-import xyz.cofe.game.tank.ui.KeyCode;
-import xyz.cofe.game.tank.ui.KeyEv;
-import xyz.cofe.game.tank.ui.MouseEv;
+import xyz.cofe.game.tank.ui.*;
 import xyz.cofe.game.tank.ui.canvas.Grid;
 import xyz.cofe.game.tank.unt.SceneProperty;
-import xyz.cofe.game.tank.ui.Tool;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
 
@@ -23,7 +20,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SelectTool extends AbstractTool implements Tool, SceneProperty {
+public class SelectTool extends AbstractTool implements Tool, SceneProperty, GridBinding, SnapToGridProperty {
     //region image, name
     @Override
     public String name() {

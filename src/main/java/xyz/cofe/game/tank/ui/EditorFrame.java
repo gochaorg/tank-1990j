@@ -16,6 +16,7 @@ import xyz.cofe.game.tank.ui.tool.*;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.gui.swing.SwingListener;
+import xyz.cofe.iter.Eterable;
 
 import java.awt.*;
 import java.io.File;
@@ -298,9 +299,19 @@ public class EditorFrame extends JFrame {
                 tool.onPaint(gs);
             }
         });
+
         selectTool.origin(editorPanel::getOrigin);
-        selectTool.setGrid(()->editorPanel.grid);
-        alignByGridAction.setGrid(editorPanel.grid);
+
+        for( var t : tools ){
+            if( t instanceof GridBinding ){
+                ((GridBinding) t).setGrid(()->editorPanel.grid);
+            }
+        }
+        for( var t : selectActions ){
+            if( t instanceof GridBinding ){
+                ((GridBinding) t).setGrid(()->editorPanel.grid);
+            }
+        }
     }
 
     private final ObjectBrowser objectBrowser;
@@ -479,8 +490,16 @@ public class EditorFrame extends JFrame {
                 .menu("Mode", modeMenu -> {
                     modeMenu.action("Snap to grid", act -> {
                         act.checked(false, snap -> {
-                            System.out.println("snap "+snap);
-                            ef.selectTool.setSnapToGrid(snap);
+                            for( var t : ef.tools ){
+                                if( t instanceof SnapToGridProperty ){
+                                    ((SnapToGridProperty) t).setSnapToGrid(snap);
+                                }
+                            }
+                            for( var t : ef.selectActions ){
+                                if( t instanceof SnapToGridProperty ){
+                                    ((SnapToGridProperty) t).setSnapToGrid(snap);
+                                }
+                            }
                         });
                     });
                 })
@@ -497,6 +516,9 @@ public class EditorFrame extends JFrame {
                             cmd.execute(ef.getScene(), ef.selectTool.getSelection());
                         });
                     }
+                    commandMenu.action("Reset view",
+                        new ResetViewCommand().origin(ef.editorPanel)
+                    );
                 })
                 .menu( "About", aboutMenu -> {
                     aboutMenu.action("about", ()->{});

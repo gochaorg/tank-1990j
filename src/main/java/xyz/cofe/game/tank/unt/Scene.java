@@ -3,89 +3,15 @@ package xyz.cofe.game.tank.unt;
 import xyz.cofe.collection.BasicEventList;
 import xyz.cofe.collection.EventList;
 import xyz.cofe.ecolls.ListenersHelper;
+import xyz.cofe.game.tank.geom.Size2D;
 
+import java.awt.Color;
 import java.util.Set;
 
 /**
  * Сцена
  */
 public class Scene {
-    protected final FiguraListener figuraListener = new FiguraListener() {
-        @Override
-        public void figuraEvent(FiguraEvent event) {
-            if( event instanceof FiguraMoved ){
-                fireEvent(new MovedFigure(Scene.this, (FiguraMoved<?>) event));
-            }
-        }
-    };
-
-    /** Фигуры расставленные на сцене */
-    protected final EventList<Figura<?>> figures = new BasicEventList<>();
-    {
-        figures.onChanged((idx,oldItem,newItem)->{
-            if( oldItem!=null ){
-                fireEvent(new RemoveFigure(this,oldItem));
-                oldItem.removeFiguraListener(figuraListener);
-            }
-            if( newItem!=null ){
-                fireEvent(new AddFigure(this,newItem));
-                newItem.addFiguraListener(figuraListener);
-            }
-        });
-    }
-
-
-    /**
-     * Фигуры расставленные на сцене
-     * @return фигуры
-     */
-    public EventList<Figura<?>> getFigures(){
-        return figures;
-    }
-
-    //region AddFigure / RemoveFigure
-
-    /**
-     * Фигура добавлена на сцену
-     */
-    public static class AddFigure extends Event {
-        public AddFigure(Scene scene, Figura<?> f) {
-            super(scene);
-            figura = f;
-        }
-
-        protected Figura<?> figura;
-        public Figura<?> getFigura(){ return figura; }
-    }
-
-    /**
-     * Фигура удалена со сцены
-     */
-    public static class RemoveFigure extends Event {
-        public RemoveFigure(Scene scene, Figura<?> f) {
-            super(scene);
-            figura = f;
-        }
-
-        protected Figura<?> figura;
-        public Figura<?> getFigura(){ return figura; }
-    }
-    //endregion
-    //region MovedFigure
-    /**
-     * Перемещение фигуры по сцене
-     */
-    public static class MovedFigure extends Event {
-        public MovedFigure(Scene scene, FiguraMoved<?> moved ) {
-            super(scene);
-            this.moved = moved;
-        }
-
-        protected FiguraMoved<?> moved;
-        public FiguraMoved<?> getFigura(){ return moved; }
-    }
-    //endregion
-
     //region event - Событие сцены
     /**
      * Событие сцены
@@ -188,6 +114,148 @@ public class Scene {
      */
     public void runEventQueue() {
         listeners.runEventQueue();
+    }
+    //endregion
+
+    //region figures : EventList<Figura<?>>
+    @SuppressWarnings("rawtypes")
+    protected final FiguraListener figuraListener = event -> {
+        if( event instanceof FiguraMoved ){
+            fireEvent(new MovedFigure(Scene.this, (FiguraMoved<?>) event));
+        }
+    };
+
+    /** Фигуры расставленные на сцене */
+    protected final EventList<Figura<?>> figures = new BasicEventList<>();
+    {
+        figures.onChanged((idx,oldItem,newItem)->{
+            if( oldItem!=null ){
+                fireEvent(new RemoveFigure(this,oldItem));
+                //noinspection unchecked
+                oldItem.removeFiguraListener(figuraListener);
+            }
+            if( newItem!=null ){
+                fireEvent(new AddFigure(this,newItem));
+                //noinspection unchecked
+                newItem.addFiguraListener(figuraListener);
+            }
+        });
+    }
+
+    /**
+     * Фигуры расставленные на сцене
+     * @return фигуры
+     */
+    public EventList<Figura<?>> getFigures(){
+        return figures;
+    }
+    //endregion
+
+    //region AddFigure / RemoveFigure
+
+    /**
+     * Фигура добавлена на сцену
+     */
+    public static class AddFigure extends Event {
+        public AddFigure(Scene scene, Figura<?> f) {
+            super(scene);
+            figura = f;
+        }
+
+        protected Figura<?> figura;
+        public Figura<?> getFigura(){ return figura; }
+    }
+
+    /**
+     * Фигура удалена со сцены
+     */
+    public static class RemoveFigure extends Event {
+        public RemoveFigure(Scene scene, Figura<?> f) {
+            super(scene);
+            figura = f;
+        }
+
+        protected Figura<?> figura;
+        public Figura<?> getFigura(){ return figura; }
+    }
+    //endregion
+    //region MovedFigure
+    /**
+     * Перемещение фигуры по сцене
+     */
+    public static class MovedFigure extends Event {
+        public MovedFigure(Scene scene, FiguraMoved<?> moved ) {
+            super(scene);
+            this.moved = moved;
+        }
+
+        protected FiguraMoved<?> moved;
+        public FiguraMoved<?> getFigura(){ return moved; }
+    }
+    //endregion
+
+    //region size
+    //region SizeChanged
+    public static class SizeChanged extends Event {
+        public final Size2D previous;
+        public final Size2D current;
+        public SizeChanged(Scene scene,Size2D previous,Size2D current) {
+            super(scene);
+            if( previous==null )throw new IllegalArgumentException( "previous==null" );
+            if( current==null )throw new IllegalArgumentException( "current==null" );
+            this.previous = previous;
+            this.current = current;
+        }
+    }
+    //endregion
+    //region width : double
+    protected double width = 32 * 8;
+    public double getWidth() {
+        return width;
+    }
+    public void setWidth(double width) {
+        var old = Size2D.of(width,height);
+        this.width = width;
+        size2D = Size2D.of(width,height);
+        fireEvent(new SizeChanged(this,old,size2D));
+    }
+    //endregion
+    //region height : double
+    protected double height = 32 * 8;
+    public double getHeight() {
+        return height;
+    }
+    public void setHeight(double height) {
+        var old = Size2D.of(width,height);
+        this.height = height;
+        size2D = Size2D.of(width,height);
+        fireEvent(new SizeChanged(this,old,size2D));
+    }
+    //endregion
+    //region size : Size2D
+    private Size2D size2D = Size2D.of(width,height);
+    public Size2D getSize(){ return size2D; }
+    //endregion
+    //endregion
+
+    //region borderWidth : double
+    protected double borderWidth = 32*2;
+    public double getBorderWidth() {
+        return borderWidth;
+    }
+    public void setBorderWidth(double borderWidth) {
+        this.borderWidth = borderWidth;
+    }
+    //endregion
+    //region borderColor : Color
+    protected Color borderColor = Color.gray;
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
     }
     //endregion
 }

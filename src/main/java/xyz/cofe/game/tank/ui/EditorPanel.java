@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +83,7 @@ public class EditorPanel extends JPanel implements OriginProperty {
                 if( ev instanceof Scene.AddFigure )repaint();
                 else if( ev instanceof Scene.RemoveFigure )repaint();
                 else if( ev instanceof Scene.MovedFigure )repaint();
+                else if( ev instanceof Scene.SizeChanged )repaint();
             }));
         }
     }
@@ -179,6 +182,28 @@ public class EditorPanel extends JPanel implements OriginProperty {
             var orig = getOrigin();
             at.translate(-orig.x(), -orig.y());
             gs.setTransform(at);
+
+            var size = scene.getSize();
+            if( size.width()>0 && size.height()>0 ){
+                double w = Math.min(32,scene.getBorderWidth());
+                GeneralPath p = new GeneralPath();
+                p.moveTo(0,0);
+                p.lineTo(size.width()+w,0);
+                p.lineTo(size.width()+w,-w);
+                p.lineTo(-w,-w);
+                p.lineTo(-w,size.height()+w);
+                p.lineTo(size.width()+w,size.height()+w);
+                p.lineTo(size.width()+w,0);
+                p.lineTo(size.width(),0);
+                p.lineTo(size.width(),size.height());
+                p.lineTo(size.width(),size.height());
+                p.lineTo(0,size.height());
+                p.closePath();
+
+                Color c = scene.getBorderColor();
+                gs.setPaint(c!=null ? c : Color.gray);
+                gs.fill(p);
+            }
 
             for( var fig : scene.getFigures() ){
                 if( fig!=null ){
