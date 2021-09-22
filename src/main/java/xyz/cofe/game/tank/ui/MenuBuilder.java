@@ -344,6 +344,11 @@ public class MenuBuilder {
             return this;
         }
 
+        public MenuItem separator(){
+            configure.add(JMenu::addSeparator);
+            return this;
+        }
+
         //region build()
         protected final List<Consumer<JMenu>> configure = new ArrayList<>();
 

@@ -489,6 +489,7 @@ public class EditorFrame extends JFrame {
                             }
                         });
                     }
+                    commandMenu.separator();
                     commandMenu.action("Reset view",
                         new ResetViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
                     );
