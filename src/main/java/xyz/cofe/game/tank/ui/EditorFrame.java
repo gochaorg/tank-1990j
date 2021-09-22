@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.formdev.flatlaf.FlatLightLaf;
+import xyz.cofe.ecolls.Closeables;
+import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.store.MapStore;
 import xyz.cofe.game.tank.ui.cmd.*;
 import xyz.cofe.game.tank.ui.tool.*;
@@ -22,10 +24,13 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -34,6 +39,8 @@ import javax.swing.Timer;
  * Редактор
  */
 public class EditorFrame extends JFrame {
+    private final Observers<EditorPanel> onEditorPanelChanged = new Observers<>();
+
     //region tools - инструменты
     private final SelectTool selectTool = new SelectTool();
 
@@ -45,13 +52,20 @@ public class EditorFrame extends JFrame {
         selectTool, brickTool, waterTool, slideTool, bushTool
     };
     {
-        for( var t : tools ){
-            if( t instanceof SceneProperty){
-                ((SceneProperty) t).setScene(getScene());
-                onSceneChanged(((SceneProperty) t)::setScene);
+        onEditorPanelChanged.listen( ev -> {
+            for( var t : tools ){
+                if( t instanceof SceneProperty){
+                    ((SceneProperty) t).setScene(ev.event.getScene());
+                }
+                if( t instanceof GridBinding ){
+                    ((GridBinding) t).setGrid(()->ev.event.grid);
+                }
             }
-        }
+
+            selectTool.origin(ev.event::getOrigin);
+        });
     }
+
     private final Map<Tool,JButton> tool2toolbarButton = new LinkedHashMap<>();
     //endregion
     //region activeTool : Tool - активный инструмент
@@ -91,109 +105,21 @@ public class EditorFrame extends JFrame {
         alignByGridAction,
         deleteSelectedAction,
     };
-
-    //region scene : Scene
-    private final List<Consumer<Scene>> onSceneChanged = new ArrayList<>();
-    private void onSceneChanged( Consumer<Scene> changeListener ){
-        if( changeListener==null )throw new IllegalArgumentException( "changeListener==null" );
-        if( onSceneChanged==null ){
-            SwingUtilities.invokeLater(()->{
-                onSceneChanged(changeListener);
-            });
-        }else {
-            onSceneChanged.add(changeListener);
-        }
-    }
-    private Scene scene;
-    public Scene getScene(){
-        if( scene!=null ){
-            return scene;
-        }
-        scene = new Scene();
-        return scene;
-    }
-    public void setScene( Scene scene ){
-        if( scene==null )throw new IllegalArgumentException( "scene==null" );
-        this.scene = scene;
-        onSceneChanged.forEach( l -> l.accept(this.scene));
-    }
-    //endregion
-    //region save/load scene
-    protected xyz.cofe.io.fs.File sceneFile;
-    protected void saveSceneAs( Scene scene, boolean forceSaveAs ){
-        if( scene==null )throw new IllegalArgumentException( "scene==null" );
-        var f = sceneFile;
-        if( f!=null && !forceSaveAs ){
-            saveSceneAs(scene, f);
-            return;
-        }
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        fileChooser.setDialogTitle("save scene");
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        if( sceneFile!=null ){
-            var dir = sceneFile.getParent();
-            if( dir.exists() ){
-                fileChooser.setCurrentDirectory(dir.toFile());
-            }
-        }else{
-            fileChooser.setCurrentDirectory(new File("."));
-        }
-        if( fileChooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION ){
-            saveSceneAs(scene, new xyz.cofe.io.fs.File(fileChooser.getSelectedFile().toString()));
-        }
-    }
-    protected void saveSceneAs( Scene scene, xyz.cofe.io.fs.File file ){
-        if( scene==null )throw new IllegalArgumentException( "scene==null" );
-        if( file==null )throw new IllegalArgumentException( "file==null" );
-
-        var map = new MapStore().store(scene);
-        var om = new ObjectMapper();
-        om.enable(SerializationFeature.INDENT_OUTPUT);
-        try {
-            var json = om.writeValueAsString(map);
-            file.writeText(json, StandardCharsets.UTF_8);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
-    protected void loadScene(){
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setDialogTitle("save scene");
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        if( sceneFile!=null ){
-            var dir = sceneFile.getParent();
-            if( dir.exists() ){
-                fileChooser.setCurrentDirectory(dir.toFile());
-            }
-        }else{
-            fileChooser.setCurrentDirectory(new File("."));
-        }
-        if( fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ){
-            loadScene(new xyz.cofe.io.fs.File(fileChooser.getSelectedFile().toString()));
-        }
-    }
-    protected void loadScene( xyz.cofe.io.fs.File file ){
-        var om = new ObjectMapper();
-        om.enable(SerializationFeature.INDENT_OUTPUT);
-        try {
-            var jsonData = om.readValue(file.readText(StandardCharsets.UTF_8),Object.class);
-            if( jsonData instanceof Map ){
-                //noinspection unchecked,rawtypes,rawtypes
-                var sceneObj = new MapStore().restore((Map)jsonData);
-                if( sceneObj instanceof Scene ){
-                    setScene((Scene) sceneObj);
+    {
+        onEditorPanelChanged.listen( ev -> {
+            for( var t : selectActions ){
+                if( t instanceof SceneProperty){
+                    ((SceneProperty) t).setScene(ev.event.getScene());
+                }
+                if( t instanceof GridBinding ){
+                    ((GridBinding) t).setGrid(()->ev.event.grid);
+                }
+                if( t instanceof OriginProperty ){
+                    ((OriginProperty) t).setOrigin(ev.event.getOrigin());
                 }
             }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        });
     }
-    //endregion
 
     private final JPanel toolPanel;
     {
@@ -259,67 +185,104 @@ public class EditorFrame extends JFrame {
 //        });
     }
 
-    private final EditorPanel editorPanel;
+//    private final EditorPanel editorPanel1;
+//    {
+//        SwingListener.onMouseClicked(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onMouseClicked(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
+//            ));
+//        SwingListener.onMousePressed(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onMousePressed(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
+//            ));
+//        SwingListener.onMouseReleased(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onMouseReleased(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
+//            ));
+//        SwingListener.onMouseDragged(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onMouseDragged(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
+//            ));
+//        SwingListener.onMouseExited(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onMouseExited(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
+//            ));
+//        SwingListener.onKeyPressed(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onKeyPressed(new KeyEv(ev))
+//            ));
+//        SwingListener.onKeyReleased(editorPanel, ev ->
+//            activeTool().ifPresent( tool ->
+//                tool.onKeyReleased(new KeyEv(ev))
+//            ));
+//        editorPanel.onPaintComponent( gs -> {
+//            var tool = getActiveTool();
+//            if( tool!=null ){
+//                tool.onPaint(gs);
+//            }
+//        });
+//    }
+
+    protected Closeables activeSceneDockListeners = new Closeables();
     {
-        editorPanel = new EditorPanel();
-        editorPanel.setScene(getScene());
-        onSceneChanged(editorPanel::setScene);
+        onEditorPanelChanged.listen( ev1 -> {
+            activeSceneDockListeners.closeAll(true);
 
-        SwingListener.onMouseClicked(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onMouseClicked(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-            ));
-        SwingListener.onMousePressed(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onMousePressed(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-            ));
-        SwingListener.onMouseReleased(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onMouseReleased(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-            ));
-        SwingListener.onMouseDragged(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onMouseDragged(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-            ));
-        SwingListener.onMouseExited(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onMouseExited(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-            ));
-        SwingListener.onKeyPressed(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onKeyPressed(new KeyEv(ev))
-            ));
-        SwingListener.onKeyReleased(editorPanel, ev ->
-            activeTool().ifPresent( tool ->
-                tool.onKeyReleased(new KeyEv(ev))
-            ));
-        editorPanel.onPaintComponent( gs -> {
-            var tool = getActiveTool();
-            if( tool!=null ){
-                tool.onPaint(gs);
-            }
+            activeSceneDockListeners.add(
+            SwingListener.onMouseClicked(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onMouseClicked(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onMousePressed(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onMousePressed(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onMouseReleased(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onMouseReleased(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onMouseDragged(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onMouseDragged(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onMouseExited(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onMouseExited(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onKeyPressed(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onKeyPressed(new KeyEv(ev))
+                )));
+
+            activeSceneDockListeners.add(
+            SwingListener.onKeyReleased(ev1.event, ev ->
+                activeTool().ifPresent( tool ->
+                    tool.onKeyReleased(new KeyEv(ev))
+                )));
+
+            activeSceneDockListeners.add(
+            ev1.event.onPaintComponent( gs -> {
+                var tool = getActiveTool();
+                if( tool!=null ){
+                    tool.onPaint(gs);
+                }
+            }));
         });
-
-        selectTool.origin(editorPanel::getOrigin);
-
-        for( var t : tools ){
-            if( t instanceof GridBinding ){
-                ((GridBinding) t).setGrid(()->editorPanel.grid);
-            }
-        }
-        for( var t : selectActions ){
-            if( t instanceof GridBinding ){
-                ((GridBinding) t).setGrid(()->editorPanel.grid);
-            }
-        }
     }
 
     private final ObjectBrowser objectBrowser;
     {
         objectBrowser = new ObjectBrowser();
-        objectBrowser.setScene(getScene());
-        onSceneChanged( objectBrowser::setScene );
-
         objectBrowser.treeTable.onFocusedNodeChanged(node -> {
             propsPanel.edit(node.getData());
         });
@@ -330,6 +293,20 @@ public class EditorFrame extends JFrame {
         properties,
         editor,
         objectBrowser
+    }
+
+    protected Optional<SceneDock> getFocusedSceneDock(){
+        var s = lastFocusedSceneDock!=null ? lastFocusedSceneDock.get() : null;
+        return s!=null ? Optional.of(s) : Optional.empty();
+    };
+
+    protected WeakReference<SceneDock> lastFocusedSceneDock;
+    protected void onSceneDockFocus( SceneDock sceneDock ){
+        System.out.println("onSceneDockFocus "+sceneDock.getTitleText());
+        lastFocusedSceneDock = new WeakReference<>(sceneDock);
+
+        //onSceneChanged.forEach( l -> l.accept(sceneDock.editorPanel.getScene()));
+        onEditorPanelChanged.fire(sceneDock.editorPanel);
     }
 
     public static void main(String[] args){
@@ -361,38 +338,6 @@ public class EditorFrame extends JFrame {
             ef.getContentPane().setLayout(new BorderLayout());
             ef.getContentPane().add(cc.getContentArea());
             cc.getThemes().select(ThemeMap.KEY_ECLIPSE_THEME);
-
-            var editorDock = new DefaultSingleCDockable(DockId.editor.name(),"Editor");
-            editorDock.getContentPane().add(ef.editorPanel);
-            SwingUtilities.invokeLater(()->{
-                cc.addDockable(editorDock);
-                editorDock.setTitleText("Editor");
-                editorDock.setMinimizable(false);
-                editorDock.setExternalizable(false);
-                editorDock.setCloseable(true);
-                editorDock.setVisible(true);
-            });
-
-            SwingListener.onWindowOpened(ef, ev -> {
-                var t = new Timer(1000, x -> {
-                    ef.editorPanel.requestFocus();
-                });
-                t.setInitialDelay(1000);
-                t.setRepeats(false);
-                t.start();
-            });
-
-            editorDock.addFocusListener(new CFocusListener() {
-                @Override
-                public void focusGained(CDockable dockable){
-                    //System.out.println("focus");
-                }
-
-                @Override
-                public void focusLost(CDockable dockable){
-                    //System.out.println("focus lost");
-                }
-            });
 
             var toolDock = new DefaultSingleCDockable(DockId.tool.name());
             toolDock.getContentPane().add(ef.toolPanel);
@@ -430,7 +375,7 @@ public class EditorFrame extends JFrame {
                 public SingleCDockable createBackup(String id){
                     System.out.println("id="+id);
                     if( DockId.tool.name().equals(id) )return toolDock;
-                    if( DockId.editor.name().equals(id) )return editorDock;
+                    //if( DockId.editor.name().equals(id) )return editorDock;
                     if( DockId.properties.name().equals(id) )return propDock;
                     if( DockId.objectBrowser.name().equals(id) )return obDock;
                     return null;
@@ -438,9 +383,56 @@ public class EditorFrame extends JFrame {
             };
 
             cc.addSingleDockableFactory(DockId.tool.name(), f);
-            cc.addSingleDockableFactory(DockId.editor.name(), f);
+            //cc.addSingleDockableFactory(DockId.editor.name(), f);
             cc.addSingleDockableFactory(DockId.properties.name(), f);
             cc.addSingleDockableFactory(DockId.objectBrowser.name(), f);
+
+            //MultipleCDockableFactory
+            SceneDockFactory sceneDockFactory = new SceneDockFactory();
+
+            var sceneDockListeners = new WeakHashMap<SceneDock, Closeables>();
+            var sceneDockNode = new WeakHashMap<SceneDock,SceneNode>();
+            Consumer<SceneDock> listenSceneDock = sceneDock -> {
+                var cl = sceneDockListeners.computeIfAbsent(sceneDock, x -> new Closeables());
+
+                var ref = new WeakReference<>(sceneDock);
+
+                SceneNode snode = new SceneNode(sceneDock.editorPanel.getScene());
+                snode.setName(()->{
+                    var r = ref.get();
+                    return r!=null ? "scene "+r.getTitleText() : "scene";
+                });
+
+                ef.objectBrowser.treeTable.getRoot().append(snode);
+                sceneDockNode.put(sceneDock, snode);
+                cl.add((Runnable) ()->{
+                    var r = ref.get();
+                    var sn = sceneDockNode.get(r);
+                    if( sn!=null ){
+                        ef.objectBrowser.treeTable.getRoot().delete(sn);
+                        sn.close();
+                    }
+                });
+
+                cl.add( sceneDock.onClosed.listen( cev -> {
+                    var r = ref.get();
+                    if( r!=null ) {
+                        var clSet = sceneDockListeners.get(r);
+                        if (clSet != null) {
+                            System.out.println("close all");
+                            clSet.closeAll(true);
+                        }
+                    }
+                    System.out.println("closed "+cev.event.getTitleText());
+                }) );
+                cl.add( sceneDock.onFocusGained.listen(cev -> {
+                    ef.onSceneDockFocus(cev.event);
+                }) );
+            };
+            sceneDockFactory.onSceneDockCreated.add(ev -> {
+                listenSceneDock.accept(ev.event);
+            });
+            cc.addMultipleDockableFactory("scene", sceneDockFactory);
 
             ActionsSettings asettings = new ActionsSettings();
             if( opts.containsKey("ui.actions.file") ){
@@ -471,16 +463,34 @@ public class EditorFrame extends JFrame {
                 });
             }
 
+            var sceneEditorCounter = new AtomicInteger(0);
+
             new MenuBuilder(asettings)
                 .menu( "File", fileMenu -> {
+                    fileMenu.action("New scene", ()->{
+                        SceneDock sceneDock = new SceneDock(sceneDockFactory);
+                        listenSceneDock.accept(sceneDock);
+
+                        cc.addDockable(sceneDock);
+
+                        sceneDock.setLocation(cc.getDefaultLocation());
+                        sceneDock.setTitleText("Editor#"+sceneEditorCounter.incrementAndGet());
+
+                        ef.getFocusedSceneDock().ifPresent(sceneDock::setLocationsAside);
+                        sceneDock.setVisible(true);
+                    });
                     fileMenu.action("Load scene", ()->{
-                        ef.loadScene();
+                        ef.getFocusedSceneDock().ifPresent(SceneDock::loadScene);
                     });
                     fileMenu.action("Save scene", ()->{
-                        ef.saveSceneAs(ef.getScene(),false);
+                        ef.getFocusedSceneDock().ifPresent(sceneDock -> {
+                            sceneDock.saveSceneAs(false);
+                        });
                     });
                     fileMenu.action("Save scene as", ()->{
-                        ef.saveSceneAs(ef.getScene(),true);
+                        ef.getFocusedSceneDock().ifPresent(sceneDock -> {
+                            sceneDock.saveSceneAs(true);
+                        });
                     });
                     fileMenu.action("Exit", ()->{
                         ef.setVisible(false);
@@ -513,12 +523,17 @@ public class EditorFrame extends JFrame {
                 .menu("Command", commandMenu -> {
                     for( var cmd : ef.selectActions ){
                         commandMenu.action(cmd.name(), ()->{
-                            cmd.execute(ef.getScene(), ef.selectTool.getSelection());
+                            var sc = ef.selectTool.getScene();
+                            var sel = ef.selectTool.getSelection();
+                            if( sc!=null && sel!=null ) {
+                                cmd.execute(sc, sel);
+                            }
                         });
                     }
                     commandMenu.action("Reset view",
-                        new ResetViewCommand().origin(ef.editorPanel)
+                        new ResetViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
                     );
+                    commandMenu.action("Run GC", new RunGCCommand());
                 })
                 .menu( "About", aboutMenu -> {
                     aboutMenu.action("about", ()->{});
@@ -548,6 +563,10 @@ public class EditorFrame extends JFrame {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+
+                    sceneDockListeners.keySet().stream().max(Comparator.comparingLong(a -> a.lastFocusGained)).ifPresent(s -> {
+                        s.toFront(s.editorPanel);
+                    });
                 });
             }
         });

@@ -4,6 +4,7 @@ import xyz.cofe.collection.BasicEventList;
 import xyz.cofe.collection.EventList;
 import xyz.cofe.ecolls.ListenersHelper;
 import xyz.cofe.game.tank.geom.Size2D;
+import xyz.cofe.gui.swing.bean.UiBean;
 
 import java.awt.Color;
 import java.util.Set;
@@ -234,7 +235,15 @@ public class Scene {
     //endregion
     //region size : Size2D
     private Size2D size2D = Size2D.of(width,height);
+    @UiBean(forceHidden = true)
     public Size2D getSize(){ return size2D; }
+    public void setSize(Size2D size){
+        if( size==null )throw new IllegalArgumentException( "size==null" );
+        var old = Size2D.of(width,height);
+        width = size.width();
+        height = size.height();
+        fireEvent(new SizeChanged(this,old,size2D));
+    }
     //endregion
     //endregion
 
@@ -258,4 +267,13 @@ public class Scene {
         this.borderColor = borderColor;
     }
     //endregion
+
+    public void assign(Scene scene){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        getFigures().clear();
+        getFigures().addAll(scene.getFigures());
+        setSize(scene.getSize());
+        setBorderColor(scene.getBorderColor());
+        setBorderWidth(scene.getBorderWidth());
+    }
 }

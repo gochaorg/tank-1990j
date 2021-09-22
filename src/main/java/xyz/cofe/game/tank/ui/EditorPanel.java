@@ -133,6 +133,7 @@ public class EditorPanel extends JPanel implements OriginProperty {
 
     @Override
     protected void processMouseEvent(MouseEvent ev) {
+        // System.out.println("processMouseEvent "+ev);
         if( ev.getID()==MouseEvent.MOUSE_PRESSED ){
             if( ev.getButton()==MouseEvent.BUTTON1 ){
                 if( moveCanvasSprite!=null && moveCanvasSprite.contains(ev) ){
