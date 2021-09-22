@@ -185,44 +185,6 @@ public class EditorFrame extends JFrame {
 //        });
     }
 
-//    private final EditorPanel editorPanel1;
-//    {
-//        SwingListener.onMouseClicked(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onMouseClicked(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-//            ));
-//        SwingListener.onMousePressed(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onMousePressed(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-//            ));
-//        SwingListener.onMouseReleased(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onMouseReleased(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-//            ));
-//        SwingListener.onMouseDragged(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onMouseDragged(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-//            ));
-//        SwingListener.onMouseExited(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onMouseExited(new MouseEv(ev, editorPanel).shift(editorPanel.getOrigin()))
-//            ));
-//        SwingListener.onKeyPressed(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onKeyPressed(new KeyEv(ev))
-//            ));
-//        SwingListener.onKeyReleased(editorPanel, ev ->
-//            activeTool().ifPresent( tool ->
-//                tool.onKeyReleased(new KeyEv(ev))
-//            ));
-//        editorPanel.onPaintComponent( gs -> {
-//            var tool = getActiveTool();
-//            if( tool!=null ){
-//                tool.onPaint(gs);
-//            }
-//        });
-//    }
-
     protected Closeables activeSceneDockListeners = new Closeables();
     {
         onEditorPanelChanged.listen( ev1 -> {
@@ -302,10 +264,7 @@ public class EditorFrame extends JFrame {
 
     protected WeakReference<SceneDock> lastFocusedSceneDock;
     protected void onSceneDockFocus( SceneDock sceneDock ){
-        System.out.println("onSceneDockFocus "+sceneDock.getTitleText());
         lastFocusedSceneDock = new WeakReference<>(sceneDock);
-
-        //onSceneChanged.forEach( l -> l.accept(sceneDock.editorPanel.getScene()));
         onEditorPanelChanged.fire(sceneDock.editorPanel);
     }
 

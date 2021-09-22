@@ -2,6 +2,7 @@ package xyz.cofe.game.tank.ui;
 
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
+import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.io.fs.File;
 
 import java.io.DataInputStream;
@@ -12,6 +13,7 @@ public class SceneDockState implements MultipleCDockableLayout {
     public String sceneFileName;
     public String title;
     public long lastFocusGained;
+    public Point origin;
 
     public SceneDockState(){}
     public SceneDockState(SceneDock sceneDock){
@@ -22,6 +24,7 @@ public class SceneDockState implements MultipleCDockableLayout {
             }
             title = sceneDock.getTitleText();
             lastFocusGained = sceneDock.lastFocusGained;
+            origin = sceneDock.editorPanel.getOrigin();
         }
     }
 
@@ -40,6 +43,7 @@ public class SceneDockState implements MultipleCDockableLayout {
         if( sceneFileName!=null )element.addElement("sceneFileName").setString(sceneFileName);
         if( title!=null )element.addElement("title").setString(title);
         element.addElement("lastFocusGained").setLong(lastFocusGained);
+        if( origin!=null )element.addElement("origin").setString(origin.toString());
     }
 
     @Override
@@ -52,6 +56,15 @@ public class SceneDockState implements MultipleCDockableLayout {
 
         e = element.getElement("lastFocusGained");
         if( e!=null ) lastFocusGained = e.getLong();
+
+        e = element.getElement("origin");
+        if( e!=null ) {
+            try {
+                origin = Point.parse(e.getString());
+            } catch (Throwable err){
+                System.err.println(err);
+            }
+        }
     }
 
     public SceneDock createSceneDock(SceneDockFactory factory){

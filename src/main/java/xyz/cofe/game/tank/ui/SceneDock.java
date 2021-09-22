@@ -38,7 +38,6 @@ public class SceneDock extends DefaultMultipleCDockable {
         editorPanel = new EditorPanel();
         initUI();
     }
-
     public SceneDock(MultipleCDockableFactory<?, ?> factory, SceneDockState state){
         super(factory);
         if( state !=null ){
@@ -59,6 +58,12 @@ public class SceneDock extends DefaultMultipleCDockable {
 
         if( sceneFile!=null ){
             reloadScene();
+        }
+
+        if( state!=null ){
+            if( state.origin!=null ){
+                editorPanel.setOrigin(state.origin);
+            }
         }
     }
 
