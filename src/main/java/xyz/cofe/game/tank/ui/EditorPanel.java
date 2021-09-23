@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import xyz.cofe.collection.BasicEventList;
 import xyz.cofe.collection.EventList;
 import xyz.cofe.ecolls.Closeables;
+import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.sprite.Sprite;
 import xyz.cofe.game.tank.ui.canvas.*;
@@ -63,6 +64,7 @@ public class EditorPanel extends JPanel implements OriginProperty {
     }
 
     //region scene : Scene
+    public Observers<Scene> onSceneChanged = new Observers<>();
     private Scene scene;
     public Scene getScene(){
         if( scene!=null ){
@@ -72,8 +74,10 @@ public class EditorPanel extends JPanel implements OriginProperty {
         return scene;
     }
     public void setScene( Scene scene ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
         this.scene = scene;
         listen(scene);
+        onSceneChanged.fire(scene);
     }
     protected final Closeables sceneListeners = new Closeables();
     protected void listen( Scene scene ){

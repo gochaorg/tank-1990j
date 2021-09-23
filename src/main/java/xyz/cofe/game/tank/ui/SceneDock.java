@@ -210,8 +210,8 @@ public class SceneDock extends DefaultMultipleCDockable {
                 //noinspection unchecked,rawtypes,rawtypes
                 var sceneObj = new MapStore().restore((Map)jsonData);
                 if( sceneObj instanceof Scene ){
-                    //editorPanel.setScene((Scene) sceneObj);
-                    editorPanel.getScene().assign((Scene) sceneObj);
+                    editorPanel.setScene((Scene) sceneObj);
+                    //editorPanel.getScene().assign((Scene) sceneObj);
                     setTitleText(file.getName());
                     setSceneFile(file);
                 }

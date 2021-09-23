@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.*;
@@ -51,8 +52,12 @@ public class EditorFrame extends JFrame {
     private final Tool[] tools = new Tool[]{
         selectTool, brickTool, waterTool, slideTool, bushTool
     };
+
+    private final Closeables toolEdSceneLs = new Closeables();
     {
         onEditorPanelChanged.listen( ev -> {
+            toolEdSceneLs.close();
+
             for( var t : tools ){
                 if( t instanceof SceneProperty){
                     ((SceneProperty) t).setScene(ev.event.getScene());
@@ -63,6 +68,15 @@ public class EditorFrame extends JFrame {
             }
 
             selectTool.origin(ev.event::getOrigin);
+
+            toolEdSceneLs.add(
+            ev.event.onSceneChanged.listen( eev -> {
+                for( var t : tools ){
+                    if( t instanceof SceneProperty){
+                        ((SceneProperty) t).setScene(eev.event);
+                    }
+                }
+            }));
         });
     }
 
@@ -105,8 +119,11 @@ public class EditorFrame extends JFrame {
         alignByGridAction,
         deleteSelectedAction,
     };
+
+    private final Closeables selectActionsSceneLs = new Closeables();
     {
         onEditorPanelChanged.listen( ev -> {
+            selectActionsSceneLs.close();
             for( var t : selectActions ){
                 if( t instanceof SceneProperty){
                     ((SceneProperty) t).setScene(ev.event.getScene());
@@ -118,6 +135,15 @@ public class EditorFrame extends JFrame {
                     ((OriginProperty) t).setOrigin(ev.event.getOrigin());
                 }
             }
+            selectActionsSceneLs.add(
+                ev.event.onSceneChanged.listen(eev -> {
+                    for( var t : selectActions ){
+                        if( t instanceof SceneProperty){
+                            ((SceneProperty) t).setScene(eev.event);
+                        }
+                    }
+                })
+            );
         });
     }
 
@@ -351,6 +377,8 @@ public class EditorFrame extends JFrame {
 
             var sceneDockListeners = new WeakHashMap<SceneDock, Closeables>();
             var sceneDockNode = new WeakHashMap<SceneDock,SceneNode>();
+            var sceneDockSceneChangeListener = new WeakHashMap<SceneDock,Closeables>();
+
             Consumer<SceneDock> listenSceneDock = sceneDock -> {
                 var cl = sceneDockListeners.computeIfAbsent(sceneDock, x -> new Closeables());
 
@@ -364,14 +392,53 @@ public class EditorFrame extends JFrame {
 
                 ef.objectBrowser.treeTable.getRoot().append(snode);
                 sceneDockNode.put(sceneDock, snode);
-                cl.add((Runnable) ()->{
+
+                Runnable clScene = ()->{
                     var r = ref.get();
                     var sn = sceneDockNode.get(r);
                     if( sn!=null ){
                         ef.objectBrowser.treeTable.getRoot().delete(sn);
                         sn.close();
                     }
+                };
+
+                Closeables cS = new Closeables();
+                cS.add(clScene);
+                sceneDockSceneChangeListener.put(sceneDock,cS);
+
+                var cl2 = sceneDock.editorPanel.onSceneChanged.listen( newScene -> {
+                    var sceneDock1 = ref.get();
+                    var cl1 = sceneDockSceneChangeListener.get(sceneDock1);
+                    if( cl1!=null ){
+                        cl1.close();
+                    }
+
+                    if( sceneDock1!=null ) {
+                        SceneNode snode1 = new SceneNode(newScene.event);
+                        snode1.setName(() -> {
+                            var r = ref.get();
+                            return r != null ? "scene " + r.getTitleText() : "scene";
+                        });
+
+                        ef.objectBrowser.treeTable.getRoot().append(snode1);
+                        sceneDockNode.put(sceneDock1, snode1);
+
+                        Runnable clScene1 = ()->{
+                            var r = ref.get();
+                            var sn = sceneDockNode.get(r);
+                            if( sn!=null ){
+                                ef.objectBrowser.treeTable.getRoot().delete(sn);
+                                sn.close();
+                            }
+                        };
+
+                        if( cl1!=null ){
+                            cl1.add(clScene1);
+                        }
+                    }
                 });
+                cl.add(cS);
+                cl.add(cl2);
 
                 cl.add( sceneDock.onClosed.listen( cev -> {
                     var r = ref.get();
