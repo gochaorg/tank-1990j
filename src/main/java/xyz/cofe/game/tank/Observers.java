@@ -49,7 +49,7 @@ public class Observers<A> extends ArrayList<Consumer1<Observers.Event<A>>> {
         return ()->{
             var r = ref.get();
             if( removeIf( c -> c==r ) ){
-                System.out.println("removed listener");
+                //System.out.println("removed listener");
             }
         };
     }

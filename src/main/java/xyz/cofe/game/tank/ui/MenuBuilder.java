@@ -12,10 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
+import javax.swing.event.MenuListener;
 
 public class MenuBuilder {
     private static Activator activator;
@@ -177,9 +180,40 @@ public class MenuBuilder {
         }
         public ActionItem checked( boolean initial, Consumer<Boolean> checkChanged ){
             if( checkChanged==null )throw new IllegalArgumentException( "checkChanged==null" );
-            menuItemBuilder = () -> {
+            menuItemBuilder = menu -> {
                 var m = new JCheckBoxMenuItem();
                 m.setSelected(initial);
+                m.addActionListener( e -> {
+                    checkChanged.accept(m.isSelected());
+                });
+                return m;
+            };
+            return this;
+        }
+        public ActionItem checked( Supplier<Boolean> state, Consumer<Boolean> checkChanged ){
+            if( checkChanged==null )throw new IllegalArgumentException( "checkChanged==null" );
+            if( state==null )throw new IllegalArgumentException( "state==null" );
+            menuItemBuilder = menu -> {
+                var m = new JCheckBoxMenuItem();
+                menu.addMenuListener(new MenuListener() {
+                    @Override
+                    public void menuSelected(MenuEvent e) {
+                        var st = state.get();
+                        if( st!=null ){
+                            m.setSelected(st);
+                        }
+                    }
+
+                    @Override
+                    public void menuDeselected(MenuEvent e) {
+
+                    }
+
+                    @Override
+                    public void menuCanceled(MenuEvent e) {
+
+                    }
+                });
                 m.addActionListener( e -> {
                     checkChanged.accept(m.isSelected());
                 });
@@ -190,13 +224,13 @@ public class MenuBuilder {
 
         //region build()
         protected final List<Consumer<JMenuItem>> jMenuItems = new ArrayList<>();
-        protected Supplier<? extends JMenuItem> menuItemBuilder = ()->{
+        protected Function<JMenu,? extends JMenuItem> menuItemBuilder = menu->{
             JMenuItem mi = new JMenuItem();
             return mi;
         };
         public void build(JMenu menu){
             if( menu==null )throw new IllegalArgumentException( "menu==null" );
-            var mi = menuItemBuilder.get();
+            var mi = menuItemBuilder.apply(menu);
 
             SwingListener.onMouseEntered(mi, e -> {
                 select(mi);

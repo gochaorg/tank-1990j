@@ -474,8 +474,14 @@ public class EditorFrame extends JFrame {
                 })
                 .menu("Tools", toolsMenu -> {
                     for( var tool : ef.tools ){
-                        toolsMenu.action(tool.name(), ()->{
-                            ef.setActiveTool(tool);
+                        toolsMenu.action(tool.name(), act->{
+                            act.checked(()->{
+                                var at = ef.getActiveTool();
+                                return at==tool;
+                            },(s)->{});
+                            act.action(ev->{
+                                ef.setActiveTool(tool);
+                            });
                         });
                     }
                 })
