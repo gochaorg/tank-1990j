@@ -14,6 +14,12 @@ import java.util.Map;
 public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
     public Bullet(){
     }
+    public Bullet(Figura<?> sample){
+        super(sample);
+        if( sample instanceof Directed ){
+            direction = ((Directed<?>)sample).direction();
+        }
+    }
     public Bullet(Bullet sample){
         super(sample);
         direction = sample.direction;

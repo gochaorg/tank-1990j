@@ -267,13 +267,4 @@ public class Scene {
         this.borderColor = borderColor;
     }
     //endregion
-
-    public void assign(Scene scene){
-        if( scene==null )throw new IllegalArgumentException( "scene==null" );
-        getFigures().clear();
-        getFigures().addAll(scene.getFigures());
-        setSize(scene.getSize());
-        setBorderColor(scene.getBorderColor());
-        setBorderWidth(scene.getBorderWidth());
-    }
 }

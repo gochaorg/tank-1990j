@@ -9,27 +9,8 @@ import xyz.cofe.game.tank.unt.Scene;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ConvertToBrickAction implements SelectAction {
-    private SelectTool selectTool;
-    public SelectTool getSelectTool() { return selectTool; }
-    public void setSelectTool(SelectTool selectTool) { this.selectTool = selectTool; }
-
-    @Override
-    public void execute(Scene scene, Set<Figura<?>> selection) {
-        if( selection==null || selection.isEmpty() || scene==null )return;
-
-        Set<Figura<?>> set = new LinkedHashSet<>(selection);
-        Set<Figura<?>> clones = new LinkedHashSet<>();
-        for( Figura<?> f : set ){
-            var c = new Brick(f);
-            clones.add(c);
-            scene.getFigures().add(c);
-        }
-        scene.getFigures().removeAll(set);
-
-        if( selectTool!=null ){
-            selectTool.getSelection().clear();
-            selectTool.getSelection().addAll(clones);
-        }
+public class ConvertToBrickAction extends ConvertToAction<Brick> {
+    public ConvertToBrickAction(){
+        super(Brick::new);
     }
 }

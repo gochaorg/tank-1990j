@@ -7,7 +7,12 @@ import xyz.cofe.game.tank.unt.Figura;
 
 import java.util.function.Supplier;
 
-public class BulletV extends OBJ<Bullet> {
+public class BulletV extends OBJ<Bullet> implements ObjectMapper {
+    public static final BulletV instance = new BulletV();
+    @Override public void registry(ObjectMappers om) {
+        ObjectMappers.mappers.put(instance.clazz, instance);
+    }
+
     public BulletV() {
         super(Bullet.class, Bullet::new);
     }

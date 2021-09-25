@@ -49,8 +49,10 @@ public class EditorFrame extends JFrame {
     private final WaterTool waterTool = new WaterTool();
     private final SlideTool slideTool = new SlideTool();
     private final BushTool bushTool = new BushTool();
+    private final PlayerOneTool playerOneTool = new PlayerOneTool();
+
     private final Tool[] tools = new Tool[]{
-        selectTool, brickTool, waterTool, slideTool, bushTool
+        selectTool, brickTool, waterTool, slideTool, bushTool, playerOneTool
     };
 
     private final Closeables toolEdSceneLs = new Closeables();
@@ -106,6 +108,9 @@ public class EditorFrame extends JFrame {
     private final ConvertToWaterAction convertToWaterAction = new ConvertToWaterAction();
     private final ConvertToBrickAction convertToBrickAction = new ConvertToBrickAction();
     private final ConvertToSlideAction convertToSlideAction = new ConvertToSlideAction();
+    private final ConvertToBulletAction convertToBulletAction = new ConvertToBulletAction();
+    private final ConvertToPlayerOneAction convertToPlayerOneAction = new ConvertToPlayerOneAction();
+    private final ConvertToPlayerTwoAction convertToPlayerTwoAction = new ConvertToPlayerTwoAction();
     {
         duplicateAction.setSelectTool(selectTool);
         convertToBushAction.setSelectTool(selectTool);
@@ -115,7 +120,10 @@ public class EditorFrame extends JFrame {
     }
     private final SelectAction[] selectActions = new SelectAction[]{
         duplicateAction,
+
         convertToBushAction,convertToWaterAction,convertToBrickAction,convertToSlideAction,
+        convertToBulletAction,convertToPlayerOneAction,convertToPlayerTwoAction,
+
         alignByGridAction,
         deleteSelectedAction,
     };

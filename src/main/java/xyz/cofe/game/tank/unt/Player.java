@@ -15,6 +15,16 @@ import java.util.Map;
  */
 public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> implements GameUnit<SELF>, Directed<SELF> {
     public Player(){}
+    public Player(Figura<?> sample){
+        super(sample);
+        if( sample instanceof Player ){
+            playerState = ((Player<?>)sample).getPlayerState();
+        }
+        if( sample instanceof Directed ){
+            direction = ((Directed<?>)sample).direction();
+        }
+        job = null;
+    }
     public Player(Player<?> sample){
         super(sample);
         playerState = sample.playerState;
@@ -22,7 +32,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         job = null;
     }
 
-    //region playerState
+    //region playerState : PlayerState
     protected PlayerState playerState = PlayerState.Level0;
     public PlayerState getPlayerState(){
         return playerState;
@@ -34,7 +44,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         currentSpriteLine().startAnimation();
     }
     //endregion
-    //region direction
+    //region direction : Direction
     protected Direction direction = Direction.RIGHT;
     public Direction direction(){
         return direction;
@@ -94,6 +104,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     }
     //endregion
 
+    //region Перемещение
     //region run()
     protected Job<?> job;
 
@@ -127,6 +138,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         job = null;
     }
 
+    @SuppressWarnings("unchecked")
     protected final Moving<SELF> moving = new Moving<SELF>((SELF) this)
         .onStopped( ev -> {
             System.out.println("stopped event");
@@ -136,12 +148,12 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
             System.out.println("collision "+ev.getRect()+" with "+ev.getWithFigura());
         });
 
+    @SuppressWarnings("UnusedReturnValue")
     public Player<SELF> collision(Iterable<? extends Figura<?>> collizion){
         moving.collision(collizion);
         return this;
     }
 
-    //region Переммещение
     /**
      * Перемещение объекта
      * @param direction направление движения
