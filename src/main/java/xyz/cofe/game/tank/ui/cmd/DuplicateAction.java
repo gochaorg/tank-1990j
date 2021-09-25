@@ -1,6 +1,7 @@
 package xyz.cofe.game.tank.ui.cmd;
 
 import xyz.cofe.game.tank.ui.SelectAction;
+import xyz.cofe.game.tank.ui.SelectToolProperty;
 import xyz.cofe.game.tank.ui.tool.SelectTool;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
@@ -8,7 +9,7 @@ import xyz.cofe.game.tank.unt.Scene;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class DuplicateAction implements SelectAction {
+public class DuplicateAction implements SelectAction, SelectToolProperty {
     private SelectTool selectTool;
     public SelectTool getSelectTool() { return selectTool; }
     public void setSelectTool(SelectTool selectTool) { this.selectTool = selectTool; }

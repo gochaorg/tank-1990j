@@ -111,13 +111,7 @@ public class EditorFrame extends JFrame {
     private final ConvertToBulletAction convertToBulletAction = new ConvertToBulletAction();
     private final ConvertToPlayerOneAction convertToPlayerOneAction = new ConvertToPlayerOneAction();
     private final ConvertToPlayerTwoAction convertToPlayerTwoAction = new ConvertToPlayerTwoAction();
-    {
-        duplicateAction.setSelectTool(selectTool);
-        convertToBushAction.setSelectTool(selectTool);
-        convertToWaterAction.setSelectTool(selectTool);
-        convertToBrickAction.setSelectTool(selectTool);
-        convertToSlideAction.setSelectTool(selectTool);
-    }
+
     private final SelectAction[] selectActions = new SelectAction[]{
         duplicateAction,
 
@@ -127,6 +121,14 @@ public class EditorFrame extends JFrame {
         alignByGridAction,
         deleteSelectedAction,
     };
+
+    {
+        for( var t : selectActions ){
+            if( t instanceof SelectToolProperty ){
+                ((SelectToolProperty) t).setSelectTool(selectTool);
+            }
+        }
+    }
 
     private final Closeables selectActionsSceneLs = new Closeables();
     {
