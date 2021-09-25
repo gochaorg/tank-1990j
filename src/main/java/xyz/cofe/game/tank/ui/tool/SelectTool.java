@@ -6,11 +6,17 @@ import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.ui.*;
 import xyz.cofe.game.tank.ui.canvas.Grid;
+import xyz.cofe.game.tank.ui.cmd.ConvertToAction;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
+import xyz.cofe.gui.swing.SwingListener;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -112,6 +118,48 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
     }
     //endregion
 
+    //region selectActions : List<SelectAction>
+    protected List<SelectAction> selectActions = List.of();
+    public List<SelectAction> getSelectActions() {
+        return selectActions;
+    }
+
+    public void setSelectActions(List<SelectAction> selectActions) {
+        if( selectActions==null )throw new IllegalArgumentException( "selectActions==null" );
+        this.selectActions = selectActions;
+    }
+    //endregion
+
+    protected JPopupMenu buildPopupMenu(){
+        var scene = getScene();
+        if( scene==null )return null;
+        if( getSelection().isEmpty() )return null;
+
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenu convertMenu = new JMenu("Convert to");
+        popupMenu.add(convertMenu);
+
+        if( selectActions!=null ){
+            for( var sa : selectActions ){
+                JMenuItem callAction = new JMenuItem(sa.name());
+                SwingListener.onActionPerformed(callAction,ev -> {
+                    sa.execute(scene, getSelection());
+                });
+                sa.image().ifPresent( img -> {
+                    var ico = new ImageIcon(img);
+                    callAction.setIcon(ico);
+                });
+
+                if( sa instanceof ConvertToAction ){
+                    convertMenu.add(callAction);
+                }else{
+                    popupMenu.add(callAction);
+                }
+            }
+        }
+        return popupMenu;
+    }
+
     protected Shape bounds(Figura<?> f, double indent ){
         return new Rectangle2D.Double(
             f.left()-indent, f.top()-indent, f.width()+indent*2, f.height()+indent*2
@@ -168,23 +216,33 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         var scene = getScene();
         if( scene==null )return;
 
-        List<Figura<?>> hits = new ArrayList<>();
+        if( p.isLeftButton() ) {
+            List<Figura<?>> hits = new ArrayList<>();
+            if (p.isShift()) {
+                scene.getFigures().stream().filter(f -> f.contains(p)).forEach(hits::add);
+                getSelection().addAll(hits);
+            } else {
+                getSelection().clear();
+                scene.getFigures().stream().filter(f -> f.contains(p)).forEach(hits::add);
+                getSelection().addAll(hits);
+            }
+            if (!hits.isEmpty()) {
+                setLastSelected(hits.get(hits.size() - 1));
+            }
+            if (p.getComponent() != null) {
+                p.getComponent().repaint();
+            }
+        } else if( p.isRightButton() && selectActions!=null && !selectActions.isEmpty() ){
+            var popup = buildPopupMenu();
+            if( popup==null )return;
 
-        if( p.isShift() ) {
-            scene.getFigures().stream().filter(f -> f.contains(p)).forEach( hits::add );
-            getSelection().addAll(hits);
-        }else {
-            getSelection().clear();
-            scene.getFigures().stream().filter(f -> f.contains(p)).forEach( hits::add );
-            getSelection().addAll(hits);
-        }
+            var cmpt = p.getComponent();
+            if( cmpt==null )return;
 
-        if( !hits.isEmpty() ){
-            setLastSelected(hits.get(hits.size()-1));
-        }
-
-        if( p.getComponent()!=null ){
-            p.getComponent().repaint();
+            var mp = cmpt.getMousePosition();
+            if( mp!=null ){
+                popup.show(cmpt, mp.x, mp.y);
+            }
         }
     }
 

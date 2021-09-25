@@ -7,15 +7,30 @@ import xyz.cofe.game.tank.unt.Brick;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
 
+import java.awt.image.BufferedImage;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 public abstract class ConvertToAction<F extends Figura<?>> implements SelectAction, SelectToolProperty {
     private final Function<Figura<?>,F> convert;
+    private BufferedImage image;
+
     public ConvertToAction(Function<Figura<?>,F> convert){
         if( convert==null )throw new IllegalArgumentException( "convert==null" );
         this.convert = convert;
+    }
+
+    public ConvertToAction(BufferedImage image,Function<Figura<?>,F> convert){
+        if( convert==null )throw new IllegalArgumentException( "convert==null" );
+        this.convert = convert;
+        this.image = image;
+    }
+
+    @Override
+    public Optional<BufferedImage> image() {
+        return image!=null ? Optional.of(image) : Optional.empty();
     }
 
     private SelectTool selectTool;

@@ -34,7 +34,7 @@ public class MouseEv implements Point {
     public int getButton(){ return button; }
 
     public boolean isLeftButton(){ return button == MouseEvent.BUTTON1; }
-    public boolean isRightButton(){ return button == MouseEvent.BUTTON2; }
+    public boolean isRightButton(){ return button == MouseEvent.BUTTON3; }
 
     protected boolean shift;
     public boolean isShift(){ return shift; }

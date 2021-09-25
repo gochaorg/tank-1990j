@@ -128,6 +128,7 @@ public class EditorFrame extends JFrame {
                 ((SelectToolProperty) t).setSelectTool(selectTool);
             }
         }
+        selectTool.setSelectActions(List.of(selectActions));
     }
 
     private final Closeables selectActionsSceneLs = new Closeables();
