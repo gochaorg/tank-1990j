@@ -111,9 +111,13 @@ public class EditorFrame extends JFrame {
     private final ConvertToBulletAction convertToBulletAction = new ConvertToBulletAction();
     private final ConvertToPlayerOneAction convertToPlayerOneAction = new ConvertToPlayerOneAction();
     private final ConvertToPlayerTwoAction convertToPlayerTwoAction = new ConvertToPlayerTwoAction();
+    private final ToFrontAction toFrontAction = new ToFrontAction();
+    private final ToBackAction toBackAction = new ToBackAction();
 
     private final SelectAction[] selectActions = new SelectAction[]{
         duplicateAction,
+
+        toFrontAction, toBackAction,
 
         convertToBushAction,convertToWaterAction,convertToBrickAction,convertToSlideAction,
         convertToBulletAction,convertToPlayerOneAction,convertToPlayerTwoAction,
