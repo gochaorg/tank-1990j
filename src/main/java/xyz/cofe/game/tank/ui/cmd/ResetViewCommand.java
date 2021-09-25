@@ -32,6 +32,7 @@ public class ResetViewCommand implements Runnable {
         var org = getOrigin();
         if( org!=null ){
             org.setOrigin(Point.of(0,0));
+            org.setScale(1.0);
         }
     }
 }

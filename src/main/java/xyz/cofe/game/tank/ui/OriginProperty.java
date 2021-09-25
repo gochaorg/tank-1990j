@@ -5,4 +5,7 @@ import xyz.cofe.game.tank.geom.Point;
 public interface OriginProperty {
     public Point getOrigin();
     public void setOrigin(Point p);
+
+    public double getScale();
+    public void setScale(double scale);
 }

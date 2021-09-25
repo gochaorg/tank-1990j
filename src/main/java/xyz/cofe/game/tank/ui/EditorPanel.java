@@ -106,6 +106,17 @@ public class EditorPanel extends JPanel implements OriginProperty {
         ccursor.origin(p);
         repaint();
     }
+    private double scale = 1.0;
+
+    @Override
+    public double getScale() {
+        return scale;
+    }
+
+    @Override
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
     //endregion
 
     private Consumer<MouseEvent> dragger = null;

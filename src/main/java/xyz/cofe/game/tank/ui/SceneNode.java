@@ -1,6 +1,7 @@
 package xyz.cofe.game.tank.ui;
 
 import xyz.cofe.ecolls.Closeables;
+import xyz.cofe.game.tank.unt.Note;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.gui.swing.tree.TreeTableNodeBasic;
 
@@ -10,6 +11,15 @@ public class SceneNode extends NamedNode implements AutoCloseable {
         if( scene==null )throw new IllegalArgumentException( "data==null" );
         setName("scene");
         append(figuresNode(scene));
+
+        setDataTextReader( node -> {
+            if( node == null )return "null";
+            if( node instanceof Note ){
+                var title = ((Note) node).getTitle();
+                if( title!=null )return "note "+title;
+            }
+            return node.toString();
+        });
     }
 
     protected Closeables sceneCloseables = new Closeables();

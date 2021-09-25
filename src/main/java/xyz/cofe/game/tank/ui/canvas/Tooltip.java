@@ -2,21 +2,16 @@ package xyz.cofe.game.tank.ui.canvas;
 
 import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.geom.Point;
-import xyz.cofe.game.tank.geom.Rect;
+import xyz.cofe.game.tank.ui.text.TextBlock;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.font.LineMetrics;
-import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class Tooltip extends CanvasHost<Tooltip> implements Drawing {
     public Tooltip(){}
@@ -74,92 +69,7 @@ public class Tooltip extends CanvasHost<Tooltip> implements Drawing {
         this.font = font;
     }
     //endregion
-    //region text block
-    private static class TextLine {
-        public String text;
-        public Rectangle2D bounds;
-        public LineMetrics lineMetrics;
-        public double x = 0;
-        public double y = 0;
-        public double y0(){
-            return y - bounds.getHeight();
-        }
-    }
-    private static List<TextLine> textLines( String text, Graphics2D gs, Font font ){
-        var frctx = gs.getFontRenderContext();
-        var lines =
-        Arrays.stream(text.split("\r?\n")).map(txt -> {
-            var tline = new TextLine();
-            tline.text = txt;
-            tline.bounds = font.getStringBounds(txt,frctx);
-            tline.lineMetrics = font.getLineMetrics(txt,frctx);
-            return tline;
-        }).collect(Collectors.toList());
 
-        double y = 0;
-        for( var line : lines ){
-            line.y = line.lineMetrics.getAscent() + y;
-            y += line.lineMetrics.getHeight();
-            line.x = 0;
-        }
-
-        return lines;
-    }
-    private static class TextBlock implements Drawing {
-        public List<TextLine> textLines;
-        public TextBlock location( double x, double y ){
-            if( textLines!=null ){
-                for( var line : textLines ){
-                    line.x = x;
-                    line.y = y + line.lineMetrics.getAscent();
-                    y += line.lineMetrics.getHeight();
-                }
-            }
-            return this;
-        }
-        public TextBlock location(Point pt){
-            if( pt==null )throw new IllegalArgumentException( "pt==null" );
-            return location(pt.x(), pt.y());
-        }
-
-        @Override
-        public void draw(Graphics2D gs) {
-            if( gs==null )return;
-            for( var line : textLines ){
-                gs.drawString(line.text, (float) line.x, (float) line.y);
-            }
-        }
-
-        @SuppressWarnings("OptionalGetWithoutIsPresent")
-        public Optional<Rect> bounds(){
-            double minX = Double.NaN;
-            double minY = Double.NaN;
-            double maxX = Double.NaN;
-            double maxY = Double.NaN;
-
-            if( textLines==null || textLines.isEmpty() )return Optional.empty();
-            minX = textLines.stream().map( t -> List.of(t.x, t.x + t.bounds.getWidth()) )
-                .flatMap(List::stream).mapToDouble(x->x).min().getAsDouble();
-            minY = textLines.stream().map( t -> List.of(t.y0(), t.y0() + t.bounds.getHeight()) )
-                .flatMap(List::stream).mapToDouble(x->x).min().getAsDouble();
-
-            maxX = textLines.stream().map( t -> List.of(t.x, t.x + t.bounds.getWidth()) )
-                .flatMap(List::stream).mapToDouble(x->x).max().getAsDouble();
-            maxY = textLines.stream().map( t -> List.of(t.y0(), t.y0() + t.bounds.getHeight()) )
-                .flatMap(List::stream).mapToDouble(x->x).max().getAsDouble();
-
-            return Optional.of( Rect.rect(minX,minY, maxX, maxY) );
-        }
-
-        public Optional<Rectangle2D> bounds2d(){
-            return bounds().map( b -> new Rectangle2D.Double( b.left(), b.top(), b.width(), b.height() ));
-        }
-    }
-    private TextBlock textBlock( String text, Graphics2D gs, Font font ){
-        var tb = new TextBlock();
-        tb.textLines = textLines(text,gs,font);
-        return tb;
-    }
     //endregion
     //region location
     private Function<Tooltip, Point> location;
@@ -231,14 +141,14 @@ public class Tooltip extends CanvasHost<Tooltip> implements Drawing {
         gs.setFont(fnt);
         if( bg==null ){
             gs.setPaint(fg);
-            var tb = textBlock(str,gs,fnt);
+            var tb = TextBlock.textBlock(str,gs,fnt);
             textBlock = tb;
             if( location!=null ){
                 tb.location(location.apply(this));
             }
             tb.draw(gs);
         }else {
-            var tb = textBlock(str,gs,fnt);
+            var tb = TextBlock.textBlock(str,gs,fnt);
             textBlock = tb;
             if( location!=null ){
                 tb.location(location.apply(this));
