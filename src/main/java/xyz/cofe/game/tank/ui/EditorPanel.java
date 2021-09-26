@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +91,7 @@ public class EditorPanel extends JPanel implements OriginProperty {
         }
     }
     //endregion
-    //region origin : Point
+    //region origin, scale
     private double xOrigin = 0;
     private double yOrigin = 0;
     public Point getOrigin(){ return Point.of(xOrigin, yOrigin); }
@@ -113,9 +112,20 @@ public class EditorPanel extends JPanel implements OriginProperty {
         return scale;
     }
 
+    private double scaleMin = 1.0 / Math.pow(2,10);
+
     @Override
     public void setScale(double scale) {
-        this.scale = scale;
+        if( Math.abs(scale)<scaleMin ){
+            this.scale = scaleMin * Math.signum(scale);
+        }else {
+            this.scale = scale;
+        }
+        hrule.scale(this.scale);
+        vrule.scale(this.scale);
+        grid.scale(this.scale);
+        ccursor.scale(this.scale);
+        repaint();
     }
     //endregion
 
@@ -197,6 +207,7 @@ public class EditorPanel extends JPanel implements OriginProperty {
 
             var orig = getOrigin();
             at.translate(-orig.x(), -orig.y());
+            at.scale(getScale(), getScale());
             gs.setTransform(at);
 
             var size = scene.getSize();
@@ -271,9 +282,35 @@ public class EditorPanel extends JPanel implements OriginProperty {
             if( pt==null )return null;
 
             var x = pt.x + getOrigin().x();
+            x = x / scale;
+
             var y = pt.y + getOrigin().y();
+            y = y / scale;
             return "("+x+","+y+")";
         });
+
         tooltips.add(ccursorPointer);
+        ////////////////////
+    }
+
+    public final Tooltip scaleTooltip = new Tooltip();
+    {
+        scaleTooltip.right(5).bottom(5).text( ()->{
+            return "scale: "+Double.toString(scale);
+        });
+
+        tooltips.add(scaleTooltip);
+    }
+
+    public final Tooltip originTooltip = new Tooltip();
+    {
+        originTooltip
+            .relative(scaleTooltip, f -> f )
+            .right(scaleTooltip,5)
+            .text( ()->{
+            return "origin: "+xOrigin+":"+yOrigin;
+            });
+
+        tooltips.add(originTooltip);
     }
 }

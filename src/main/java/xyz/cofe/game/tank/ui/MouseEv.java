@@ -74,4 +74,10 @@ public class MouseEv implements Point {
         this.y += p.y();
         return this;
     }
+
+    public MouseEv scale( double scale ){
+        this.x = this.x / scale;
+        this.y = this.y / scale;
+        return this;
+    }
 }

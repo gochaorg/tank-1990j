@@ -64,8 +64,8 @@ public abstract class Ruler<SELF extends Ruler<SELF>> extends CanvasHost<SELF> i
     //region regularMarks : NavigableMap<Double, LineMark>
     private final NavigableMap<Double, LineMark> regularMarks = new TreeMap<>();
     {
-        regularMarks.put(8d, new LineMark().color(Color.gray).length(0.3).width(1f) );
-        regularMarks.put(32d, new LineMark().color(Color.black).length(0.5).width(1f).annotate(true) );
+        regularMarks.put(32d, new LineMark().color(Color.gray).length(0.3).width(1f) );
+        regularMarks.put(32d*8d, new LineMark().color(Color.black).length(0.5).width(1f).annotate(true) );
     }
     public NavigableMap<Double, LineMark> regularMarks(){ return regularMarks; }
     //endregion

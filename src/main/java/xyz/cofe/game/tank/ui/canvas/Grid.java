@@ -79,15 +79,20 @@ public class Grid extends CanvasHost<Grid> implements Drawing {
         var cmpt = component();
         if( cmpt==null )return;
 
+        var scale = scale();
+        if( scale==0 )return;
+
         regularMarks.forEach( (step,mark) -> {
             if( step<=0 )return;
 
-            var vport = viewPortRect(step);
+            var s = step * scale;
+
+            var vport = viewPortRect(s);
             var p = Tuple2.of(mark,vport);
-            for(double x = vport.left(); x<vport.right(); x+=step ){
+            for(double x = vport.left(); x<vport.right(); x+=s ){
                 vmarkers.put(x,p);
             }
-            for(double y = vport.top(); y<vport.bottom(); y+=step ){
+            for(double y = vport.top(); y<vport.bottom(); y+=s ){
                 hmarkers.put(y,p);
             }
         });

@@ -91,6 +91,18 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         this.origin = origin;
         return this;
     }
+
+    protected Supplier<Double> scale;
+    public double getScale(){
+        var s = scale!=null ? scale.get() : null;
+        return s!=null ? s : 0.0;
+    }
+    public void setScale(Supplier<Double> scale){
+        this.scale = scale;
+    }
+    public void setScale(double scale){
+        this.scale = ()->scale;
+    }
     //endregion
 
     //region grid : Supplier<Grid>
@@ -159,10 +171,13 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         }
         return popupMenu;
     }
-
     protected Shape bounds(Figura<?> f, double indent ){
+        var scale = getScale();
         return new Rectangle2D.Double(
-            f.left()-indent, f.top()-indent, f.width()+indent*2, f.height()+indent*2
+            f.left()*scale-indent,
+            f.top()*scale-indent,
+            f.width()*scale+indent*2,
+            f.height()*scale+indent*2
         );
     }
 

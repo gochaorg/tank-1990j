@@ -20,6 +20,8 @@ public class HRuler extends Ruler<HRuler> {
         gs.setPaint(Color.darkGray);
         gs.drawRect(0,0,(int)viewWidth, size());
 
+        var scale = scale();
+
         regularMarks().forEach( (step,mark) -> {
             if( step<=0 )return;
             gs.setPaint(mark.color());
@@ -30,7 +32,7 @@ public class HRuler extends Ruler<HRuler> {
             double xBegin = vpRect.left();
             double xEnd = vpRect.right();
 
-            for( double x = xBegin; x<xEnd; x += step ){
+            for( double x = xBegin; x<xEnd; x += step*scale ){
                 int xOut = (int)translateX(x);
                 gs.drawLine(
                     xOut,
@@ -39,7 +41,7 @@ public class HRuler extends Ruler<HRuler> {
                     size());
 
                 if( mark.annotate() ){
-                    String txt = Double.toString(x);
+                    String txt = Double.toString(x/scale);
                     if( txt.endsWith(".0") ){
                         txt = txt.substring(0,txt.length()-2);
                     }

@@ -21,6 +21,7 @@ import xyz.cofe.gui.swing.SwingListener;
 import xyz.cofe.iter.Eterable;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,6 +71,7 @@ public class EditorFrame extends JFrame {
             }
 
             selectTool.origin(ev.event::getOrigin);
+            selectTool.setScale(ev.event::getScale);
 
             toolEdSceneLs.add(
             ev.event.onSceneChanged.listen( eev -> {
@@ -233,35 +235,42 @@ public class EditorFrame extends JFrame {
         onEditorPanelChanged.listen( ev1 -> {
             activeSceneDockListeners.closeAll(true);
 
+            Function<MouseEvent, MouseEv> createMe = ev -> {
+                var me = new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()).scale(ev1.event.getScale());
+                //System.out.println("mouse event at x="+me.x()+" y="+me.y());
+                return me;
+            };
+
             activeSceneDockListeners.add(
             SwingListener.onMouseClicked(ev1.event, ev ->
-                activeTool().ifPresent( tool ->
-                    tool.onMouseClicked(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
+                activeTool().ifPresent( tool ->{
+                    tool.onMouseClicked(createMe.apply(ev));
+                    }
                 )));
 
             activeSceneDockListeners.add(
             SwingListener.onMousePressed(ev1.event, ev ->
-                activeTool().ifPresent( tool ->
-                    tool.onMousePressed(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
-                )));
+                activeTool().ifPresent( tool -> {
+                    tool.onMousePressed(createMe.apply(ev));
+                })));
 
             activeSceneDockListeners.add(
             SwingListener.onMouseReleased(ev1.event, ev ->
-                activeTool().ifPresent( tool ->
-                    tool.onMouseReleased(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
-                )));
+                activeTool().ifPresent( tool -> {
+                    tool.onMouseReleased(createMe.apply(ev));
+                })));
 
             activeSceneDockListeners.add(
             SwingListener.onMouseDragged(ev1.event, ev ->
-                activeTool().ifPresent( tool ->
-                    tool.onMouseDragged(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
-                )));
+                activeTool().ifPresent( tool -> {
+                    tool.onMouseDragged(createMe.apply(ev));
+                })));
 
             activeSceneDockListeners.add(
             SwingListener.onMouseExited(ev1.event, ev ->
-                activeTool().ifPresent( tool ->
-                    tool.onMouseExited(new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()))
-                )));
+                activeTool().ifPresent( tool -> {
+                    tool.onMouseExited(createMe.apply(ev));
+                })));
 
             activeSceneDockListeners.add(
             SwingListener.onKeyPressed(ev1.event, ev ->
@@ -583,6 +592,13 @@ public class EditorFrame extends JFrame {
                     commandMenu.action("Reset view",
                         new ResetViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
                     );
+                    commandMenu.action("Zoom in",
+                        new ZoomInViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
+                    );
+                    commandMenu.action("Zoom out",
+                        new ZoomOutViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
+                    );
+                    commandMenu.separator();
                     commandMenu.action("Run GC", new RunGCCommand());
                 })
                 .menu( "About", aboutMenu -> {

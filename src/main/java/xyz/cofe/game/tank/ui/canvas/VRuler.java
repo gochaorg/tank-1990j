@@ -23,6 +23,8 @@ public class VRuler extends Ruler<VRuler> {
         gs.setPaint(Color.darkGray);
         gs.drawRect(0,0,(int)size(), (int)viewHeight);
 
+        var scale = scale();
+
         regularMarks().forEach( (step,mark) -> {
             if( step<=0 )return;
             gs.setPaint(mark.color());
@@ -34,7 +36,7 @@ public class VRuler extends Ruler<VRuler> {
             double yBegin = vpRect.top();
             double yEnd = vpRect.bottom();
 
-            for( double y = yBegin; y<yEnd; y += step ){
+            for( double y = yBegin; y<yEnd; y += step*scale ){
                 int yOut = (int)translateY(y);
 
                 gs.drawLine(
@@ -46,7 +48,7 @@ public class VRuler extends Ruler<VRuler> {
                 if( mark.annotate() ){
                     var transformSaved = (AffineTransform)gs.getTransform().clone();
 
-                    String txt = Double.toString(y);
+                    String txt = Double.toString(y/scale);
                     if( txt.endsWith(".0") ){
                         txt = txt.substring(0,txt.length()-2);
                     }

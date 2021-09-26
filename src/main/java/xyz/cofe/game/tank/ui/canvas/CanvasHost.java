@@ -54,6 +54,14 @@ public abstract class CanvasHost<SELF extends CanvasHost<SELF>> {
     }
     //endregion
 
+    private double scale = 1.0;
+    public double scale(){ return scale; }
+    public SELF scale(double s){
+        scale = s;
+        //noinspection unchecked
+        return (SELF) this;
+    }
+
     protected Point translate( Point p ){
         if( p==null )throw new IllegalArgumentException( "p==null" );
         return Point.of(

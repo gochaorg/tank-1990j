@@ -2,6 +2,7 @@ package xyz.cofe.game.tank.ui.canvas;
 
 import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.geom.Point;
+import xyz.cofe.game.tank.geom.Size2D;
 import xyz.cofe.game.tank.ui.text.TextBlock;
 
 import java.awt.Color;
@@ -70,7 +71,6 @@ public class Tooltip extends CanvasHost<Tooltip> implements Drawing {
     }
     //endregion
 
-    //endregion
     //region location
     private Function<Tooltip, Point> location;
     public Function<Tooltip, Point> location(){ return location; }
@@ -112,6 +112,97 @@ public class Tooltip extends CanvasHost<Tooltip> implements Drawing {
             }
             return p;
         }).orElse(Point.of(0,0));
+        return this;
+    }
+    public Tooltip right( double rightMargin ){
+        var prev = location;
+        location = self -> {
+            var prevLoc = prev!=null ? prev.apply(self) : Point.of(0,0);
+            var y = prevLoc.y();
+            var x = prevLoc.x();
+
+            var pt = Point.of(x,y);
+
+            var cmpt = component();
+            if( cmpt!=null ){
+                pt = textBlock().flatMap( tb -> {
+                    return tb.bounds().map(Size2D::width).map( tbW -> cmpt.getWidth() - tbW - rightMargin );
+                }).map( newX -> Point.of(newX,y)).orElse(pt);
+            }
+
+            return pt;
+        };
+        return this;
+    }
+    public Tooltip bottom( double bottomMargin ){
+        var prev = location;
+        location = self -> {
+            var prevLoc = prev!=null ? prev.apply(self) : Point.of(0,0);
+            var y = prevLoc.y();
+            var x = prevLoc.x();
+
+            var pt = Point.of(x,y);
+
+            var cmpt = component();
+            if( cmpt!=null ){
+                pt = textBlock().flatMap( tb -> {
+                    return tb.bounds().map(Size2D::height).map( tbH -> cmpt.getHeight() - tbH - bottomMargin );
+                }).map( newY -> Point.of(x,newY)).orElse(pt);
+            }
+
+            return pt;
+        };
+        return this;
+    }
+    public Tooltip right( Tooltip from, double rightMargin ){
+        if( from==null )throw new IllegalArgumentException( "from==null" );
+        var prev = location;
+
+        location = self -> {
+            var prevLoc = prev!=null ? prev.apply(self) : Point.of(0,0);
+            var y = prevLoc.y();
+            var x = prevLoc.x();
+            var pt = Point.of(x,y);
+
+            var fromPt = from.location().apply(from);
+
+            pt = textBlock().flatMap( tb -> {
+                return tb.bounds().map(Size2D::width).map( tbW -> fromPt.x() - tbW - rightMargin );
+            }).map( newX -> Point.of(newX,y)).orElse(pt);
+
+            return pt;
+        };
+
+        return this;
+    };
+    public Tooltip bottom( Tooltip from, double bottomMargin ){
+        if( from==null )throw new IllegalArgumentException( "from==null" );
+
+        var prev = location;
+        location = self -> {
+            var prevLoc = prev!=null ? prev.apply(self) : Point.of(0,0);
+            var y = prevLoc.y();
+            var x = prevLoc.x();
+
+            var fromPt = from.location().apply(from);
+
+            var pt = Point.of(x,y);
+
+            pt = textBlock().flatMap( tb -> {
+                return tb.bounds().map(Size2D::height).map( tbH -> fromPt.y() - tbH - bottomMargin );
+            }).map( newY -> Point.of(x,newY)).orElse(pt);
+
+            return pt;
+        };
+        return this;
+    };
+    public Tooltip relative( Tooltip from, Function<Point,Point> offset ){
+        if( from==null )throw new IllegalArgumentException( "from==null" );
+        if( offset==null )throw new IllegalArgumentException( "offset==null" );
+        location = self -> {
+            var fromPt = from.location().apply(from);
+            return offset.apply(fromPt);
+        };
         return this;
     }
     //endregion
