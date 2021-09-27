@@ -91,7 +91,12 @@ public class MapStore {
         objView.keys.forEach(key -> {
             var value = key.get(obj);
             if( value==null )return;
-            if( SimpleTypes.isSimple(value.getClass()) ) {
+            if( SimpleTypes.isSimple(value.getClass())
+                || key instanceof OBJ.StringKey
+                || key instanceof OBJ.DoubleKey
+                || key instanceof OBJ.IntKey
+                || key instanceof OBJ.BooleanKey
+            ) {
                 m.put(key.name, key.get(obj));
             }else{
                 if( key instanceof OBJ.ListKey ){
@@ -182,7 +187,12 @@ public class MapStore {
                 var v = map.get(key.name);
                 if( v==null )continue;
 
-                if( SimpleTypes.isSimple(v.getClass()) ) {
+                if( SimpleTypes.isSimple(v.getClass())
+                    || key instanceof OBJ.StringKey
+                    || key instanceof OBJ.DoubleKey
+                    || key instanceof OBJ.IntKey
+                    || key instanceof OBJ.BooleanKey
+                ) {
                     //noinspection unchecked,rawtypes,rawtypes
                     var ninst = ((BiFunction) key.write).apply(inst, v);
                     if (ninst != null) {

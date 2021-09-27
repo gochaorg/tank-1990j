@@ -51,6 +51,11 @@ public abstract class OBJ<B> {
         }
     }
 
+    public class BooleanKey extends Key<Boolean> {
+        public BooleanKey(String name, Function<B, Boolean> read, BiFunction<B, Boolean, B> write) {
+            super(name, read, write);
+        }
+    }
     public class IntKey extends Key<Integer> {
         public IntKey(String name, Function<B, Integer> read, BiFunction<B, Integer, B> write) {
             super(name, read, write);

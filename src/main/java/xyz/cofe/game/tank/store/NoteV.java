@@ -58,4 +58,12 @@ public class NoteV extends OBJ<Note> implements ObjectMapper {
 
     @SuppressWarnings("Convert2MethodRef")
     final DoubleKey height = new DoubleKey("height", s -> s.getHeight(), (s, v)->{s.setHeight(v);return s;});
+
+    @SuppressWarnings("Convert2MethodRef")
+    final DoubleKey contentTopMargin = new DoubleKey("contentTopMargin",
+        s -> s.getContentTopMargin(), (s, v)->{s.setContentTopMargin(v);return s;});
+
+    @SuppressWarnings("Convert2MethodRef")
+    final BooleanKey contentVisible = new BooleanKey("contentVisible",
+        s -> s.isContentVisible(), (s, v)->{s.setContentVisible(v);return s;});
 }

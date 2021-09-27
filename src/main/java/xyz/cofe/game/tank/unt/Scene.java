@@ -13,6 +13,15 @@ import java.util.Set;
  * Сцена
  */
 public class Scene {
+    public Scene(){}
+    public Scene(Scene sample){
+        if( sample==null )throw new IllegalArgumentException( "sample==null" );
+        getFigures().addAll(sample.getFigures());
+        setSize(sample.getSize());
+        setBorderWidth(sample.getBorderWidth());
+        setBorderColor(sample.getBorderColor());
+    }
+
     //region event - Событие сцены
     /**
      * Событие сцены

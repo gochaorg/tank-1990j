@@ -10,11 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.formdev.flatlaf.FlatLightLaf;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rtextarea.RTextScrollPane;
 import xyz.cofe.ecolls.Closeables;
 import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.store.MapStore;
 import xyz.cofe.game.tank.ui.cmd.*;
 import xyz.cofe.game.tank.ui.tool.*;
+import xyz.cofe.game.tank.unt.Note;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.gui.swing.SwingListener;
@@ -36,6 +39,8 @@ import java.util.function.Supplier;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * Редактор
@@ -302,11 +307,59 @@ public class EditorFrame extends JFrame {
         });
     }
 
+    private final RSyntaxTextArea textArea;
+    {
+        textArea = new RSyntaxTextArea();
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateSelectedNote(textArea.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateSelectedNote(textArea.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateSelectedNote(textArea.getText());
+            }
+        });
+        objectBrowser.treeTable.onFocusedNodeChanged(node -> {
+            var nodeData = node.getData();
+            if( nodeData instanceof Note ){
+                onSelected((Note) nodeData);
+            }
+        });
+        selectTool.addListener( ev -> {
+            if( ev instanceof SelectTool.LastSelectChanged ){
+                var e = (SelectTool.LastSelectChanged)ev;
+                if( e.figura instanceof Note ){
+                    onSelected((Note)e.figura);
+                }
+            }
+        });
+    }
+
+    private WeakReference<Note> selectedNote;
+    private void onSelected(Note note){
+        if( note==null )return;
+        if( selectedNote!=null )selectedNote.clear();
+        textArea.setText(note.getContent()!=null ? note.getContent() : "");
+        selectedNote = new WeakReference<>(note);
+    }
+    private void updateSelectedNote( String text ){
+        var note = selectedNote!=null ? selectedNote.get() : null;
+        if( note==null )return;
+        note.setContent(text!=null ? text : "");
+    }
+
     public static enum DockId {
         tool,
         properties,
-        editor,
-        objectBrowser
+        objectBrowser,
+        textContent
     }
 
     protected Optional<SceneDock> getFocusedSceneDock(){
@@ -350,7 +403,7 @@ public class EditorFrame extends JFrame {
             ef.getContentPane().add(cc.getContentArea());
             cc.getThemes().select(ThemeMap.KEY_ECLIPSE_THEME);
 
-            var toolDock = new DefaultSingleCDockable(DockId.tool.name());
+            var toolDock = new DefaultSingleCDockable(DockId.tool.name(),"Tools");
             toolDock.getContentPane().add(ef.toolPanel);
             SwingUtilities.invokeLater(()->{
                 cc.addDockable(toolDock);
@@ -381,12 +434,25 @@ public class EditorFrame extends JFrame {
                 obDock.setVisible(true);
             });
 
+            var txtDock = new DefaultSingleCDockable(DockId.textContent.name(),"Text");
+            var txtScroll = new RTextScrollPane(ef.textArea);
+            txtDock.getContentPane().add(txtScroll);
+            txtDock.setFocusComponent(txtScroll);
+            SwingUtilities.invokeLater(()->{
+                cc.addDockable(txtDock);
+
+                var base = CLocation.base(cc.getContentArea());
+                CLocation loc = base.normalEast(0.2);
+                txtDock.setLocation(loc);
+                txtDock.setVisible(true);
+            });
+
             SingleCDockableFactory f = new SingleCDockableFactory() {
                 @Override
                 public SingleCDockable createBackup(String id){
                     System.out.println("id="+id);
                     if( DockId.tool.name().equals(id) )return toolDock;
-                    //if( DockId.editor.name().equals(id) )return editorDock;
+                    if( DockId.textContent.name().equals(id))return txtDock;
                     if( DockId.properties.name().equals(id) )return propDock;
                     if( DockId.objectBrowser.name().equals(id) )return obDock;
                     return null;
@@ -394,7 +460,7 @@ public class EditorFrame extends JFrame {
             };
 
             cc.addSingleDockableFactory(DockId.tool.name(), f);
-            //cc.addSingleDockableFactory(DockId.editor.name(), f);
+            cc.addSingleDockableFactory(DockId.textContent.name(), f);
             cc.addSingleDockableFactory(DockId.properties.name(), f);
             cc.addSingleDockableFactory(DockId.objectBrowser.name(), f);
 
@@ -577,6 +643,11 @@ public class EditorFrame extends JFrame {
                             });
                         });
                     }
+                    toolsMenu.separator();
+                    toolsMenu.action(toolDock.getTitleText(),()->toolDock.setVisible(true));
+                    toolsMenu.action(txtDock.getTitleText(),()->txtDock.setVisible(true));
+                    toolsMenu.action(propDock.getTitleText(),()->propDock.setVisible(true));
+                    toolsMenu.action(obDock.getTitleText(),()->obDock.setVisible(true));
                 })
                 .menu("Command", commandMenu -> {
                     for( var cmd : ef.selectActions ){

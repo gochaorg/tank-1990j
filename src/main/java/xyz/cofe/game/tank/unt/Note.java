@@ -1,12 +1,15 @@
 package xyz.cofe.game.tank.unt;
 
+import xyz.cofe.fn.Tuple2;
 import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.geom.Size2D;
+import xyz.cofe.game.tank.ui.text.TextBlock;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
+import java.util.Objects;
 
 public class Note extends Figura<Note> {
     public final Observers<Size2D> onSizeChanged = new Observers<>();
@@ -144,7 +147,6 @@ public class Note extends Figura<Note> {
         onSizeChanged.listen(ev -> {
             fillShapeCached = null;
             outlineShapeCached = null;
-            System.out.println("cleared");
         });
     }
     //endregion
@@ -190,6 +192,7 @@ public class Note extends Figura<Note> {
     //endregion
 
     //region font : Font
+    public final Observers<Tuple2<Font,Font>> onFontChanged = new Observers<>();
     private Font font = new Font(Font.SANS_SERIF, Font.PLAIN,12);
     public Font getFont(){
         if( font==null ){
@@ -198,16 +201,59 @@ public class Note extends Figura<Note> {
         return font;
     }
     public void setFont(Font font){
+        if( font==null )throw new IllegalArgumentException( "font==null" );
+        var old = this.font;
         this.font = font;
+        onFontChanged.fire(Tuple2.of(old,font));
     }
     //endregion
     //region content : String
+    public final Observers<Tuple2<String,String>> onContentChanged = new Observers<>();
     private String content;
     public String getContent(){ return content; }
     public void setContent(String txt){
-        this.content = txt;
+        var prev = content;
+        content = txt;
+        if( !Objects.equals(txt,prev) ){
+            onContentChanged.fire(Tuple2.of(prev,content));
+        }
     }
     //endregion
+
+    //region contentVisible : boolean
+    private boolean contentVisible = false;
+    public boolean isContentVisible(){ return contentVisible; }
+    public void setContentVisible(boolean visible){
+        contentVisible = visible;
+    }
+    //endregion
+    //region contentTopMargin : double
+    protected double contentTopMargin=0;
+
+    public double getContentTopMargin() {
+        return contentTopMargin;
+    }
+
+    public void setContentTopMargin(double contentTopMargin) {
+        this.contentTopMargin = contentTopMargin;
+    }
+    //endregion
+
+    private TextBlock contentTextBlock;
+    {
+        onFontChanged.listen( e -> contentTextBlock = null );
+        onContentChanged.listen( e -> contentTextBlock = null );
+    }
+
+    private TextBlock contentTextBlock(Graphics2D gs, Font font){
+        if( contentTextBlock!=null )return contentTextBlock;
+
+        String content = getContent();
+        if( content==null || content.trim().length()<1 || gs==null || font==null )return null;
+
+        contentTextBlock = TextBlock.textBlock(content,gs,font);
+        return contentTextBlock;
+    }
 
     @Override
     public void draw(Graphics2D gs) {
@@ -232,14 +278,27 @@ public class Note extends Figura<Note> {
             gs.fill(outlineShape);
         }
 
+        gs.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         var ftitle = getFont();
         var title = getTitle();
         var ctitle = getTitleColor();
+        var textY = 0;
+        var textX = 2;
         if( ctitle!=null && title!=null && title.length()>0 && ftitle!=null ){
-            gs.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             var fm = gs.getFontMetrics(ftitle);
             var lm = fm.getLineMetrics(title,gs);
-            gs.drawString( title, 2, lm.getAscent() );
+            gs.setPaint(ctitle);
+            gs.drawString( title, textX, textY + lm.getAscent() );
+            textY += lm.getHeight();
+        }
+
+        if( contentVisible && content!=null && content.length()>0 && ftitle!=null ){
+            if( ctitle!=null )gs.setPaint(ctitle);
+            var tb = contentTextBlock(gs,ftitle);
+            if( tb!=null ){
+                tb.location(textX, textY+contentTopMargin);
+                tb.draw(gs);
+            }
         }
 
         gs.setTransform(atSaved);
