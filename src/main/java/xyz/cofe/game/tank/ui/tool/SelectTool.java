@@ -2,10 +2,14 @@ package xyz.cofe.game.tank.ui.tool;
 
 import xyz.cofe.collection.BasicEventSet;
 import xyz.cofe.collection.EventSet;
+import xyz.cofe.ecolls.Closeables;
+import xyz.cofe.fn.Tuple3;
+import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.ui.*;
 import xyz.cofe.game.tank.ui.canvas.Grid;
+import xyz.cofe.game.tank.ui.canvas.Tooltip;
 import xyz.cofe.game.tank.ui.cmd.ConvertToAction;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.game.tank.unt.Figura;
@@ -48,9 +52,13 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
     }
     //endregion
     //region scene : Scene
+    protected final Observers<Scene> onSceneChanged = new Observers<>();
     protected Scene scene;
     public Scene getScene() { return scene; }
-    public void setScene(Scene scene) { this.scene = scene; }
+    public void setScene(Scene scene) {
+        this.scene = scene;
+        onSceneChanged.fire(scene);
+    }
     //endregion
     //region selection : Set<Figura<?>>
     protected final EventSet<Figura<?>> selection = new BasicEventSet<>(new LinkedHashSet<>());
@@ -142,6 +150,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
     }
     //endregion
 
+    //region context menu
     protected JPopupMenu buildPopupMenu(){
         var scene = getScene();
         if( scene==null )return null;
@@ -171,7 +180,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         }
         return popupMenu;
     }
-    protected Shape bounds(Figura<?> f, double indent ){
+    protected Rectangle2D.Double bounds(Rect f, @SuppressWarnings("SameParameterValue") double indent ){
         var scale = getScale();
         return new Rectangle2D.Double(
             f.left()*scale-indent,
@@ -180,11 +189,116 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
             f.height()*scale+indent*2
         );
     }
+    //endregion
 
     protected Stroke stroke = new BasicStroke(
         1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.0f, new float[]{ 3f, 1f }, 0.0f);
 
     protected Color color = Color.gray;
+
+    protected List<Tuple3<Figura<?>, Figura<?>, Rect>> intersections( Scene scene ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        List<Tuple3<Figura<?>, Figura<?>, Rect>> res = new ArrayList<>();
+        for( var faIdx=0; faIdx<scene.getFigures().size(); faIdx++ ){
+            for( var fbIdx=faIdx+1; fbIdx<scene.getFigures().size(); fbIdx++ ){
+                var fa = scene.getFigures().get(faIdx);
+                var fb = scene.getFigures().get(fbIdx);
+                if( fa==null || fb==null || fa==fb )continue;
+
+                var intersect = fa.intersection(fb);
+                if( intersect.isEmpty() )continue;
+
+                res.add(Tuple3.of(fa,fb,intersect.get()));
+            }
+        }
+
+        return res;
+    }
+
+    private List<Tuple3<Figura<?>, Figura<?>, Rect>> intersections;
+    {
+        onSceneChanged.listen( ev -> {
+            intersections=null;
+            intersectionsRenders=null;
+        });
+    }
+
+    private List<Tuple3<Figura<?>, Figura<?>, Rectangle2D.Double>> intersectionsRenders;
+    private List<Tuple3<Figura<?>, Figura<?>, Rectangle2D.Double>> intersectionsRenders(){
+        if( intersectionsRenders!=null )return intersectionsRenders;
+        if( scene==null )return List.of();
+        intersections = intersections(scene);
+
+        if( intersections==null || intersections.isEmpty() ){
+            intersectionsRenders = List.of();
+            return intersectionsRenders;
+        }
+        intersectionsRenders = new ArrayList<>();
+        for( var itr : intersections ){
+            Tuple3 tuple =
+                Tuple3.of(itr.a(), itr.b(), bounds(itr.c(),0));
+
+            intersectionsRenders.add(tuple);
+        }
+        return intersectionsRenders;
+    }
+
+    private Closeables figMovLs = new Closeables();
+    {
+        onSceneChanged.listen( ev -> {
+            figMovLs.close();
+            if( ev.event!=null ) {
+                figMovLs.add(
+                ev.event.addListener( e -> {
+                    if( e instanceof Scene.MovedFigure || e instanceof Scene.AddFigure || e instanceof Scene.RemoveFigure ){
+                        intersections = null;
+                        intersectionsRenders = null;
+                    }
+                }));
+                intersections = null;
+                intersectionsRenders = null;
+            }
+        });
+    }
+
+    protected Stroke intersectStroke1 = new BasicStroke(2f,
+        BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0f,
+        new float[]{2f,2f},0f
+    );
+    protected Stroke intersectStroke2 = new BasicStroke(2f,
+        BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,0f,
+        new float[]{2f,2f},2f
+    );
+    protected Color intersectColor1 = Color.red;
+    protected Color intersectColor2 = Color.green;
+    protected Color intersectColor3;
+    {
+        intersectColor3 = new Color(255,128,128,128);
+    }
+    protected boolean intersectVisible = false;
+
+    public boolean isIntersectVisible() {
+        return intersectVisible;
+    }
+
+    public void setIntersectVisible(boolean intersectVisible) {
+        this.intersectVisible = intersectVisible;
+    }
+
+    private Tooltip intersectCount;
+    {
+        intersectCount = new Tooltip();
+        intersectCount.setText(()->{
+            var ic = intersectionsRenders;
+            if( ic!=null ){
+                return "intersections "+ic.size();
+            }
+            return "intersections 0";
+        });
+    }
+    public Tooltip getIntersectCountTooltip(){
+        return intersectCount;
+    }
 
     @Override
     public void onPaint(Graphics2D gs) {
@@ -217,10 +331,34 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
             gs.draw(rrct);
         }
 
+        if( intersectVisible ){
+            var intersect = intersectionsRenders();
+            if( intersect!=null
+                && intersectColor1 !=null && intersectStroke1!=null
+                && intersectColor2 !=null && intersectStroke2!=null
+            ){
+                for( var intr : intersect ){
+                    if( intr!=null && intr.c()!=null ){
+                        gs.setPaint(intersectColor3);
+                        gs.fill(intr.c());
+
+                        gs.setPaint(intersectColor1);
+                        gs.setStroke(intersectStroke1);
+                        gs.draw(intr.c());
+
+                        gs.setPaint(intersectColor2);
+                        gs.setStroke(intersectStroke2);
+                        gs.draw(intr.c());
+                    }
+                }
+            }
+        }
+
         /////////////////////////
         gs.setTransform(savedAt);
     }
 
+    //region input events
     protected MouseEv dragStart;
     protected Map<Figura<?>,Point> dragInitial = new LinkedHashMap<>();
 
@@ -380,4 +518,5 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
             setLastSelected(hits.get(hits.size()-1));
         }
     }
+    //endregion
 }

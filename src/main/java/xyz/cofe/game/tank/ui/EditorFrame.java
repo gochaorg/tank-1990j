@@ -630,6 +630,25 @@ public class EditorFrame extends JFrame {
                             }
                         });
                     });
+                    modeMenu.action("Intersection visible", act -> {
+                        act.checked(ef.selectTool::isIntersectVisible, state -> {
+                            ef.selectTool.setIntersectVisible(state);
+                            for( var sdock : sceneDockNode.keySet() ){
+                                if( sdock==null )continue;
+                                var tt = ef.selectTool.getIntersectCountTooltip();
+                                tt.location(5,5);
+                                if( state ) {
+                                    if( !sdock.editorPanel.tooltips.contains(tt) ){
+                                        sdock.editorPanel.tooltips.add(tt);
+                                    }
+                                }else{
+                                    if( sdock.editorPanel.tooltips.contains(tt) ){
+                                        sdock.editorPanel.tooltips.remove(tt);
+                                    }
+                                }
+                            }
+                        });
+                    });
                 })
                 .menu("Tools", toolsMenu -> {
                     for( var tool : ef.tools ){
