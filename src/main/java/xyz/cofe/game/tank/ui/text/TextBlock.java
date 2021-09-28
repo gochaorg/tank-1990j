@@ -50,6 +50,7 @@ public class TextBlock implements Drawing {
     public void draw(Graphics2D gs) {
         if (gs == null) return;
         for (var line : textLines) {
+            if( line.font!=null )gs.setFont(line.font);
             gs.drawString(line.text, (float) line.x, (float) line.y);
         }
     }
@@ -95,6 +96,9 @@ public class TextBlock implements Drawing {
      * @return текстовый блок
      */
     public static TextBlock textBlock(String text, Graphics2D gs, Font font) {
+        if( text==null )throw new IllegalArgumentException( "text==null" );
+        if( gs==null )throw new IllegalArgumentException( "gs==null" );
+        if( font==null )throw new IllegalArgumentException( "font==null" );
         var tb = new TextBlock();
         tb.textLines = TextLine.textLines(text, gs, font);
         return tb;

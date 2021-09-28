@@ -2,6 +2,8 @@ package xyz.cofe.game.tank.ui.text;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
@@ -26,6 +28,11 @@ public class TextLine {
      * Информация о рендере линии
      */
     public LineMetrics lineMetrics;
+
+    /**
+     * Шрифт
+     */
+    public Font font;
 
     /**
      * Расположение текста
@@ -53,13 +60,24 @@ public class TextLine {
      * @return список линий
      */
     public static List<TextLine> textLines(String text, Graphics2D gs, Font font) {
-        var frctx = gs.getFontRenderContext();
+        if( text==null )throw new IllegalArgumentException( "text==null" );
+        if( gs==null )throw new IllegalArgumentException( "gs==null" );
+        if( font==null )throw new IllegalArgumentException( "font==null" );
+
+
+        var frctx = new FontRenderContext(gs.getTransform(),
+            gs.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING)!=RenderingHints.VALUE_TEXT_ANTIALIAS_OFF,
+            gs.getRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS)!=RenderingHints.VALUE_FRACTIONALMETRICS_OFF
+            );
+
+        //var frctx = gs.getFontRenderContext();
         var lines =
             Arrays.stream(text.split("\r?\n")).map(txt -> {
                 var tline = new TextLine();
                 tline.text = txt;
                 tline.bounds = font.getStringBounds(txt, frctx);
                 tline.lineMetrics = font.getLineMetrics(txt, frctx);
+                tline.font = font;
                 return tline;
             }).collect(Collectors.toList());
 

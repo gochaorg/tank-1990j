@@ -9,11 +9,16 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.List;
 
 public class Note extends Figura<Note> {
     public final Observers<Size2D> onSizeChanged = new Observers<>();
 
+    //region constructors
     public Note(){}
     public Note(Figura<?> sample1){
         super(sample1);
@@ -32,7 +37,7 @@ public class Note extends Figura<Note> {
             title = sample.title;
             titleColor = sample.titleColor;
             content = sample.content;
-            font = sample.font;
+            fontTitle = sample.fontTitle;
         }
     }
     public Note(Note sample){
@@ -49,8 +54,16 @@ public class Note extends Figura<Note> {
         title = sample.title;
         titleColor = sample.titleColor;
         content = sample.content;
-        font = sample.font;
+        fontTitle = sample.fontTitle;
+
+        contentTextBlock = sample.contentTextBlock;
+        contentTopMargin = sample.contentTopMargin;
     }
+    @Override
+    public Note clone() {
+        return new Note(this);
+    }
+    //endregion
 
     //region width : double
     private double width = 32;
@@ -190,23 +203,23 @@ public class Note extends Figura<Note> {
         titleColor = color;
     }
     //endregion
-
-    //region font : Font
-    public final Observers<Tuple2<Font,Font>> onFontChanged = new Observers<>();
-    private Font font = new Font(Font.SANS_SERIF, Font.PLAIN,12);
-    public Font getFont(){
-        if( font==null ){
-            font = new Font(Font.SANS_SERIF, Font.PLAIN,12);
+    //region fontTitle : Font
+    public final Observers<Tuple2<Font,Font>> onFontTitleChanged = new Observers<>();
+    private Font fontTitle = new Font(Font.SANS_SERIF, Font.PLAIN,12);
+    public Font getFontTitle(){
+        if( fontTitle ==null ){
+            fontTitle = new Font(Font.SANS_SERIF, Font.PLAIN,12);
         }
-        return font;
+        return fontTitle;
     }
-    public void setFont(Font font){
-        if( font==null )throw new IllegalArgumentException( "font==null" );
-        var old = this.font;
-        this.font = font;
-        onFontChanged.fire(Tuple2.of(old,font));
+    public void setFontTitle(Font fontTitle){
+        if( fontTitle ==null )throw new IllegalArgumentException( "font==null" );
+        var old = this.fontTitle;
+        this.fontTitle = fontTitle;
+        onFontTitleChanged.fire(Tuple2.of(old, fontTitle));
     }
     //endregion
+
     //region content : String
     public final Observers<Tuple2<String,String>> onContentChanged = new Observers<>();
     private String content;
@@ -217,6 +230,29 @@ public class Note extends Figura<Note> {
         if( !Objects.equals(txt,prev) ){
             onContentChanged.fire(Tuple2.of(prev,content));
         }
+    }
+    //endregion
+    //region fontTitle : Font
+    public final Observers<Tuple2<Font,Font>> onFontContentChanged = new Observers<>();
+    private Font fontContent = new Font(Font.SANS_SERIF, Font.PLAIN,12);
+    public Font getFontContent(){
+        if( fontContent ==null ){
+            fontContent = new Font(Font.SANS_SERIF, Font.PLAIN,12);
+        }
+        return fontContent;
+    }
+    public void setFontContent(Font font){
+        if( font ==null )throw new IllegalArgumentException( "font==null" );
+        var old = this.fontContent;
+        this.fontContent = font;
+        onFontContentChanged.fire(Tuple2.of(old, font));
+    }
+    //endregion
+    //region contentColor : Color
+    private Color contentColor = Color.black;
+    public Color getContentColor(){ return contentColor; }
+    public void setContentColor(Color color){
+        contentColor = color;
     }
     //endregion
 
@@ -239,9 +275,10 @@ public class Note extends Figura<Note> {
     }
     //endregion
 
-    private TextBlock contentTextBlock;
+    //region draw()
+    private transient TextBlock contentTextBlock;
     {
-        onFontChanged.listen( e -> contentTextBlock = null );
+        onFontContentChanged.listen(e -> contentTextBlock = null );
         onContentChanged.listen( e -> contentTextBlock = null );
     }
 
@@ -279,7 +316,7 @@ public class Note extends Figura<Note> {
         }
 
         gs.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        var ftitle = getFont();
+        var ftitle = getFontTitle();
         var title = getTitle();
         var ctitle = getTitleColor();
         var textY = 0;
@@ -288,13 +325,17 @@ public class Note extends Figura<Note> {
             var fm = gs.getFontMetrics(ftitle);
             var lm = fm.getLineMetrics(title,gs);
             gs.setPaint(ctitle);
+            gs.setFont(ftitle);
             gs.drawString( title, textX, textY + lm.getAscent() );
             textY += lm.getHeight();
         }
 
-        if( contentVisible && content!=null && content.length()>0 && ftitle!=null ){
-            if( ctitle!=null )gs.setPaint(ctitle);
-            var tb = contentTextBlock(gs,ftitle);
+        var fcontent = getFontContent();
+        var ccontent = getContentColor();
+        if( contentVisible && content!=null && content.length()>0 && fcontent!=null && ccontent!=null ){
+            //gs.setFont(fcontent);
+            gs.setPaint(ccontent);
+            var tb = contentTextBlock(gs,fcontent);
             if( tb!=null ){
                 tb.location(textX, textY+contentTopMargin);
                 tb.draw(gs);
@@ -303,9 +344,37 @@ public class Note extends Figura<Note> {
 
         gs.setTransform(atSaved);
     }
+    //endregion
 
-    @Override
-    public Note clone() {
-        return new Note(this);
+    public static List<Note> filter( Scene scene, Predicate<Note> filter ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        if( filter==null )throw new IllegalArgumentException( "filter==null" );
+        var res = new ArrayList<Note>();
+        for( var fig : scene.getFigures() ){
+            if( fig instanceof Note ){
+                var n = (Note)fig;
+                if( filter.test(n) ){
+                    res.add(n);
+                }
+            }
+        }
+        return res;
+    }
+
+    public static Optional<Note> findByTitle( Scene scene, Predicate<String> filter ){
+        if( scene==null )throw new IllegalArgumentException( "scene==null" );
+        if( filter==null )throw new IllegalArgumentException( "filter==null" );
+        for( var fig : scene.getFigures() ){
+            if( fig instanceof Note ){
+                var n = (Note)fig;
+                if( filter.test(n.getTitle()) ){
+                    return Optional.of(n);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+    public static Optional<Note> findByTitle( Scene scene, String filter ){
+        return findByTitle(scene, title -> Objects.equals(title,filter));
     }
 }

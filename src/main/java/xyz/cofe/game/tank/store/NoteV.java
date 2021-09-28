@@ -3,10 +3,9 @@ package xyz.cofe.game.tank.store;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Note;
-import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.gui.swing.typeconv.impl.RGB;
 
-import java.util.function.Supplier;
+import java.awt.Font;
 
 public class NoteV extends OBJ<Note> implements ObjectMapper {
     public static final NoteV instance = new NoteV();
@@ -54,16 +53,35 @@ public class NoteV extends OBJ<Note> implements ObjectMapper {
             (s,v)->{s.setOutlineColor(RGB.rgb(v));return s;});
 
     @SuppressWarnings("Convert2MethodRef")
-    final DoubleKey width = new DoubleKey("width", s -> s.getWidth(), (s, v)->{s.setWidth(v);return s;} );
+    public final DoubleKey width = new DoubleKey("width", s -> s.getWidth(), (s, v)->{s.setWidth(v);return s;} );
 
     @SuppressWarnings("Convert2MethodRef")
-    final DoubleKey height = new DoubleKey("height", s -> s.getHeight(), (s, v)->{s.setHeight(v);return s;});
+    public final DoubleKey height = new DoubleKey("height", s -> s.getHeight(), (s, v)->{s.setHeight(v);return s;});
 
     @SuppressWarnings("Convert2MethodRef")
-    final DoubleKey contentTopMargin = new DoubleKey("contentTopMargin",
+    public final DoubleKey contentTopMargin = new DoubleKey("contentTopMargin",
         s -> s.getContentTopMargin(), (s, v)->{s.setContentTopMargin(v);return s;});
 
     @SuppressWarnings("Convert2MethodRef")
-    final BooleanKey contentVisible = new BooleanKey("contentVisible",
+    public final BooleanKey contentVisible = new BooleanKey("contentVisible",
         s -> s.isContentVisible(), (s, v)->{s.setContentVisible(v);return s;});
+
+    @SuppressWarnings("Convert2MethodRef")
+    public final ObjKey<Font> fontTitle = new ObjKey<Font>("fontTitle",
+        note -> note.getFontTitle(), (n, f) -> {
+        n.setFontTitle(f);
+        return n;
+        });
+
+    @SuppressWarnings("Convert2MethodRef")
+    public final ObjKey<Font> fontContent = new ObjKey<Font>("fontContent",
+        note -> note.getFontContent(), (n, f) -> {
+        n.setFontContent(f);
+        return n;
+        });
+
+    public final StringKey contentColor =
+        new StringKey("contentColor",
+            s -> s.getContentColor()!=null ? RGB.rgb(s.getContentColor()) : null,
+            (s,v)->{s.setContentColor(RGB.rgb(v));return s;});
 }
