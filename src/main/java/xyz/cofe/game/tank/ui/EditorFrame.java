@@ -3,8 +3,7 @@ package xyz.cofe.game.tank.ui;
 //import com.github.weisj.darklaf.LafManager;
 //import com.github.weisj.darklaf.theme.DarculaTheme;
 import bibliothek.gui.dock.common.*;
-import bibliothek.gui.dock.common.event.CFocusListener;
-import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.intern.DefaultCDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,14 +13,11 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import xyz.cofe.ecolls.Closeables;
 import xyz.cofe.game.tank.Observers;
-import xyz.cofe.game.tank.store.MapStore;
 import xyz.cofe.game.tank.ui.cmd.*;
 import xyz.cofe.game.tank.ui.tool.*;
 import xyz.cofe.game.tank.unt.Note;
-import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.gui.swing.SwingListener;
-import xyz.cofe.iter.Eterable;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -35,10 +31,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -689,6 +683,10 @@ public class EditorFrame extends JFrame {
                         new ZoomOutViewCommand().origin(()->ef.getFocusedSceneDock().map(s->s.editorPanel).orElse(null))
                     );
                     commandMenu.separator();
+                    commandMenu.action("Play scene",
+                        new PlaySceneCommand()
+                            .scene(()->ef.getFocusedSceneDock().map( s -> s.editorPanel.getScene()).orElse(null) )
+                    );
                     commandMenu.action("Run GC", new RunGCCommand());
                 })
                 .menu( "About", aboutMenu -> {
