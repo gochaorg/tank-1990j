@@ -31,6 +31,7 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
         direction = sample.direction;
         job = null;
     }
+    public abstract SELF clone();
 
     //region playerState : PlayerState
     protected PlayerState playerState = PlayerState.Level0;
@@ -141,18 +142,12 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     @SuppressWarnings("unchecked")
     protected final Moving<SELF> moving = new Moving<SELF>((SELF) this)
         .onStopped( ev -> {
-            System.out.println("stopped event");
+            //System.out.println("stopped event");
             stop();
         })
         .onCollision( ev -> {
-            System.out.println("collision "+ev.getRect()+" with "+ev.getWithFigura());
+           // System.out.println("collision "+ev.getRect()+" with "+ev.getWithFigura());
         });
-
-    @SuppressWarnings("UnusedReturnValue")
-    public Player<SELF> collision(Iterable<? extends Figura<?>> collizion){
-        moving.collision(collizion);
-        return this;
-    }
 
     /**
      * Перемещение объекта

@@ -7,13 +7,13 @@ import xyz.cofe.game.tank.geom.Rect;
  */
 public class MoveCollector {
     //region movings : Iterable<Moving<?>> - задания перемещения
-    private Iterable<Moving<?>> movings;
+    private Iterable<? extends Moving<?>> movings;
 
     /**
      * Указывает перемещаемые игровые объекты/задачи
      * @return задания перемещения
      */
-    public Iterable<Moving<?>> getMovings(){
+    public Iterable<? extends Moving<?>> getMovings(){
         return movings;
     }
 
@@ -21,18 +21,18 @@ public class MoveCollector {
      * Указывает перемещаемые игровые объекты/задачи
      * @param movings задания перемещения
      */
-    public void setMovings(Iterable<Moving<?>> movings){
+    public void setMovings(Iterable<? extends Moving<?>> movings){
         this.movings = movings;
     }
     //endregion
     //region collisions : Iterable<Rect> - объекты с которыми возможно столкновения
-    private Iterable<Rect> collisions;
+    private Iterable<? extends Rect> collisions;
 
     /**
      * Указывает объекты с которыми возможно столкновения
      * @return объекты с которыми возможно столкновения
      */
-    public Iterable<Rect> getCollisions(){
+    public Iterable<? extends Rect> getCollisions(){
         return collisions;
     }
 
@@ -40,7 +40,7 @@ public class MoveCollector {
      * Указывает объекты с которыми возможно столкновения
      * @param collisions объекты с которыми возможно столкновения
      */
-    public void setCollisions(Iterable<Rect> collisions){
+    public void setCollisions(Iterable<? extends Rect> collisions){
         this.collisions = collisions;
     }
     //endregion

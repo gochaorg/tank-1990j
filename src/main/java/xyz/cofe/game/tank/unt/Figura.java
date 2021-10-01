@@ -18,6 +18,13 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
         left = sample.left();
         top = sample.top();
     }
+
+    protected boolean notification = true;
+    public boolean isNotification(){ return notification; }
+    public void setNotification(boolean notification){
+        this.notification = notification;
+    }
+
     public abstract Figura<SELF> clone();
 
     //region left : double - Левый край объекта
@@ -124,7 +131,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
 
     @SuppressWarnings("unchecked")
     protected void fireMoved(Point from, Point to){
-        fireFiguraEvent(new FiguraMoved<SELF>((SELF) this,from,to));
+        if( notification ) fireFiguraEvent(new FiguraMoved<SELF>((SELF) this,from,to));
     }
 
     /**

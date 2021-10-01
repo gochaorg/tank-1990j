@@ -27,16 +27,30 @@ public class MoveEstimation {
     }
     //endregion
     //region collisions, computeCollisions() - Расчет коллизий
-    protected Map<Moving<?>, List<Rect>> collisions = new LinkedHashMap<>();
+    protected Map<Moving<?>, List<Collision>> collisions = new LinkedHashMap<>();
+
+    public static class Collision {
+        public Moving<?> moving;
+        public UnitMoveEstimation<?> estimation;
+        public Rect intersection;
+        public Rect collisionObject;
+
+        public Collision(Moving<?> moving, UnitMoveEstimation<?> estimation, Rect intersection, Rect collisionObject) {
+            this.moving = moving;
+            this.estimation = estimation;
+            this.intersection = intersection;
+            this.collisionObject = collisionObject;
+        }
+    }
 
     /**
      * Расчет коллизий
      * @param collisions с какими объектами можно столкнуться
      */
-    public void computeCollisions( Iterable<Rect> collisions ){
+    public void computeCollisions( Iterable<? extends Rect> collisions ){
         if( collisions==null )throw new IllegalArgumentException( "collisions==null" );
 
-        Map<Moving<?>, List<Rect>> collisionMap = this.collisions;
+        Map<Moving<?>, List<Collision>> collisionMap = this.collisions;
         moving.forEach( (move, est) -> {
             var gu = move.getGameUnit();
             collisions.forEach( crect -> {
@@ -45,15 +59,16 @@ public class MoveEstimation {
                 if( ointr.isEmpty() )return;
 
                 var collLst = collisionMap.computeIfAbsent(move, k -> new ArrayList<>());
-                collLst.add(ointr.get());
+                collLst.add(
+                    new Collision(move, est, ointr.get(), crect));
             });
         } );
 
         this.collisions.forEach( (mv, colls) -> {
             var p0 = mv.getGameUnit().getCentralPoint();
             colls.sort((a, b) -> {
-                var da = p0.distance(a.getCentralPoint());
-                var db = p0.distance(b.getCentralPoint());
+                var da = p0.distance(a.collisionObject.getCentralPoint());
+                var db = p0.distance(b.collisionObject.getCentralPoint());
                 return Double.compare(da, db);
             });
         });
@@ -63,7 +78,7 @@ public class MoveEstimation {
      * Коллизии
      * @return Объект и с кем столкнулся
      */
-    public Map<Moving<?>, List<Rect>> getCollisions(){
+    public Map<Moving<?>, List<Collision>> getCollisions(){
         return collisions;
     }
     //endregion
@@ -88,7 +103,7 @@ public class MoveEstimation {
      * @param limitCollPerUnit Лимит пересечений на unit; или -1 - без ограничения
      * @param collision коллизии объекта
      */
-    public void apply(int limitCollPerUnit, Consumer3<Moving<?>,GameUnit<?>,Rect> collision){
+    public void apply(int limitCollPerUnit, Consumer3<Moving<?>,GameUnit<?>,Collision> collision){
         if( collision==null )throw new IllegalArgumentException( "collision==null" );
         getUncollisiedMovings().forEach( mv -> {
             var est = getMoving().get(mv);
@@ -98,10 +113,10 @@ public class MoveEstimation {
         });
         getCollisions().forEach( (mv,coll)->{
             int idx = 0;
-            for( Rect rect : coll ){
+            for( Collision cl : coll ){
                 idx++;
                 if( (idx<limitCollPerUnit && limitCollPerUnit>0) || limitCollPerUnit<0 ){
-                    collision.accept(mv, mv.getGameUnit(), rect);
+                    collision.accept(mv, mv.getGameUnit(), cl);
                 }
             }
         });

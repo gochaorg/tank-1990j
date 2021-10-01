@@ -1,11 +1,14 @@
 package xyz.cofe.game.tank.ui.cmd;
 
 import xyz.cofe.game.tank.ui.MainFrame;
+import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.game.tank.unt.Scene;
 
 import javax.swing.WindowConstants;
+import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class PlaySceneCommand implements Runnable {
     //region scene
@@ -36,8 +39,20 @@ public class PlaySceneCommand implements Runnable {
         mf.setDefaultCloseOperation(MainFrame.DISPOSE_ON_CLOSE);
         mf.setSize(800,600);
         mf.setLocationRelativeTo(null);
-        mf.setScene(scene);
+
+        mf.setScene(new Scene(scene,
+            new ArrayList<Figura<?>>(
+                scene.getFigures().stream()
+                    .map( f -> {
+                        f.setNotification(false);
+                        return f;
+                    } )
+                    .collect(Collectors.toList())
+            )
+        ));
+
         mf.setVisible(true);
         mf.toFront();
+        mf.gameStart();
     }
 }

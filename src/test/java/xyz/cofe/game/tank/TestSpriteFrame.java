@@ -77,7 +77,7 @@ public class TestSpriteFrame extends JFrame {
             new Brick().location(300,200)
         );
 
-        { playerOne.collision(bricks); }
+//        { playerOne.collision(bricks); }
 
         protected void render(Graphics2D gs){
             gs.setPaint(Color.black);

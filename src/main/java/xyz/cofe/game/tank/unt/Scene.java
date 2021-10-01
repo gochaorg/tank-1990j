@@ -7,6 +7,8 @@ import xyz.cofe.game.tank.geom.Size2D;
 import xyz.cofe.gui.swing.bean.UiBean;
 
 import java.awt.Color;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,6 +19,13 @@ public class Scene {
     public Scene(Scene sample){
         if( sample==null )throw new IllegalArgumentException( "sample==null" );
         getFigures().addAll(sample.getFigures());
+        setSize(sample.getSize());
+        setBorderWidth(sample.getBorderWidth());
+        setBorderColor(sample.getBorderColor());
+    }
+    public Scene(Scene sample, List<Figura<?>> figures){
+        if( sample==null )throw new IllegalArgumentException( "sample==null" );
+        setFigures(figures);
         setSize(sample.getSize());
         setBorderWidth(sample.getBorderWidth());
         setBorderColor(sample.getBorderColor());
@@ -136,28 +145,49 @@ public class Scene {
     };
 
     /** Фигуры расставленные на сцене */
-    protected final EventList<Figura<?>> figures = new BasicEventList<>();
-    {
-        figures.onChanged((idx,oldItem,newItem)->{
-            if( oldItem!=null ){
-                fireEvent(new RemoveFigure(this,oldItem));
-                //noinspection unchecked
-                oldItem.removeFiguraListener(figuraListener);
-            }
-            if( newItem!=null ){
-                fireEvent(new AddFigure(this,newItem));
-                //noinspection unchecked
-                newItem.addFiguraListener(figuraListener);
-            }
-        });
-    }
+    private List<Figura<?>> figures;
+//    {
+//        var figures = new BasicEventList<Figura<?>>();
+//        figures.onChanged((idx,oldItem,newItem)->{
+//            if( oldItem!=null ){
+//                fireEvent(new RemoveFigure(this,oldItem));
+//                //noinspection unchecked
+//                oldItem.removeFiguraListener(figuraListener);
+//            }
+//            if( newItem!=null ){
+//                fireEvent(new AddFigure(this,newItem));
+//                //noinspection unchecked
+//                newItem.addFiguraListener(figuraListener);
+//            }
+//        });
+//        this.figures = figures;
+//    }
 
     /**
      * Фигуры расставленные на сцене
      * @return фигуры
      */
-    public EventList<Figura<?>> getFigures(){
-        return figures;
+    public List<Figura<?>> getFigures(){
+        if( this.figures==null ){
+            var figures = new BasicEventList<Figura<?>>();
+            figures.onChanged((idx,oldItem,newItem)->{
+                if( oldItem!=null ){
+                    fireEvent(new RemoveFigure(this,oldItem));
+                    //noinspection unchecked
+                    oldItem.removeFiguraListener(figuraListener);
+                }
+                if( newItem!=null ){
+                    fireEvent(new AddFigure(this,newItem));
+                    //noinspection unchecked
+                    newItem.addFiguraListener(figuraListener);
+                }
+            });
+            this.figures = figures;
+        }
+        return this.figures;
+    }
+    public void setFigures(List<Figura<?>> list){
+        figures = list;
     }
     //endregion
 
