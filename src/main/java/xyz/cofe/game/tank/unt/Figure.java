@@ -11,9 +11,9 @@ import xyz.cofe.gui.swing.bean.UiBean;
 /**
  * Абстрактная фигура, с координатами
  */
-public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect, Moveable<SELF> {
-    public Figura(){}
-    public Figura(Figura<?> sample){
+public abstract class Figure<SELF extends Figure<SELF>> implements Drawing, Rect, Moveable<SELF> {
+    public Figure(){}
+    public Figure(Figure<?> sample){
         if( sample==null )throw new IllegalArgumentException( "sample==null" );
         left = sample.left();
         top = sample.top();
@@ -25,7 +25,7 @@ public abstract class Figura<SELF extends Figura<SELF>> implements Drawing, Rect
         this.notification = notification;
     }
 
-    public abstract Figura<SELF> clone();
+    public abstract Figure<SELF> clone();
 
     //region left : double - Левый край объекта
     private double left;

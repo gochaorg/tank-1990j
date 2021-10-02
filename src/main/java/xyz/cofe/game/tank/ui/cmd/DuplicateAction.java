@@ -3,7 +3,7 @@ package xyz.cofe.game.tank.ui.cmd;
 import xyz.cofe.game.tank.ui.SelectAction;
 import xyz.cofe.game.tank.ui.SelectToolProperty;
 import xyz.cofe.game.tank.ui.tool.SelectTool;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ public class DuplicateAction implements SelectAction, SelectToolProperty {
     public void setSelectTool(SelectTool selectTool) { this.selectTool = selectTool; }
 
     @Override
-    public void execute(Scene scene, Set<Figura<?>> selection) {
+    public void execute(Scene scene, Set<Figure<?>> selection) {
         System.out.println("duplicate");
 
         if( scene==null )return;
         if( selection==null || selection.isEmpty() )return;
 
-        var clones = new ArrayList<Figura<?>>();
+        var clones = new ArrayList<Figure<?>>();
         for( var selected : selection ){
             var clone = selected.clone();
             clones.add(clone);

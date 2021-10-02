@@ -12,7 +12,7 @@ import xyz.cofe.game.tank.ui.canvas.Grid;
 import xyz.cofe.game.tank.ui.canvas.Tooltip;
 import xyz.cofe.game.tank.ui.cmd.ConvertToAction;
 import xyz.cofe.game.tank.unt.SceneProperty;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.gui.swing.SwingListener;
 
@@ -61,20 +61,20 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
     }
     //endregion
     //region selection : Set<Figura<?>>
-    protected final EventSet<Figura<?>> selection = new BasicEventSet<>(new LinkedHashSet<>());
-    public EventSet<Figura<?>> getSelection(){ return selection; }
+    protected final EventSet<Figure<?>> selection = new BasicEventSet<>(new LinkedHashSet<>());
+    public EventSet<Figure<?>> getSelection(){ return selection; }
     //endregion
     //region lastSelected : Figura<?>
-    protected Figura<?> lastSelected;
-    public Figura<?> getLastSelected() { return lastSelected; }
-    public void setLastSelected(Figura<?> lastSelected) {
+    protected Figure<?> lastSelected;
+    public Figure<?> getLastSelected() { return lastSelected; }
+    public void setLastSelected(Figure<?> lastSelected) {
         var ch = this.lastSelected != lastSelected;
         this.lastSelected = lastSelected;
         if( ch )fireEvent(new LastSelectChanged(lastSelected));
     }
     public static class LastSelectChanged implements ToolEvent {
-        public final Figura<?> figura;
-        public LastSelectChanged(Figura<?> figura) {
+        public final Figure<?> figura;
+        public LastSelectChanged(Figure<?> figura) {
             this.figura = figura;
         }
     }
@@ -196,9 +196,9 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
 
     protected Color color = Color.gray;
 
-    protected List<Tuple3<Figura<?>, Figura<?>, Rect>> intersections( Scene scene ){
+    protected List<Tuple3<Figure<?>, Figure<?>, Rect>> intersections(Scene scene ){
         if( scene==null )throw new IllegalArgumentException( "scene==null" );
-        List<Tuple3<Figura<?>, Figura<?>, Rect>> res = new ArrayList<>();
+        List<Tuple3<Figure<?>, Figure<?>, Rect>> res = new ArrayList<>();
         for( var faIdx=0; faIdx<scene.getFigures().size(); faIdx++ ){
             for( var fbIdx=faIdx+1; fbIdx<scene.getFigures().size(); fbIdx++ ){
                 var fa = scene.getFigures().get(faIdx);
@@ -215,7 +215,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         return res;
     }
 
-    private List<Tuple3<Figura<?>, Figura<?>, Rect>> intersections;
+    private List<Tuple3<Figure<?>, Figure<?>, Rect>> intersections;
     {
         onSceneChanged.listen( ev -> {
             intersections=null;
@@ -223,8 +223,8 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         });
     }
 
-    private List<Tuple3<Figura<?>, Figura<?>, Rectangle2D.Double>> intersectionsRenders;
-    private List<Tuple3<Figura<?>, Figura<?>, Rectangle2D.Double>> intersectionsRenders(){
+    private List<Tuple3<Figure<?>, Figure<?>, Rectangle2D.Double>> intersectionsRenders;
+    private List<Tuple3<Figure<?>, Figure<?>, Rectangle2D.Double>> intersectionsRenders(){
         if( intersectionsRenders!=null )return intersectionsRenders;
         if( scene==null )return List.of();
         intersections = intersections(scene);
@@ -360,7 +360,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
 
     //region input events
     protected MouseEv dragStart;
-    protected Map<Figura<?>,Point> dragInitial = new LinkedHashMap<>();
+    protected Map<Figure<?>,Point> dragInitial = new LinkedHashMap<>();
 
     @Override
     public void onMouseClicked(MouseEv p) {
@@ -370,7 +370,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         if( scene==null )return;
 
         if( p.isLeftButton() ) {
-            List<Figura<?>> hits = new ArrayList<>();
+            List<Figure<?>> hits = new ArrayList<>();
             if (p.isShift()) {
                 scene.getFigures().stream().filter(f -> f.contains(p)).forEach(hits::add);
                 getSelection().addAll(hits);
@@ -500,7 +500,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         var scene = getScene();
         if( scene==null )return;
 
-        List<Figura<?>> hits = new ArrayList<>();
+        List<Figure<?>> hits = new ArrayList<>();
         for( var f : scene.getFigures() ){
             rect.intersection(f).ifPresent( i -> {
                 hits.add(f);

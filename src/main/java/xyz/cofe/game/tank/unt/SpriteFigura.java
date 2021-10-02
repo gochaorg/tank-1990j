@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Фигура представляющая спрайт {@link Sprite} или последовательность спрайтов {@link SpriteLine}
  */
-public class SpriteFigura extends Figura<SpriteFigura> implements Animated<SpriteFigura> {
+public class SpriteFigura extends Figure<SpriteFigura> implements Animated<SpriteFigura> {
     protected SpriteLine sprites;
 
     public SpriteFigura(Sprite sprite){

@@ -11,10 +11,10 @@ import java.util.Map;
 /**
  * Пуля
  */
-public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
+public class Bullet extends AbstractGameUnit<Bullet> implements Directed<Bullet> {
     public Bullet(){
     }
-    public Bullet(Figura<?> sample){
+    public Bullet(Figure<?> sample){
         super(sample);
         if( sample instanceof Directed ){
             direction = ((Directed<?>)sample).direction();
@@ -72,7 +72,6 @@ public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
         return sprites.maxSize().height();
     }
     //endregion
-
     //region direction
     protected Direction direction = Direction.RIGHT;
     public Direction direction(){
@@ -91,5 +90,28 @@ public class Bullet extends Figura<Bullet> implements Directed<Bullet> {
         MutableRect mrect = new MutableRect(frameBounds.get(direction()));
         mrect.location( mrect.left()+left(), mrect.top()+top() );
         return mrect;
+    }
+
+    //region animation
+    @Override
+    public boolean isAnimationRunning() {
+        return false;
+    }
+
+    @Override
+    public Bullet startAnimation() {
+        return this;
+    }
+
+    @Override
+    public Bullet stopAnimation() {
+        return this;
+    }
+    //endregion
+
+    {
+        moving.started().listen( ev -> {
+            direction(ev.event.getDirection());
+        });
     }
 }

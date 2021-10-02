@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class PlayerTwo extends Player<PlayerTwo> {
     public PlayerTwo(){}
-    public PlayerTwo(Figura<?> sample){
+    public PlayerTwo(Figure<?> sample){
         super(sample);
     }
     public PlayerTwo(PlayerTwo sample){

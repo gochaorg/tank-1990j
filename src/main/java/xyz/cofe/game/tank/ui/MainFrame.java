@@ -152,6 +152,7 @@ public class MainFrame extends JFrame {
     private TCounter gameCycleTC = new TCounter(1000);
     private TCounter repaintForceTC = new TCounter(1000);
     private TCounter paintTC = new TCounter(1000);
+    private boolean timeCounters = false;
 
     private int timesIdx = 0;
     private long lastEcho = 0;
@@ -159,22 +160,24 @@ public class MainFrame extends JFrame {
         fullCycleTC.start();
 
         if( gameCycle!=null ){
-            gameCycleTC.start();
+            if( timeCounters )gameCycleTC.start();
             gameCycle.next();
-            gameCycleTC.stop();
+            if( timeCounters )gameCycleTC.stop();
         }
 
-        repaintForceTC.start();
+        if( timeCounters )repaintForceTC.start();
         repaintForce();
-        repaintForceTC.stop();
+        if( timeCounters )repaintForceTC.stop();
 
-        fullCycleTC.stop();
+        if( timeCounters )fullCycleTC.stop();
 
         ////////////
-        fullCycleTC.echo(2000, fc -> fc.print("full "));
-        gameCycleTC.echo(2000, fc -> fc.print("game "));
-        repaintForceTC.echo(2000, fc -> fc.print("repaint "));
-        paintTC.echo(2000, fc -> fc.print("paint "));
+        if( timeCounters ) {
+            fullCycleTC.echo(2000, fc -> fc.print("full "));
+            gameCycleTC.echo(2000, fc -> fc.print("game "));
+            repaintForceTC.echo(2000, fc -> fc.print("repaint "));
+            paintTC.echo(2000, fc -> fc.print("paint "));
+        }
     }
 
     /**
@@ -216,7 +219,7 @@ public class MainFrame extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             try {
-                paintTC.start();
+                if( timeCounters )paintTC.start();
 
                 if (!(g instanceof Graphics2D)) {
                     super.paintComponent(g);
@@ -234,7 +237,7 @@ public class MainFrame extends JFrame {
                     figure.draw(gs);
                 }
             } finally {
-                paintTC.stop();
+                if( timeCounters )paintTC.stop();
             }
         }
     }

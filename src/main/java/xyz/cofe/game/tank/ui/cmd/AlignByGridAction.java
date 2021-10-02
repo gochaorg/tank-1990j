@@ -3,7 +3,7 @@ package xyz.cofe.game.tank.ui.cmd;
 import xyz.cofe.game.tank.ui.GridBinding;
 import xyz.cofe.game.tank.ui.canvas.Grid;
 import xyz.cofe.game.tank.ui.SelectAction;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
 import java.util.Set;
@@ -26,7 +26,7 @@ public class AlignByGridAction implements SelectAction, GridBinding {
 
 
     @Override
-    public void execute(Scene scene, Set<Figura<?>> selection) {
+    public void execute(Scene scene, Set<Figure<?>> selection) {
         if( scene==null )throw new IllegalArgumentException( "scene==null" );
         if( selection==null )throw new IllegalArgumentException( "selection==null" );
         var grid = getGrid();

@@ -2,7 +2,7 @@ package xyz.cofe.game.tank.store;
 
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.unt.Direction;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Player;
 import xyz.cofe.game.tank.unt.PlayerState;
 
@@ -14,7 +14,7 @@ public abstract class PlayerV<CLS extends Player<?>> extends OBJ<CLS> {
     }
 
     public final ObjKey<Point> location = new ObjKey<Point>("location",
-        Figura::getLocation,
+        Figure::getLocation,
         (ob,v) -> {
             ob.setLocation(v);
             return ob;

@@ -8,7 +8,7 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  */
 public class Slide extends LevelBrick<Slide> {
     public Slide(){}
-    public Slide(Figura<?> sample){super(sample);}
+    public Slide(Figure<?> sample){super(sample);}
     public Slide(LevelBrick<?> sample){
         super(sample);
     }

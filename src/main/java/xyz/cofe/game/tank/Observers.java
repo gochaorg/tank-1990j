@@ -9,11 +9,34 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
+/**
+ * Шаблон "обсервер" / подписчик-издатель
+ * @param <A> тип события
+ */
 public class Observers<A> extends ArrayList<Consumer1<Observers.Event<A>>> {
+    /**
+     * Событие
+     * @param <A> тип события
+     */
     public static class Event<A> {
+        /**
+         * Издатель
+         */
         public final Observers<A> observers;
+
+        /**
+         * Событие
+         */
         public final A event;
+
+        /**
+         * подписчик
+         */
         public final Consumer1<Observers.Event<A>> listener;
+
+        /**
+         * Коллекция подписчиков которые будет отсоединены после этого сообщения
+         */
         public final Collection<Consumer1<Observers.Event<A>>> removeListeners;
 
         public Event(Observers<A> observers, A event, Consumer1<Observers.Event<A>> listener, Collection<Consumer1<Observers.Event<A>>> removeListeners) {

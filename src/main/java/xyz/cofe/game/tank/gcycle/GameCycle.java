@@ -1,18 +1,22 @@
 package xyz.cofe.game.tank.gcycle;
 
 import xyz.cofe.game.tank.GameUnit;
+import xyz.cofe.game.tank.Observers;
 import xyz.cofe.game.tank.job.MoveCollector;
 import xyz.cofe.game.tank.job.Moving;
 import xyz.cofe.game.tank.unt.*;
 import xyz.cofe.iter.Eterable;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * Игровой цикл
  */
 public class GameCycle {
+    private final Observers<Figure<?>> figureDeleted = new Observers<>();
+
     /**
      * Сцена
      */
@@ -76,11 +80,29 @@ public class GameCycle {
     public void next(){
         if( !running )return;
         moveCollector.estimate().apply(3, (moveJob,unit,coll)->{
-            System.out.println("collision "+unit+" with "+coll.collisionObject+" rect "+coll.intersection);
+            //System.out.println("collision "+unit+" with "+coll.collisionObject+" rect "+coll.intersection);
             if( unit instanceof Player && coll.collisionObject instanceof LevelBrick ){
                 ((Player<?>)unit).stop();
             }
         });
+
+        var drops = movings
+            .map(Moving::getGameUnit)
+            .filter( f -> f instanceof Figure)
+            .filter( f -> f.right() < 0
+                || f.left() > scene.getWidth()
+                || f.top() > scene.getHeight()
+                || f.bottom() < 0
+            )
+            .map( f -> (Figure<?>)f )
+            .toList();
+
+        scene.getFigures().removeAll(drops);
+        if( drops.size()>0 ){
+            for( var d : drops ){
+                System.out.println("dropped "+d);
+            }
+        }
     }
 
     // начальное состояние игрока
@@ -119,6 +141,11 @@ public class GameCycle {
         return _player!=null ? Optional.of(_player) : Optional.empty();
     }
 
+    private double tankSpeed = 32;
+    private double bulletSpeed = tankSpeed * 4;
+    private long fireDelay = 1000 / 2;
+    private Map<Player<?>,Long> lastFire = new HashMap<>();
+
     /**
      * Пользовательский ввод
      * @param userInput событие ввода пользователя
@@ -128,7 +155,7 @@ public class GameCycle {
         if( !running )return;
         player().ifPresent( player -> {
             if( userInput instanceof UserMoveStop ){
-                //player.stop();
+                player.stop();
             }else if( userInput instanceof UserMoveStart ){
                 var ums = (UserMoveStart)userInput;
                 var j = player.getJob();
@@ -136,11 +163,25 @@ public class GameCycle {
                     var m = ((Moving<?>)j);
                     if( m.getDirection()!=ums.direction ){
                         player.stop();
-                        player.move(ums.direction, 32);
+                        player.move(ums.direction, tankSpeed);
                     }
                 }else{
-                    player.move(ums.direction, 32);
+                    player.move(ums.direction, tankSpeed);
                 }
+            }else if( userInput instanceof UserFire ){
+                var timeout =
+                    System.currentTimeMillis() -
+                    lastFire.getOrDefault(player,0L);
+
+                if( timeout<fireDelay )return;
+
+                Bullet bullet = player.createBullet();
+                scene.getFigures().add(bullet);
+                bullet.setJob(
+                    bullet.moving
+                        .direction(player.direction())
+                        .speed(bulletSpeed).start()
+                );
             }
         });
     }

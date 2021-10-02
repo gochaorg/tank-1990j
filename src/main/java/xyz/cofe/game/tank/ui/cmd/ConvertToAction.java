@@ -3,8 +3,7 @@ package xyz.cofe.game.tank.ui.cmd;
 import xyz.cofe.game.tank.ui.SelectAction;
 import xyz.cofe.game.tank.ui.SelectToolProperty;
 import xyz.cofe.game.tank.ui.tool.SelectTool;
-import xyz.cofe.game.tank.unt.Brick;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
 import java.awt.image.BufferedImage;
@@ -13,16 +12,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-public abstract class ConvertToAction<F extends Figura<?>> implements SelectAction, SelectToolProperty {
-    private final Function<Figura<?>,F> convert;
+public abstract class ConvertToAction<F extends Figure<?>> implements SelectAction, SelectToolProperty {
+    private final Function<Figure<?>,F> convert;
     private BufferedImage image;
 
-    public ConvertToAction(Function<Figura<?>,F> convert){
+    public ConvertToAction(Function<Figure<?>,F> convert){
         if( convert==null )throw new IllegalArgumentException( "convert==null" );
         this.convert = convert;
     }
 
-    public ConvertToAction(BufferedImage image,Function<Figura<?>,F> convert){
+    public ConvertToAction(BufferedImage image,Function<Figure<?>,F> convert){
         if( convert==null )throw new IllegalArgumentException( "convert==null" );
         this.convert = convert;
         this.image = image;
@@ -38,12 +37,12 @@ public abstract class ConvertToAction<F extends Figura<?>> implements SelectActi
     public void setSelectTool(SelectTool selectTool) { this.selectTool = selectTool; }
 
     @Override
-    public void execute(Scene scene, Set<Figura<?>> selection) {
+    public void execute(Scene scene, Set<Figure<?>> selection) {
         if( selection==null || selection.isEmpty() || scene==null )return;
 
-        Set<Figura<?>> set = new LinkedHashSet<>(selection);
-        Set<Figura<?>> clones = new LinkedHashSet<>();
-        for( Figura<?> f : set ){
+        Set<Figure<?>> set = new LinkedHashSet<>(selection);
+        Set<Figure<?>> clones = new LinkedHashSet<>();
+        for( Figure<?> f : set ){
             var c = convert.apply(f);
             clones.add(c);
             scene.getFigures().add(c);

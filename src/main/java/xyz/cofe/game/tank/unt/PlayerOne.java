@@ -6,7 +6,7 @@ import xyz.cofe.game.tank.sprite.SpritesData;
 
 public class PlayerOne extends Player<PlayerOne> {
     public PlayerOne(){}
-    public PlayerOne(Figura<?> figura){
+    public PlayerOne(Figure<?> figura){
         super(figura);
     }
     public PlayerOne( PlayerOne sample ){

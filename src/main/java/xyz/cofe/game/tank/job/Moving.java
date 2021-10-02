@@ -1,14 +1,12 @@
 package xyz.cofe.game.tank.job;
 
 import java.util.Optional;
-import xyz.cofe.ecolls.Closeables;
+
 import xyz.cofe.game.tank.GameUnit;
 import xyz.cofe.game.tank.Moveable;
 import xyz.cofe.game.tank.geom.MutableRect;
-import xyz.cofe.game.tank.geom.Rect;
 import xyz.cofe.game.tank.unt.Directed;
 import xyz.cofe.game.tank.unt.Direction;
-import xyz.cofe.game.tank.unt.Figura;
 
 import java.util.function.Consumer;
 
@@ -77,7 +75,6 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return this;
     }
     //endregion
-
     //region offset - Смещение на которое необходимо передвинуть объект, спустя заданное время
     /**
      * Смещение на которое необходимо передвинуть объект, спустя заданное время {@link #nextRunTime}, {@link #duration}
@@ -90,7 +87,6 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
      */
     public double getOffset(){ return offset; }
     //endregion
-
     //region direction - Направление премещения
     /**
      * Направление премещения
@@ -130,27 +126,6 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
     }
     //endregion
 
-    //region collision - коллизии
-    protected Iterable<? extends Rect> collision;
-
-    /**
-     * Возвращает список объектов с которыми возможны коллизии
-     * @return список объектов
-     */
-    public Iterable<? extends Rect> collision(){ return collision; }
-
-    /**
-     * Указывает список объектов с которыми возможны коллизии
-     * @param collizion список объектов
-     * @return SELF ссылка
-     */
-    @SuppressWarnings({"SpellCheckingInspection", "UnusedReturnValue"})
-    public Moving<UNT> collision(Iterable<? extends Figura<?>> collizion){
-        this.collision = collizion;
-        return this;
-    }
-    //endregion
-
     //region move()
     /**
      * Функция перемещения
@@ -161,7 +136,10 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
     //endregion
 
     //region getScn()
-    protected volatile long scn = 0;
+    /**
+     * текущий номер изменения, используется чтоб не применять повторно {@link UnitMoveEstimation}
+     */
+    protected long scn = 0;
 
     /**
      * Возвращает текущий номер изменения, используется чтоб не применять повторно {@link UnitMoveEstimation}
@@ -187,24 +165,6 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return dstart;
     }
 
-    //region estimationOnly
-    protected boolean estimationOnly = false;
-
-    /**
-     * Указывает - передвижение объекта только при предварительно расчете {@link #estimate()}
-     * @return true - передвижение объекта только при предварительно расчете
-     */
-    public boolean isEstimationOnly(){ return estimationOnly; }
-
-    /**
-     * Указывает - передвижение объекта только при предварительно расчете {@link #estimate()}
-     * @param v true - передвижение объекта только при предварительно расчете
-     */
-    public void setEstimationOnly(boolean v){
-        estimationOnly = v;
-    }
-    //endregion
-
     @Override
     protected boolean doRun(){
         var gu = getGameUnit();
@@ -213,33 +173,8 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
             return false;
         }
 
-        if( isEstimationOnly() )return false;
-
-        if( collision!=null ){
-            var target = new MutableRect(gu);
-            move(target);
-
-            int collisionCount = 0;
-            for( var crect : collision ){
-                if( crect!=null ){
-                    var collsn = target.intersection(crect);
-                    if( collsn.isPresent() ){
-                        collision(collsn.get(), crect);
-                        collisionCount++;
-                    }
-                }
-            }
-
-            if( collisionCount<1 ){
-                move(gu);
-                return true;
-            }
-        }else{
-            move(gu);
-            return true;
-        }
-
-        return false;
+        move(gu);
+        return true;
     }
 
     //region estimation
@@ -265,7 +200,7 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         return Optional.of( new UnitMoveEstimation<>(this, target, nextRunTime1, this::apply) );
     }
 
-    protected synchronized void apply( UnitMoveEstimation<UNT> est ){
+    private void apply( UnitMoveEstimation<UNT> est ){
         if( est==null )throw new IllegalArgumentException( "est==null" );
         if( scn!=est.getScn() )throw new IllegalStateException("scn not matched");
         if( !isRunning() ){
@@ -280,39 +215,7 @@ public class Moving<UNT extends GameUnit<UNT>> extends AbstractJob<Moving<UNT>> 
         gu.location( est.getTo().left(), est.getTo().top() );
         nextRunTime = est.getNextRun();
 
-        fireExecuted();
+        executed().fire(this);
     }
     //endregion
-
-    /**
-     * Произошла коллизия
-     * @param collision где произошла коллизия
-     * @param withObject с кем произошла коллизия
-     */
-    protected void collision(Rect collision, Rect withObject ){
-        stop();
-        fireJobEvent(new CollisionDetected<>(this,withObject,collision));
-    }
-
-    public Moving<UNT> onCollision( Consumer<CollisionDetected<UNT>> listener ){
-        if( listener==null )throw new IllegalArgumentException( "listener==null" );
-        listeners.addListener( e -> {
-            if( e instanceof CollisionDetected ){
-                listener.accept((CollisionDetected<UNT>)e);
-            }
-        });
-        return this;
-    }
-    public Moving<UNT> onCollision(Closeables closeables, Consumer<CollisionDetected<UNT>> listener ){
-        if( listener==null )throw new IllegalArgumentException( "listener==null" );
-        var u = listeners.addListener( e -> {
-            if( e instanceof CollisionDetected ){
-                listener.accept((CollisionDetected<UNT>)e);
-            }
-        });
-        if( closeables!=null ){
-            closeables.add(u);
-        }
-        return this;
-    }
 }

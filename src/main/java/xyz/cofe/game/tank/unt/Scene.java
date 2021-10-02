@@ -1,13 +1,11 @@
 package xyz.cofe.game.tank.unt;
 
 import xyz.cofe.collection.BasicEventList;
-import xyz.cofe.collection.EventList;
 import xyz.cofe.ecolls.ListenersHelper;
 import xyz.cofe.game.tank.geom.Size2D;
 import xyz.cofe.gui.swing.bean.UiBean;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +21,7 @@ public class Scene {
         setBorderWidth(sample.getBorderWidth());
         setBorderColor(sample.getBorderColor());
     }
-    public Scene(Scene sample, List<Figura<?>> figures){
+    public Scene(Scene sample, List<Figure<?>> figures){
         if( sample==null )throw new IllegalArgumentException( "sample==null" );
         setFigures(figures);
         setSize(sample.getSize());
@@ -145,7 +143,7 @@ public class Scene {
     };
 
     /** Фигуры расставленные на сцене */
-    private List<Figura<?>> figures;
+    private List<Figure<?>> figures;
 //    {
 //        var figures = new BasicEventList<Figura<?>>();
 //        figures.onChanged((idx,oldItem,newItem)->{
@@ -167,9 +165,9 @@ public class Scene {
      * Фигуры расставленные на сцене
      * @return фигуры
      */
-    public List<Figura<?>> getFigures(){
+    public List<Figure<?>> getFigures(){
         if( this.figures==null ){
-            var figures = new BasicEventList<Figura<?>>();
+            var figures = new BasicEventList<Figure<?>>();
             figures.onChanged((idx,oldItem,newItem)->{
                 if( oldItem!=null ){
                     fireEvent(new RemoveFigure(this,oldItem));
@@ -186,7 +184,7 @@ public class Scene {
         }
         return this.figures;
     }
-    public void setFigures(List<Figura<?>> list){
+    public void setFigures(List<Figure<?>> list){
         figures = list;
     }
     //endregion
@@ -197,26 +195,26 @@ public class Scene {
      * Фигура добавлена на сцену
      */
     public static class AddFigure extends Event {
-        public AddFigure(Scene scene, Figura<?> f) {
+        public AddFigure(Scene scene, Figure<?> f) {
             super(scene);
             figura = f;
         }
 
-        protected Figura<?> figura;
-        public Figura<?> getFigura(){ return figura; }
+        protected Figure<?> figura;
+        public Figure<?> getFigura(){ return figura; }
     }
 
     /**
      * Фигура удалена со сцены
      */
     public static class RemoveFigure extends Event {
-        public RemoveFigure(Scene scene, Figura<?> f) {
+        public RemoveFigure(Scene scene, Figure<?> f) {
             super(scene);
             figura = f;
         }
 
-        protected Figura<?> figura;
-        public Figura<?> getFigura(){ return figura; }
+        protected Figure<?> figura;
+        public Figure<?> getFigura(){ return figura; }
     }
     //endregion
     //region MovedFigure

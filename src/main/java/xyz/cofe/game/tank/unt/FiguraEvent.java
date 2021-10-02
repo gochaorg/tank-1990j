@@ -4,7 +4,7 @@ package xyz.cofe.game.tank.unt;
  * Событие фигуры
  * @param <SELF> фигура
  */
-public class FiguraEvent<SELF extends Figura<SELF>> {
+public class FiguraEvent<SELF extends Figure<SELF>> {
     public FiguraEvent(SELF self){
         this.figura = self;
     }

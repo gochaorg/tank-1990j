@@ -1,6 +1,7 @@
 package xyz.cofe.game.tank.job;
 
 import xyz.cofe.ecolls.ListenersHelper;
+import xyz.cofe.game.tank.Observers;
 
 import java.util.Set;
 
@@ -9,8 +10,28 @@ import java.util.Set;
  * @param <SELF> Дочерний класс
  */
 public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Runnable, Job<SELF> {
-    protected final ListenersHelper<JobListener<SELF>, JobEvent<SELF>> listeners
-        = new ListenersHelper<>(JobListener::jobEvent);
+    private final Observers<SELF> started = new Observers<>();
+    private final Observers<SELF> stopped = new Observers<>();
+    private final Observers<SELF> executed = new Observers<>();
+
+    /**
+     * Событие старта задания
+     * @return старт задания
+     */
+    public Observers<SELF> started(){ return this.started; }
+
+    /**
+     * Событие остановки задания
+     * @return остановка задания
+     */
+    public Observers<SELF> stopped(){ return this.stopped; }
+
+    /**
+     * Событие выполнения задания
+     * @return выполнения задания
+     */
+    public Observers<SELF> executed(){ return this.executed; }
+
 
     //region start(), doStart()
     /**
@@ -29,8 +50,9 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
         nextRunTime = startedTime + starting.duration;
         duration = starting.duration;
 
-        fireStarted();
-        return (SELF) this;
+        SELF self = (SELF)this;
+        started.fire(self);
+        return self;
     }
 
     protected static class DoStart {
@@ -53,7 +75,7 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     public SELF stop(){
         if( isRunning() ){
             this.stoppedTime = System.currentTimeMillis();
-            fireStopped();
+            stopped.fire((SELF) this);
         }
 
         return (SELF) this;
@@ -77,7 +99,8 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
 
         var succ = doRun();
         if( succ ){
-            fireExecuted();
+            //noinspection unchecked
+            executed.fire((SELF) this);
         }
     }
 
@@ -160,106 +183,6 @@ public abstract class AbstractJob<SELF extends AbstractJob<SELF>> implements Run
     public boolean isRunning(){
         if( startedTime == 0 ) return false;
         return stoppedTime <= 0;
-    }
-    //endregion
-
-    //region listeners / Уведомления
-    /**
-     * Проверка наличия подписчика
-     * @param listener подписчик
-     * @return true - подписчик, подписан на события
-     */
-    public boolean hasJobListener(JobListener<SELF> listener){
-        return listeners.hasListener(listener);
-    }
-
-    /**
-     * Получение списка подписчиков
-     * @return подписчики
-     */
-    public Set<JobListener<SELF>> getJobListeners(){
-        return listeners.getListeners();
-    }
-
-    /**
-     * Добавления подписчика
-     * @param listener подписчик
-     * @return Отписка от событий
-     */
-    public AutoCloseable addJobListener(JobListener<SELF> listener){
-        return listeners.addListener(listener);
-    }
-
-    /**
-     * Добавления подписчика
-     * @param listener подписчик
-     * @param weakLink подписчик добавляется как weak ссылка
-     * @return Отписка от событий
-     */
-    public AutoCloseable addJobListener(JobListener<SELF> listener, boolean weakLink){
-        return listeners.addListener(listener, weakLink);
-    }
-
-    /**
-     * Удаление подписчика
-     * @param listener подписчик
-     */
-    public void removeJobListener(JobListener<SELF> listener){
-        listeners.removeListener(listener);
-    }
-
-    /**
-     * Удаляет всех подписчиков
-     */
-    public void removeAllJobListeners(){
-        listeners.removeAllListeners();
-    }
-
-    /**
-     * Уведомляет подписчиков о событии
-     * @param event событие
-     */
-    protected void fireJobEvent(JobEvent<SELF> event){
-        listeners.fireEvent(event);
-    }
-
-    /**
-     * Добавляет событие в очередь
-     * @param ev событие
-     */
-    protected void addJobEvent(JobEvent<SELF> ev){
-        listeners.addEvent(ev);
-    }
-
-    /**
-     * Выполняет события из очереди
-     */
-    protected void runJobEventQueue(){
-        listeners.runEventQueue();
-    }
-
-    /**
-     * Уведомление о запуске задания
-     */
-    @SuppressWarnings("unchecked")
-    protected void fireStarted(){
-        fireJobEvent(new JobStarted<>((SELF) this));
-    }
-
-    /**
-     * Уведомление о завершение задания
-     */
-    @SuppressWarnings("unchecked")
-    protected void fireStopped(){
-        fireJobEvent(new JobStopped<>((SELF) this));
-    }
-
-    /**
-     * Уведомление о выполнения задания
-     */
-    @SuppressWarnings("unchecked")
-    protected void fireExecuted(){
-        fireJobEvent(new JobExecuted<>((SELF) this));
     }
     //endregion
 }

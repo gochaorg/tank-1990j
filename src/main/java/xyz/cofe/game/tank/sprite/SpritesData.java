@@ -163,7 +163,7 @@ public class SpritesData {
     //endregion
 
     //region images() : BufferedImage[] - кадры
-    private volatile boolean spriteImagesReaded = false;
+    private boolean spriteImagesReaded = false;
     private final List<BufferedImage> spriteImages = new ArrayList<>();
 
     /**
@@ -172,14 +172,11 @@ public class SpritesData {
      */
     public List<BufferedImage> images(){
         if( spriteImagesReaded )return spriteImages;
-        synchronized( this ){
-            if( spriteImagesReaded )return spriteImages;
-            for( int frame=0; frame<frames; frame++ ){
-                spriteImages.add(image(frame));
-            }
-            spriteImagesReaded = true;
-            return spriteImages;
+        for( int frame=0; frame<frames; frame++ ){
+            spriteImages.add(image(frame));
         }
+        spriteImagesReaded = true;
+        return spriteImages;
     }
 
     private BufferedImage image( int frame ){

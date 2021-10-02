@@ -1,6 +1,5 @@
 package xyz.cofe.game.tank.ui;
 
-import xyz.cofe.game.tank.unt.Figura;
 import xyz.cofe.gui.swing.properties.Property;
 
 import java.util.*;

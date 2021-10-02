@@ -1,12 +1,10 @@
 package xyz.cofe.game.tank.ui.cmd;
 
 import xyz.cofe.game.tank.ui.MainFrame;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
-import javax.swing.WindowConstants;
 import java.util.ArrayList;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,9 +39,10 @@ public class PlaySceneCommand implements Runnable {
         mf.setLocationRelativeTo(null);
 
         mf.setScene(new Scene(scene,
-            new ArrayList<Figura<?>>(
+            new ArrayList<Figure<?>>(
                 scene.getFigures().stream()
                     .map( f -> {
+                        f = f.clone();
                         f.setNotification(false);
                         return f;
                     } )

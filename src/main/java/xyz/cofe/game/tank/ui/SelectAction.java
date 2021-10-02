@@ -1,6 +1,6 @@
 package xyz.cofe.game.tank.ui;
 
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
 import java.awt.image.BufferedImage;
@@ -28,5 +28,5 @@ public interface SelectAction {
      * @param scene сцена
      * @param selection выбранные объекты
      */
-    void execute(Scene scene, Set<Figura<?>> selection);
+    void execute(Scene scene, Set<Figure<?>> selection);
 }

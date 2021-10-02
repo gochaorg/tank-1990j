@@ -6,7 +6,7 @@ import xyz.cofe.game.tank.geom.Point;
  * Уведомление о перемещении
  * @param <SELF> фигура
  */
-public class FiguraMoved<SELF extends Figura<SELF>> extends FiguraEvent<SELF> {
+public class FiguraMoved<SELF extends Figure<SELF>> extends FiguraEvent<SELF> {
     /**
      * Конструктор
      * @param self фигура

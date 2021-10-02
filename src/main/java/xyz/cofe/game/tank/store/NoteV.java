@@ -1,7 +1,7 @@
 package xyz.cofe.game.tank.store;
 
 import xyz.cofe.game.tank.geom.Point;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Note;
 import xyz.cofe.gui.swing.typeconv.impl.RGB;
 
@@ -30,7 +30,7 @@ public class NoteV extends OBJ<Note> implements ObjectMapper {
     });
 
     public final ObjKey<Point> location = new ObjKey<Point>("location",
-        Figura::getLocation,
+        Figure::getLocation,
         (ob,v) -> {
             ob.setLocation(v);
             return ob;

@@ -7,7 +7,7 @@ import xyz.cofe.game.tank.ui.SnapToGridProperty;
 import xyz.cofe.game.tank.ui.canvas.Grid;
 import xyz.cofe.game.tank.unt.SceneProperty;
 import xyz.cofe.game.tank.ui.Tool;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 
 import java.awt.image.BufferedImage;
@@ -69,7 +69,7 @@ public abstract class LevelBrickTool<SELF extends LevelBrickTool<SELF>>
     }
     //endregion
 
-    protected abstract Figura<?> buildFigura();
+    protected abstract Figure<?> buildFigura();
 
     @Override
     public void onMouseClicked(MouseEv pt) {

@@ -119,11 +119,11 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
                 newSprites.add(s);
             }
         }
-        synchronized( this ){
+        //synchronized( this ){
             this.sprites.clear();
             this.sprites.addAll(newSprites);
             onSpritesChanged();
-        }
+        //}
     }
 
     public SpriteLine sprites(List<Sprite> sprites){
@@ -161,7 +161,7 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
     }
     //endregion
     //region getSizes() : List<Size2D> - размеры кадров
-    private volatile List<Size2D> sizes;
+    private List<Size2D> sizes;
 
     /**
      * Размеры кадров
@@ -169,16 +169,13 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
      */
     protected List<Size2D> sizes(){
         if( sizes!=null )return sizes;
-        synchronized( this ){
-            if( sizes!=null )return sizes;
-            sizes = sprites.stream().map(Sprite::size).collect(Collectors.toList());
-            return sizes;
-        }
+        sizes = sprites.stream().map(Sprite::size).collect(Collectors.toList());
+        return sizes;
     }
     //endregion
 
     //region maxSize() - Максимальный размер кадра
-    protected volatile Size2D maxSize;
+    protected Size2D maxSize;
 
     /**
      * Возвращает максимальный размер кадра
@@ -186,22 +183,19 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
      */
     public Size2D maxSize(){
         if( maxSize!=null )return maxSize;
-        synchronized( this ){
-            if( maxSize!=null )return maxSize;
-            List<Size2D> sizes = sizes();
-            if( sizes.isEmpty() ){
-                maxSize = new MutableRect();
-            }else if( sizes.size()==1 ){
-                maxSize = sizes.get(0);
-            }else{
-                maxSize = sizes.stream().max(Comparator.comparingDouble(Size2D::area)).get();
-            }
-            return maxSize;
+        List<Size2D> sizes = sizes();
+        if( sizes.isEmpty() ){
+            maxSize = new MutableRect();
+        }else if( sizes.size()==1 ){
+            maxSize = sizes.get(0);
+        }else{
+            maxSize = sizes.stream().max(Comparator.comparingDouble(Size2D::area)).get();
         }
+        return maxSize;
     }
     //endregion
     //region minSize() - Минимальный размер кадра
-    protected volatile Size2D minSize;
+    protected Size2D minSize;
 
     /**
      * Возвращает минимальный размер кадра
@@ -209,18 +203,15 @@ public class SpriteLine implements PositionalDrawing, Animated<SpriteLine> {
      */
     public Size2D minSize(){
         if( minSize!=null )return minSize;
-        synchronized( this ){
-            if( minSize!=null )return minSize;
-            List<Size2D> sizes = sizes();
-            if( sizes.isEmpty() ){
-                minSize = new MutableRect();
-            }else if( sizes.size()==1 ){
-                minSize = sizes.get(0);
-            }else{
-                minSize = sizes.stream().min(Comparator.comparingDouble(Size2D::area)).get();
-            }
-            return minSize;
+        List<Size2D> sizes = sizes();
+        if( sizes.isEmpty() ){
+            minSize = new MutableRect();
+        }else if( sizes.size()==1 ){
+            minSize = sizes.get(0);
+        }else{
+            minSize = sizes.stream().min(Comparator.comparingDouble(Size2D::area)).get();
         }
+        return minSize;
     }
     //endregion
 

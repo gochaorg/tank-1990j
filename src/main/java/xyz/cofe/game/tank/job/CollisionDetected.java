@@ -2,7 +2,6 @@ package xyz.cofe.game.tank.job;
 
 import xyz.cofe.game.tank.GameUnit;
 import xyz.cofe.game.tank.geom.Rect;
-import xyz.cofe.game.tank.unt.Figura;
 
 public class CollisionDetected<UNT extends GameUnit<UNT>> implements JobEvent<Moving<UNT>> {
     public CollisionDetected(Moving<UNT> job, Rect withObject, Rect rect){

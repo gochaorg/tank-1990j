@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.List;
 
-public class Note extends Figura<Note> {
+public class Note extends Figure<Note> {
     public final Observers<Size2D> onSizeChanged = new Observers<>();
 
     //region constructors
     public Note(){}
-    public Note(Figura<?> sample1){
+    public Note(Figure<?> sample1){
         super(sample1);
         if( sample1 instanceof Note ){
             Note sample = (Note) sample1;

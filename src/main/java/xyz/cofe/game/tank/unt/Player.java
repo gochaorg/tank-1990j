@@ -1,8 +1,6 @@
 package xyz.cofe.game.tank.unt;
 
 import xyz.cofe.game.tank.*;
-import xyz.cofe.game.tank.job.Job;
-import xyz.cofe.game.tank.job.Moving;
 import xyz.cofe.game.tank.sprite.SpriteLine;
 import xyz.cofe.iter.Eterable;
 
@@ -13,9 +11,9 @@ import java.util.Map;
  * Некий игрок
  * @param <SELF> дочерний класс
  */
-public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> implements GameUnit<SELF>, Directed<SELF> {
+public abstract class Player<SELF extends Player<SELF>> extends AbstractGameUnit<SELF> implements GameUnit<SELF>, Directed<SELF> {
     public Player(){}
-    public Player(Figura<?> sample){
+    public Player(Figure<?> sample){
         super(sample);
         if( sample instanceof Player ){
             playerState = ((Player<?>)sample).getPlayerState();
@@ -105,49 +103,11 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
     }
     //endregion
 
-    //region Перемещение
-    //region run()
-    protected Job<?> job;
-
-    @Override
-    public Job<?> getJob(){
-        return job;
-    }
-
-    @Override
-    public void setJob(Job<?> newJob){
-        this.job = newJob;
-    }
-
-    @Override
-    public void run(){
-        Runnable r = job;
-        if( r!=null ){
-            r.run();
-        }
-    }
-    //endregion
-
-    /**
-     * Остановка танка
-     */
-    public void stop(){
-        stopAnimation();
-        if( job!=null ){
-            job.stop();
-        }
-        job = null;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected final Moving<SELF> moving = new Moving<SELF>((SELF) this)
-        .onStopped( ev -> {
-            //System.out.println("stopped event");
-            stop();
-        })
-        .onCollision( ev -> {
-           // System.out.println("collision "+ev.getRect()+" with "+ev.getWithFigura());
+    {
+        moving.started().listen( ev -> {
+            direction(ev.event.getDirection());
         });
+    }
 
     /**
      * Перемещение объекта
@@ -156,31 +116,29 @@ public abstract class Player<SELF extends Player<SELF>> extends Figura<SELF> imp
      */
     public void move(Direction direction, double speedPixelPerSec){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
-        direction(direction);
-
+        //direction(direction);
         job = moving.direction(direction).speed(speedPixelPerSec).start();
     }
-
-    //endregion
 
     public Bullet createBullet(){
         var blt = new Bullet().direction(direction());
 
         var myXCenter = width() / 2 + left();
         var myYCenter = height() / 2 + top();
+        var indent = 2;
 
         switch( direction() ){
             case UP:
-                blt.location( myXCenter-blt.width()/2, myYCenter-height()/2-blt.height() );
+                blt.location( myXCenter-blt.width()/2, myYCenter-height()/2-blt.height()-indent );
                 break;
             case DOWN:
-                blt.location( myXCenter-blt.width()/2, myYCenter+height()/2+blt.height()*0 );
+                blt.location( myXCenter-blt.width()/2, myYCenter+height()/2+blt.height()*0+indent );
                 break;
             case LEFT:
-                blt.location( myXCenter-width()/2-blt.width(), myYCenter-blt.height()/2 );
+                blt.location( myXCenter-width()/2-blt.width()-indent, myYCenter-blt.height()/2 );
                 break;
             case RIGHT:
-                blt.location( myXCenter+width()/2+blt.width()*0, myYCenter-blt.height()/2 );
+                blt.location( myXCenter+width()/2+blt.width()*0+indent, myYCenter-blt.height()/2 );
                 break;
         }
 

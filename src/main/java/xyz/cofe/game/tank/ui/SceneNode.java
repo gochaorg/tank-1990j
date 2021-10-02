@@ -2,7 +2,7 @@ package xyz.cofe.game.tank.ui;
 
 import xyz.cofe.collection.EventList;
 import xyz.cofe.ecolls.Closeables;
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Note;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.gui.swing.tree.TreeTableNodeBasic;
@@ -37,7 +37,7 @@ public class SceneNode extends NamedNode implements AutoCloseable {
         }
 
         if( figs instanceof EventList ){
-            var elist = (EventList<Figura<?>>)figs;
+            var elist = (EventList<Figure<?>>)figs;
             var cl = elist.onChanged(false,(idx,old,cur)->{
                 if( old!=null ){
                     node.remove(idx);

@@ -1,11 +1,8 @@
 package xyz.cofe.game.tank.store;
 
-import xyz.cofe.game.tank.unt.Figura;
+import xyz.cofe.game.tank.unt.Figure;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.gui.swing.typeconv.impl.RGB;
-
-import java.util.List;
-import java.util.function.Supplier;
 
 public class SceneV extends OBJ<Scene> implements ObjectMapper {
     public static final SceneV instance = new SceneV();
@@ -17,7 +14,7 @@ public class SceneV extends OBJ<Scene> implements ObjectMapper {
         ObjectMappers.mappers.put(instance.clazz, instance);
     }
 
-    final ListKey<Figura<?>> figures = new ListKey<Figura<?>>(
+    final ListKey<Figure<?>> figures = new ListKey<Figure<?>>(
         "figures",
         Scene::getFigures,
         ((scene, figuras) -> {
