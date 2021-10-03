@@ -169,8 +169,8 @@ public interface Rect extends Size2D {
         if( a_x1<=b_x0 )return Optional.empty();
         if( a_y1<=b_y0 )return Optional.empty();
 
-        if( a_x0>b_x1 )return Optional.empty();
-        if( a_y0>b_y1 )return Optional.empty();
+        if( a_x0>=b_x1 )return Optional.empty();
+        if( a_y0>=b_y1 )return Optional.empty();
 
 //        double a_dx = Math.abs(a_x0 - a_x1);
 //        double b_dx = Math.abs(b_x0 - b_x1);
