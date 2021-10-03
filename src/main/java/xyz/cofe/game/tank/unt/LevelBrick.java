@@ -23,6 +23,8 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figure<S
         this.state = sample.state;
     }
 
+    public abstract SELF clone();
+
     /**
      * Спрайт (16x16) изображающий строительный блок
      * @return спрайт
@@ -45,17 +47,30 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figure<S
     public SELF state(int state){
         if( state<0 )throw new IllegalStateException("state<0");
         if( state>15 )throw new IllegalArgumentException( "state>15" );
+        this.state = state;
         return (SELF)this;
     }
 
-    protected final int UL_BRICK = 0b0001;
-    protected final int UR_BRICK = 0b0010;
-    protected final int BL_BRICK = 0b0100;
-    protected final int BR_BRICK = 0b1000;
-    protected boolean isUpLeft(){ return (state & UL_BRICK) == UL_BRICK; }
-    protected boolean isUpRight(){ return (state & UR_BRICK) == UR_BRICK; }
-    protected boolean isBottomLeft(){ return (state & BL_BRICK) == BL_BRICK; }
-    protected boolean isBottomRight(){ return (state & BR_BRICK) == BR_BRICK; }
+    public static final int UL_BRICK = 0b0001;
+    public static final int UR_BRICK = 0b0010;
+    public static final int BL_BRICK = 0b0100;
+    public static final int BR_BRICK = 0b1000;
+    public boolean isUpLeft(){ return (state & UL_BRICK) == UL_BRICK; }
+    public void setUpLeft( boolean set ){
+        state = set ? state | UL_BRICK : state & ~UL_BRICK;
+    }
+    public boolean isUpRight(){ return (state & UR_BRICK) == UR_BRICK; }
+    public void setUpRight( boolean set ){
+        state = set ? state | UR_BRICK : state & ~UR_BRICK;
+    }
+    public boolean isBottomLeft(){ return (state & BL_BRICK) == BL_BRICK; }
+    public void setBottomLeft( boolean set ){
+        state = set ? state | BL_BRICK : state & ~BL_BRICK;
+    }
+    public boolean isBottomRight(){ return (state & BR_BRICK) == BR_BRICK; }
+    public void setBottomRight( boolean set ){
+        state = set ? state | BR_BRICK : state & ~BR_BRICK;
+    }
     //endregion
     //region width, height
     /**
@@ -64,7 +79,9 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figure<S
      */
     @Override
     public double width(){
-        return sprite().image().getWidth() * 2;
+        return sprite().image().getWidth()
+            *
+            ((isBottomRight() || isUpRight()) ? 2 : 1 );
     }
 
     /**
@@ -73,17 +90,27 @@ public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figure<S
      */
     @Override
     public double height(){
-        return sprite().image().getHeight() * 2;
+        return sprite().image().getHeight()
+            *
+            (( isBottomLeft() || isBottomRight() ) ? 2 : 1 );
     }
     //endregion
 
     @Override
     public void draw(Graphics2D gs){
         if( gs==null )throw new IllegalArgumentException( "gs==null" );
-        if( isUpLeft() ) sprite().draw(gs, left(), top());
-        if( isUpRight() ) sprite().draw(gs, left()+sprite().image().getWidth(), top());
-        if( isBottomLeft() ) sprite().draw(gs, left(), top()+sprite().image().getHeight());
-        if( isBottomRight() ) sprite().draw(gs, left()+sprite().image().getWidth(), top()+sprite().image().getHeight());
+        if( isUpLeft() ) {
+            sprite().draw(gs, left(), top());
+        }
+        if( isUpRight() ) {
+            sprite().draw(gs, left()+sprite().image().getWidth(), top());
+        }
+        if( isBottomLeft() ) {
+            sprite().draw(gs, left(), top()+sprite().image().getHeight());
+        }
+        if( isBottomRight() ) {
+            sprite().draw(gs, left()+sprite().image().getWidth(), top()+sprite().image().getHeight());
+        }
     }
 
     @Override
