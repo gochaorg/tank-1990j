@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -216,6 +217,32 @@ public class MainFrame extends JFrame {
             setDoubleBuffered(true);
         }
 
+        private Shape sceneBorder;
+        private Shape getSceneBorder(){
+            if( sceneBorder!=null )return sceneBorder;
+
+            double b = scene.getBorderWidth();
+            if( b<=0 )return null;
+
+            double w = scene.getWidth();
+            double h = scene.getHeight();
+
+            GeneralPath p = new GeneralPath();
+            p.moveTo(0,0);
+            p.lineTo(w,0);
+            p.lineTo(w,h);
+            p.lineTo(0,h);
+            p.lineTo(0,0);
+            p.lineTo(0-b,0);
+            p.lineTo(0-b,h+b);
+            p.lineTo(w+b,h+b);
+            p.lineTo(w+b,0-b);
+            p.lineTo(0-b,0-b);
+            p.lineTo(0-b,0);
+            p.closePath();
+            return p;
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             try {
@@ -229,6 +256,13 @@ public class MainFrame extends JFrame {
                 Graphics2D gs = (Graphics2D) g;
                 gs.setPaint(getBackground());
                 gs.fillRect(0, 0, getWidth(), getHeight());
+
+                Color sceneBorderColor = scene.getBorderColor();
+                Shape sceneBorder = getSceneBorder();
+                if( sceneBorder!=null && sceneBorderColor!=null ){
+                    gs.setPaint(sceneBorderColor);
+                    gs.fill(sceneBorder);
+                }
 
                 if (scene == null) return;
                 for (var figure : scene.getFigures()) {
