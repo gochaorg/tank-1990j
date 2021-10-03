@@ -16,21 +16,59 @@ import java.util.function.Supplier;
  * @param <B>
  */
 public abstract class OBJ<B> {
+    /**
+     * Тип объекта
+     */
     public final Class<B> clazz;
+
+    /**
+     * Создание нового экземпляра класса
+     */
     public final Supplier<B> newInstance;
+
+    /**
+     * Список свойств класса
+     */
     public final List<Key<?>> keys = new ArrayList<>();
 
+    /**
+     * Конструктор
+     * @param cls тип объекта
+     * @param newInst Создание нового экземпляра класса
+     */
     public OBJ(Class<B> cls, Supplier<B> newInst) {
         if (cls == null) throw new IllegalArgumentException("cls==null");
         if (newInst == null) throw new IllegalArgumentException("newInst==null");
         clazz = cls;
         newInstance = newInst;
     }
+
+    /**
+     * Описывает сохраняемое свойства класса
+     * @param <V> Тип свойства
+     */
     public abstract class Key<V> {
+        /**
+         * Имя свойства
+         */
         public final String name;
+
+        /**
+         * Чтение значения свойства
+         */
         public final Function<B, V> read;
+
+        /**
+         * Запись значения свойства
+         */
         public final BiFunction<B, V, B> write;
 
+        /**
+         * Конструктор
+         * @param name Имя свойства
+         * @param read Чтение значения свойства
+         * @param write Запись значения свойства
+         */
         public Key(String name, Function<B, V> read, BiFunction<B, V, B> write) {
             if (name == null) throw new IllegalArgumentException("name==null");
             if (read == null) throw new IllegalArgumentException("read==null");
@@ -41,10 +79,22 @@ public abstract class OBJ<B> {
             keys.add(this);
         }
 
+        /**
+         * Запись значения в объект
+         * @param b объект
+         * @param v значение
+         * @return объект или новый объект
+         */
         public B set(B b, V v) {
             if (b == null) throw new IllegalArgumentException("b==null");
             return write.apply(b, v);
         }
+
+        /**
+         * Чтение значения свойства
+         * @param b объект
+         * @return значение
+         */
         public V get(B b) {
             if (b == null) throw new IllegalArgumentException("b==null");
             return read.apply(b);

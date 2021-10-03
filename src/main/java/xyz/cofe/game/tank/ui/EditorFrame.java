@@ -113,6 +113,7 @@ public class EditorFrame extends JFrame {
     private final ConvertToPlayerOneAction convertToPlayerOneAction = new ConvertToPlayerOneAction();
     private final ConvertToPlayerTwoAction convertToPlayerTwoAction = new ConvertToPlayerTwoAction();
     private final ConvertToNoteAction convertToNoteAction = new ConvertToNoteAction();
+    private final ConvertToEnemyAction convertToEnemyAction = new ConvertToEnemyAction();
     private final ToFrontAction toFrontAction = new ToFrontAction();
     private final ToBackAction toBackAction = new ToBackAction();
 
@@ -122,7 +123,7 @@ public class EditorFrame extends JFrame {
         toFrontAction, toBackAction,
 
         convertToBushAction,convertToWaterAction,convertToBrickAction,convertToSlideAction,
-        convertToBulletAction,convertToPlayerOneAction,convertToPlayerTwoAction,
+        convertToBulletAction,convertToPlayerOneAction,convertToPlayerTwoAction,convertToEnemyAction,
         convertToNoteAction,
 
         alignByGridAction,
