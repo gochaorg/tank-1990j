@@ -15,12 +15,25 @@ import java.util.Optional;
  * Игровой цикл
  */
 public class GameCycle {
+    /**
+     * Уведомление о удалении фигуры со сцены
+     */
     private final Observers<Figure<?>> figureDeleted = new Observers<>();
 
     /**
      * Сцена
      */
     public final Scene scene;
+
+    /**
+     * Удаление фигуры со сцены с уведомлением
+     * @param figure фигура
+     */
+    private void delete( Figure<?> figure ){
+        if( figure==null )throw new IllegalArgumentException( "figure==null" );
+        scene.getFigures().remove(figure);
+        figureDeleted.fire(figure);
+    }
 
     /**
      * Перемещение фигур
@@ -52,7 +65,14 @@ public class GameCycle {
             .filter( f -> f instanceof Player || f instanceof Brick ));
     }
 
+    /**
+     * Передвигаемые объекты
+     */
     protected Eterable<GameUnit<?>> gameUnits;
+
+    /**
+     * Перемещения по сцене
+     */
     protected Eterable<? extends Moving<?>> movings;
 
     /**
@@ -74,15 +94,64 @@ public class GameCycle {
         running = false;
     }
 
+    private void acceptFire( LevelBrick<?> brick, Bullet bullet ){
+        // Состояние                            direction
+        // -----------------------------------|-------|-------|-------|-------|
+        //        - верх | верх | ниж  | ниж  | R     | L     | U     | D     |
+        //        - лев  | прав | лев  | прав |       |       |       |       |
+        // -----------------------------------|-------|-------|-------|-------|
+        // 0b0000 -      |      |      |      |       |       |       |       |
+        //                                    |       |       |       |       |
+        // 0b0001 - есть |      |      |      |       |       |       |       |
+        // 0b0010 -      | есть |      |      |       |       |       |       |
+        // 0b0011 - есть | есть |      |      |       |       |       |       |
+        // 0b0100 -      |      | есть |      |       |       |       |       |
+        // 0b0101 - есть |      | есть |      |       |       |       |       |
+        // 0b0110 -      | есть | есть |      |       |       |       |       |
+        // 0b0111 - есть | есть | есть |      |       |       |       |       |
+        // 0b1000 -      |      |      | есть |       |       |       |       |
+        // 0b1001 - есть |      |      | есть |       |       |       |       |
+        // 0b1010 -      | есть |      | есть |       |       |       |       |
+        // 0b1011 - есть | есть |      | есть |       |       |       |       |
+        // 0b1100 -      |      | есть | есть |       |       |       |       |
+        // 0b1101 - есть |      | есть | есть |       |       |       |       |
+        // 0b1110 -      | есть | есть | есть |       |       |       |       |
+        // 0b1111 - есть | есть | есть | есть |       |       | 0011  |       |
+
+
+        var state = brick.state();
+        if( state==0b0100 || state==0b1000 || state==0b0010 || state==0b0001 || state==0b0000 ){
+            delete(brick);
+        }else {
+            // Предполагается что при импорте каждый блок будут преобразован в 4 блока - 2 на 2.
+            throw new UnsupportedOperationException("not implement");
+        }
+
+        if( brick.state()==0 ){
+            delete(brick);
+        }
+    }
+
     /**
      * Расчет очередного цикла
      */
     public void next(){
         if( !running )return;
+
+        // перемещение фигур с расчетом пересечений
         moveCollector.estimate().apply(3, (moveJob,unit,coll)->{
-            //System.out.println("collision "+unit+" with "+coll.collisionObject+" rect "+coll.intersection);
+
+            // Танк уперся в стену ?
             if( unit instanceof Player && coll.collisionObject instanceof LevelBrick ){
                 ((Player<?>)unit).stop();
+            }else
+
+            // Пуля попала в стену ?
+            if( unit instanceof Bullet && coll.collisionObject instanceof LevelBrick ){
+                var bullet = (Bullet)unit;
+                acceptFire( (LevelBrick<?>) coll.collisionObject, bullet );
+                bullet.stop();
+                delete(bullet);
             }
         });
 
@@ -97,10 +166,9 @@ public class GameCycle {
             .map( f -> (Figure<?>)f )
             .toList();
 
-        scene.getFigures().removeAll(drops);
         if( drops.size()>0 ){
             for( var d : drops ){
-                System.out.println("dropped "+d);
+                delete(d);
             }
         }
     }
@@ -141,10 +209,49 @@ public class GameCycle {
         return _player!=null ? Optional.of(_player) : Optional.empty();
     }
 
+    // Скорость танка
     private double tankSpeed = 32;
+
+    // Скорость снаряда
     private double bulletSpeed = tankSpeed * 4;
+
+    // Максимальная частота выстрелов
     private long fireDelay = 1000 / 2;
+
+    // Время последнего выстрела
     private Map<Player<?>,Long> lastFire = new HashMap<>();
+    {
+        figureDeleted.listen( ev -> {
+            if( ev.event instanceof Player ) {
+                lastFire.remove(ev.event);
+            }
+        });
+    }
+
+    /**
+     * Выстрел игрока
+     * @param player игрок
+     * @return true - выстрел произведен; false - не произведен по причине ограничения частоты
+     */
+    private boolean fire( Player<?> player ){
+        var timeout =
+            System.currentTimeMillis() -
+                lastFire.getOrDefault(player,0L);
+
+        if( timeout<fireDelay )return false;
+
+        lastFire.put(player,System.currentTimeMillis());
+
+        Bullet bullet = player.createBullet();
+        scene.getFigures().add(bullet);
+        bullet.setJob(
+            bullet.moving
+                .direction(player.direction())
+                .speed(bulletSpeed).start()
+        );
+
+        return true;
+    }
 
     /**
      * Пользовательский ввод
@@ -169,19 +276,7 @@ public class GameCycle {
                     player.move(ums.direction, tankSpeed);
                 }
             }else if( userInput instanceof UserFire ){
-                var timeout =
-                    System.currentTimeMillis() -
-                    lastFire.getOrDefault(player,0L);
-
-                if( timeout<fireDelay )return;
-
-                Bullet bullet = player.createBullet();
-                scene.getFigures().add(bullet);
-                bullet.setJob(
-                    bullet.moving
-                        .direction(player.direction())
-                        .speed(bulletSpeed).start()
-                );
+                fire(player);
             }
         });
     }
