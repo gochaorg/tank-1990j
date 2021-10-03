@@ -376,7 +376,7 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
                 getSelection().addAll(hits);
             } else {
                 getSelection().clear();
-                scene.getFigures().stream().filter(f -> f.contains(p)).forEach(hits::add);
+                scene.getFigures().stream().filter(f -> f.contains(p)).findFirst().ifPresent(hits::add);
                 getSelection().addAll(hits);
             }
             if (!hits.isEmpty()) {
