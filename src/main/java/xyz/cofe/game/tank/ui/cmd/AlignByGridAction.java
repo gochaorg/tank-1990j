@@ -9,6 +9,9 @@ import xyz.cofe.game.tank.unt.Scene;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Выровнять выделенные значения по сетке
+ */
 public class AlignByGridAction implements SelectAction, GridBinding {
     //region grid : Supplier<Grid>
     protected Supplier<Grid> grid;

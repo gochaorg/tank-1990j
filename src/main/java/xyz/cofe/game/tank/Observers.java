@@ -46,13 +46,20 @@ public class Observers<A> extends ArrayList<Consumer1<Observers.Event<A>>> {
             this.removeListeners = removeListeners;
         }
 
+        /**
+         * Отписка от уведомлений текущего подписчика {@link #listener}
+         */
         public void unsubscribe(){
             if( listener!=null && removeListeners!=null ){
                 removeListeners.add(listener);
             }
         }
     }
-    
+
+    /**
+     * Уведомление о событии
+     * @param a событие
+     */
     public void fire( A a ){
         var removeSet = new LinkedHashSet<Consumer1<Observers.Event<A>>>();
         //var ls = new LinkedHashSet<Consumer1<Observers.Event<A>>>();
@@ -65,6 +72,11 @@ public class Observers<A> extends ArrayList<Consumer1<Observers.Event<A>>> {
         removeAll(removeSet);
     }
 
+    /**
+     * Подписка на события
+     * @param listener подписчик
+     * @return Отписка от уведомлений
+     */
     public Runnable listen( Consumer1<Observers.Event<A>> listener ){
         if( listener==null )throw new IllegalArgumentException( "listener==null" );
         add( listener );

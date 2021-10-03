@@ -12,6 +12,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Конвертация выделенных объектов в указанный
+ * @param <F> Тип в который будет конвертация
+ */
 public abstract class ConvertToAction<F extends Figure<?>> implements SelectAction, SelectToolProperty {
     private final Function<Figure<?>,F> convert;
     private BufferedImage image;

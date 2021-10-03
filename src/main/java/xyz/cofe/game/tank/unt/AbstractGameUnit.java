@@ -78,6 +78,9 @@ public abstract class AbstractGameUnit<SELF extends AbstractGameUnit<SELF>>
         job = null;
     }
 
+    /**
+     * Задача перемещения объекта
+     */
     @SuppressWarnings("unchecked")
     public final Moving<SELF> moving = new Moving<SELF>((SELF) this);
 }

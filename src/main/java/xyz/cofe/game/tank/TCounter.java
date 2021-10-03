@@ -3,34 +3,100 @@ package xyz.cofe.game.tank;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+/**
+ * Счетчик для замеров производительности
+ */
 public class TCounter {
+    /**
+     * Сколько последних значений хранить
+     */
     public final int length;
+
+    /**
+     * Замеры - значение в нс.
+     * Каждое значение содержит продолжительность - разницу между {@link #start()} и {@link #stop()}
+     */
     public final long times[];
+
+    /**
+     * Конструктор
+     * @param len Сколько значений хранить
+     */
     public TCounter(int len){
         if( len<1 )throw new IllegalArgumentException( "len<1" );
         length = len;
         times = new long[len];
         pointer = 0;
     }
+
+    /**
+     * Номер очередной записи
+     */
     private int pointer;
+
+    /**
+     * Время вызова {@link #start()} - нс.
+     */
     public long started;
+
+    /**
+     * Время вызова {@link #stop()} - нс.
+     */
     public long stopped;
+
+    /**
+     * Начало очередного замера
+     */
     public void start(){
         started = System.nanoTime();
     }
+
+    /**
+     * Конец очередного замера
+     */
     public void stop(){
         stopped = System.nanoTime();
         times[pointer%length] = stopped - started;
         pointer++;
     }
 
+    /**
+     * Простая статистика замеров
+     */
     public class Echo {
+        /**
+         * Кол-во замеренных значений, не больше {@link #length}
+         */
         public int count;
+
+        /**
+         * Суммарное значение
+         */
         public double summa;
+
+        /**
+         * Минимальное
+         */
         public double min;
+
+        /**
+         * Максимальное
+         */
         public double max;
+
+        /**
+         * Среднее
+         */
         public double avg;
+
+        /**
+         * Отсортированная выборка
+         */
         public long[] sorted;
+
+        /**
+         * Время статистики - мс {@link System#currentTimeMillis()}
+         */
         public long time;
         public Echo(){
             time = System.currentTimeMillis();
