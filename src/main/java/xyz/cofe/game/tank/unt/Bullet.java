@@ -114,4 +114,9 @@ public class Bullet extends AbstractGameUnit<Bullet> implements Directed<Bullet>
             direction(ev.event.getDirection());
         });
     }
+
+    @Override
+    public String toString(){
+        return this.getClass().getSimpleName()+"{ x0="+left()+" y0="+top()+" x1="+right()+" y1="+bottom()+" w="+width()+" h="+height()+"}";
+    }
 }
