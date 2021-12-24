@@ -62,7 +62,10 @@ public class GameCycle {
 
         moveCollector.setCollisions(
         Eterable.of(scene.getFigures())
-            .filter( f -> f instanceof Player || f instanceof Brick ));
+            .filter( f -> f instanceof Player
+                || f instanceof Brick
+                || f instanceof Steel
+            ));
     }
 
     /**
@@ -141,7 +144,7 @@ public class GameCycle {
         // перемещение фигур с расчетом пересечений
         moveCollector.estimate().apply(3, (moveJob,unit,coll)->{
 
-            // Танк уперся в стену ?
+            // Танк уперся в стену или в стальной блок ?
             if( unit instanceof Player && coll.collisionObject instanceof LevelBrick ){
                 ((Player<?>)unit).stop();
             }else
@@ -149,7 +152,9 @@ public class GameCycle {
             // Пуля попала в стену ?
             if( unit instanceof Bullet && coll.collisionObject instanceof LevelBrick ){
                 var bullet = (Bullet)unit;
-                acceptFire( (LevelBrick<?>) coll.collisionObject, bullet );
+                if( coll.collisionObject instanceof Brick ) {
+                    acceptFire((LevelBrick<?>) coll.collisionObject, bullet);
+                }
                 bullet.stop();
                 delete(bullet);
             }
