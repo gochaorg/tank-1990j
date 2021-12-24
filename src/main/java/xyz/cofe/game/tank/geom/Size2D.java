@@ -42,4 +42,9 @@ public interface Size2D {
             }
         };
     }
+
+    public static Size2D of(Rect rect){
+        if( rect==null )throw new IllegalArgumentException( "rect==null" );
+        return of( rect.width(), rect.height() );
+    }
 }
