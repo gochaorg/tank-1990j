@@ -11,6 +11,9 @@ public class Steel extends LevelBrick<Steel> {
     public Steel(Steel sample){
         super(sample);
     }
+    public Steel(Figure<?> sample){
+        super(sample);
+    }
     public Steel clone(){
         return new Steel(this);
     }
