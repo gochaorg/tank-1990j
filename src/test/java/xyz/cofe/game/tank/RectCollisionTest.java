@@ -1,11 +1,14 @@
 package xyz.cofe.game.tank;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import xyz.cofe.T;
 import xyz.cofe.game.tank.geom.Rect;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class RectCollisionTest {
-    @Test
+    @Tag(T.Simple) @Test
     public void test01(){
         var r1 = Rect.rect(0,0,10,10);
         var r2 = Rect.rect(5,5,15,15);

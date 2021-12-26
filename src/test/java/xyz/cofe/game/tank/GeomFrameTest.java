@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import xyz.cofe.fn.Tuple3;
 import xyz.cofe.game.tank.geom.Line;

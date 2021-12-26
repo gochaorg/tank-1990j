@@ -96,7 +96,7 @@ public class TestSpriteFrame extends JFrame {
 //            });
         }
 
-        public static void draw(Graphics2D gs, Rect rect, Paint color){
+        public static void draw( Graphics2D gs, Rect rect, Paint color){
             if( gs==null )throw new IllegalArgumentException( "gs==null" );
             if( rect==null )throw new IllegalArgumentException( "rect==null" );
             if( color==null )throw new IllegalArgumentException( "color==null" );

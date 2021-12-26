@@ -1,7 +1,11 @@
-package xyz.cofe.game.tank;
+package xyz.cofe.game.tank.stat;
+
+import xyz.cofe.text.FullDecFormat;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Счетчик для замеров производительности
@@ -58,6 +62,26 @@ public class TCounter {
         stopped = System.nanoTime();
         times[pointer%length] = stopped - started;
         pointer++;
+    }
+
+    public <A> A track( Supplier<A> code ){
+        if( code==null )throw new IllegalArgumentException( "code==null" );
+        try{
+            start();
+            return code.get();
+        } finally {
+            stop();
+        }
+    }
+
+    public void track( Runnable code ){
+        if( code==null )throw new IllegalArgumentException( "code==null" );
+        try{
+            start();
+            code.run();
+        } finally {
+            stop();
+        }
     }
 
     /**
@@ -155,6 +179,70 @@ public class TCounter {
             }
             System.out.println();
         }
+
+        public String toString(){
+            return toString(null);
+        }
+
+        public String toString(EchoFormat fmt){
+            if( fmt==null )fmt = defEcho;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(fmt.cnt(count));
+            if( count>1 ){
+                double k = 0.000001;
+                sb.append(fmt.min(min * k));
+                sb.append(fmt.avg(avg * k));
+                sb.append(fmt.max(max * k));
+
+                sb.append(fmt.p50(prc(0.5) * k));
+                sb.append(fmt.p90(prc(0.9) * k));
+                sb.append(fmt.p997(prc(0.997) * k));
+            }
+            return sb.toString();
+        }
+    }
+
+    public static class EchoFormat {
+        protected FullDecFormat cnt = new FullDecFormat("### ###");
+        public FullDecFormat cnt(){ return cnt; }
+        protected Function<Number,String> f_cnt = n -> "cnt="+cnt().format(n);
+        public String cnt(Number n){ return f_cnt.apply(n); }
+
+        protected FullDecFormat min = new FullDecFormat("###.000");
+        public FullDecFormat min(){ return min; }
+        protected Function<Number,String> f_min = n -> " min="+min().format(n);
+        public String min(Number n){ return f_min.apply(n); }
+
+        protected FullDecFormat avg = new FullDecFormat("###.000");
+        public FullDecFormat avg(){ return avg; }
+        protected Function<Number,String> f_avg = n -> " avg="+avg().format(n);
+        public String avg(Number n){ return f_avg.apply(n); }
+
+        protected FullDecFormat max = new FullDecFormat("###.000");
+        public FullDecFormat max(){ return max; }
+        protected Function<Number,String> f_max = n -> " max="+max().format(n);
+        public String max(Number n){ return f_max.apply(n); }
+
+        protected FullDecFormat p50 = new FullDecFormat("###.000");
+        public FullDecFormat p50(){ return p50; }
+        protected Function<Number,String> f_p50 = n -> " 50%="+p50().format(n);
+        public String p50(Number n){ return f_p50.apply(n); }
+
+        protected FullDecFormat p90 = new FullDecFormat("###.000");
+        public FullDecFormat p90(){ return p90; }
+        protected Function<Number,String> f_p90 = n -> " 90%="+p90().format(n);
+        public String p90(Number n){ return f_p90.apply(n); }
+
+        protected FullDecFormat p997 = new FullDecFormat("###.000");
+        public FullDecFormat p997(){ return p997; }
+        protected Function<Number,String> f_p997 = n -> " 99.7%="+p997().format(n);
+        public String p997(Number n){ return f_p997.apply(n); }
+    }
+    private static EchoFormat defEcho = new EchoFormat();
+
+    public Echo echo(){
+        return new Echo();
     }
 
     public Echo lastEcho;

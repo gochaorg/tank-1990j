@@ -4,14 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import xyz.cofe.T;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.unt.Brick;
 import xyz.cofe.game.tank.unt.Scene;
 import xyz.cofe.game.tank.unt.Water;
 
 public class MapStoreTest {
-    @Test
+    @Tag(T.Simple) @Test
     public void pointStore(){
         var m = new MapStore().store(Point.of(1,2));
         System.out.println(m);
@@ -20,7 +22,7 @@ public class MapStoreTest {
         System.out.println(x);
     }
 
-    @Test
+    @Tag(T.Simple) @Test
     public void brickStore(){
         var b = new Brick().location(Point.of(1,2));
         var m = new MapStore().store(b, BrickV.instance);
@@ -61,7 +63,7 @@ public class MapStoreTest {
             "brick2", Compaund1::getBrick2, (p, b) -> {p.setBrick2(b); return p;} );
     }
 
-    @Test
+    @Tag(T.Simple) @Test
     public void crossRef(){
         ObjectMappers.mappers.put(Compaund1.class, new Compaund1View());
         ObjectMappers.mappers.put(Brick.class, BrickV.instance);
@@ -91,7 +93,7 @@ public class MapStoreTest {
         }
     }
 
-    @Test
+    @Tag(T.Simple) @Test
     public void sceneFig01(){
         var scene = new Scene();
         scene.getFigures().add(new Brick().location(1,1));

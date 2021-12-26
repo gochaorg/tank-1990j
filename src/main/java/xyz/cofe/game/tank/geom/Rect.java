@@ -1,7 +1,10 @@
 package xyz.cofe.game.tank.geom;
 
+import xyz.cofe.game.tank.unt.Figure;
+
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -83,6 +86,23 @@ public interface Rect extends Size2D {
             }
 
             @Override
+            public int hashCode(){
+                return Objects.hash(x0,y0,x1,y1);
+            }
+
+            @Override
+            public boolean equals( Object obj ){
+                if( obj==null )return false;
+                if( obj.getClass()!=this.getClass() )return false;
+                var r = (Rect)obj;
+                if( left()!=r.left() )return false;
+                if( top()!=r.top() )return false;
+                if( right()!=r.right() )return false;
+                if( bottom()!=r.bottom() )return false;
+                return super.equals(obj);
+            }
+
+            @Override
             public String toString(){
                 return "Rect{ left="+x0+" top="+y0+" right="+x1+" bottom="+y1+" w="+w+" h="+h+" }";
             }
@@ -119,6 +139,15 @@ public interface Rect extends Size2D {
         return left() <= x && x < right() && top() <= y && y< bottom();
     }
 
+    public default boolean contains( double x, boolean leftInc, boolean rightInc, double y, boolean topInc, boolean bottomInc ){
+        return
+                (leftInc    ? left() <= x   :  left() < x)
+            &&  (rightInc   ? x <= right()  : x < right())
+            &&  (topInc     ? top() <= y    : top() < y)
+            &&  (bottomInc  ? y <= bottom() : y < bottom())
+            ;
+    }
+
     /**
      * Проверка наличия координат в прямоугольнике
      * @param p координата
@@ -127,6 +156,11 @@ public interface Rect extends Size2D {
     public default boolean contains( Point p ){
         if( p==null )throw new IllegalArgumentException( "p==null" );
         return contains(p.x(), p.y());
+    }
+
+    public default boolean contains( Point p, boolean leftInc, boolean rightInc, boolean topInc, boolean bottomInc ){
+        if( p==null )throw new IllegalArgumentException( "p==null" );
+        return contains(p.x(), leftInc, rightInc, p.y(), topInc, bottomInc);
     }
 
     /**
@@ -151,7 +185,7 @@ public interface Rect extends Size2D {
 
     /**
      * Пересечение квадратов
-     * @param rect кавдрат
+     * @param rect квадрат
      * @return пересечение
      */
     public default Optional<Rect> intersection( Rect rect ){
@@ -230,6 +264,25 @@ public interface Rect extends Size2D {
         double x1 = Math.max( right(), rect.right() );
         double y1 = Math.max( bottom(), rect.bottom() );
         return Rect.rect(x0,y0,x1,y1);
+    }
+
+    /**
+     * Вычисляет общую рамку, объединяющую все указанные объекты
+     * @param rectangles объекты
+     * @return общая рамка
+     */
+    public static Optional<Rect> bounds( Iterable<? extends Rect> rectangles ){
+        if( rectangles==null )throw new IllegalArgumentException( "rectangles==null" );
+        Rect r = null;
+        for( var a : rectangles ){
+            if( a==null )continue;
+            if( r==null ){
+                r = a;
+            }else{
+                r = r.bounds(a);
+            }
+        }
+        return r!=null ? Optional.of(r) : Optional.empty();
     }
 
     /**

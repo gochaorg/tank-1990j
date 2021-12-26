@@ -126,6 +126,9 @@
                         <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <groups>Simple</groups>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

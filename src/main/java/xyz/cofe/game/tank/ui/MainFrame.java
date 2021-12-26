@@ -1,6 +1,6 @@
 package xyz.cofe.game.tank.ui;
 
-import xyz.cofe.game.tank.TCounter;
+import xyz.cofe.game.tank.stat.TCounter;
 import xyz.cofe.game.tank.gcycle.GameCycle;
 import xyz.cofe.game.tank.gcycle.UserFire;
 import xyz.cofe.game.tank.gcycle.UserMoveStart;
@@ -16,9 +16,6 @@ import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.GeneralPath;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainFrame extends JFrame {
     public MainFrame(){
