@@ -2,6 +2,9 @@ package xyz.cofe.game.tank.ui;
 
 import java.awt.event.KeyEvent;
 
+/**
+ * Код клавиши клавиатуры
+ */
 public enum KeyCode {
     __Undefined(-1),
 

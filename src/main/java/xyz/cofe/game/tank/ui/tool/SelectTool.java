@@ -30,6 +30,9 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Инструмент выбора объектов на холсте/сцене, перемещения объектов
+ */
 public class SelectTool extends AbstractTool implements Tool, SceneProperty, GridBinding, SnapToGridProperty {
     //region image, name
     @Override
@@ -51,17 +54,42 @@ public class SelectTool extends AbstractTool implements Tool, SceneProperty, Gri
         return image;
     }
     //endregion
-    //region scene : Scene
+    //region scene : Scene - текущая сцена
+    /**
+     * Событие смены текущей сцены
+     */
     protected final Observers<Scene> onSceneChanged = new Observers<>();
+
+    /**
+     * Текущая сцена
+     */
     protected Scene scene;
+
+    /**
+     * Возвращает текущую сцену
+     * @return сцена или null
+     */
     public Scene getScene() { return scene; }
+
+    /**
+     * Указывает текущую сцену
+     * @param scene сцена
+     */
     public void setScene(Scene scene) {
         this.scene = scene;
         onSceneChanged.fire(scene);
     }
     //endregion
-    //region selection : Set<Figura<?>>
+    //region selection : Set<Figura<?>> - Коллекция выбранных объектов сцены
+    /**
+     * Коллекция выбранных объектов сцены
+     */
     protected final EventSet<Figure<?>> selection = new BasicEventSet<>(new LinkedHashSet<>());
+
+    /**
+     * Коллекция выбранных объектов сцены
+     * @return коллекция выбранных объектов
+     */
     public EventSet<Figure<?>> getSelection(){ return selection; }
     //endregion
     //region lastSelected : Figura<?>

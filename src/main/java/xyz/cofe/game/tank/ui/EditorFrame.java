@@ -237,7 +237,7 @@ public class EditorFrame extends JFrame {
             activeSceneDockListeners.closeAll(true);
 
             Function<MouseEvent, MouseEv> createMe = ev -> {
-                var me = new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()).scale(ev1.event.getScale());
+                var me = new MouseEv(ev, ev1.event).shift(ev1.event.getOrigin()).scale(1/ev1.event.getScale());
                 //System.out.println("mouse event at x="+me.x()+" y="+me.y());
                 return me;
             };

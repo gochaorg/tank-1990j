@@ -66,8 +66,16 @@ public interface Tool {
      */
     default void onMouseExited(MouseEv pt){}
 
+    /**
+     * Нажатие клавиши клавиатуры
+     * @param keyEv событие
+     */
     default void onKeyPressed(KeyEv keyEv){}
 
+    /**
+     * Отпускание клавиши клавиатуры
+     * @param keyEv событие
+     */
     default void onKeyReleased(KeyEv keyEv){}
 
     /**

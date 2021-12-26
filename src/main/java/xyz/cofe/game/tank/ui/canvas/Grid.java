@@ -10,10 +10,23 @@ import xyz.cofe.game.tank.Drawing;
 import xyz.cofe.game.tank.geom.Point;
 import xyz.cofe.game.tank.geom.Rect;
 
+/**
+ * Сетка для размещения фигур
+ */
 public class Grid extends CanvasHost<Grid> implements Drawing {
     //region visible : boolean
     private boolean visible = true;
+
+    /**
+     * Возвращает видима или нет сетка
+     * @return true - видима
+     */
     public boolean isVisible(){ return visible; }
+
+    /**
+     * Указывает видима или нет сетка
+     * @param v true - видима
+     */
     public void setVisible(boolean v){ visible = v; }
     //endregion
     //region regularMarks : NavigableMap<Double, LineMark>

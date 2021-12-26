@@ -15,10 +15,17 @@ public class KeyEv {
         }
     }
 
+    /**
+     * Конструктор
+     */
     public KeyEv(){
         keyCode = KeyCode.__Undefined;
     }
 
+    /**
+     * Конструктор копирования
+     * @param ev образец
+     */
     public KeyEv(KeyEvent ev){
         int c = ev.getKeyCode();
         keyCode = keyCodes.getOrDefault(c,KeyCode.__Undefined);
@@ -30,17 +37,42 @@ public class KeyEv {
     }
 
     protected KeyCode keyCode;
+
+    /**
+     * Возвращает код клавиши
+     * @return код клавиши
+     */
     public KeyCode keyCode(){ return keyCode; }
 
     protected boolean shift;
+
+    /**
+     * Возвращает признак нажатия SHIFT
+     * @return true - клавиша SHIFT нажата
+     */
     public boolean isShift(){ return shift; }
 
     protected boolean control;
+
+    /**
+     * Возвращает признак нажатия CONTROL
+     * @return true - клавиша CONTROL нажата
+     */
     public boolean isControl(){ return control; }
 
     protected boolean alt;
+
+    /**
+     * Возвращает признак нажатия ALT
+     * @return true - клавиша ALT нажата
+     */
     public boolean isAlt(){ return alt; }
 
     protected boolean meta;
+
+    /**
+     * Возвращает признак нажатия META (Win)
+     * @return true - клавиша META (Win) нажата
+     */
     public boolean isMeta(){ return meta; }
 }
