@@ -4,14 +4,35 @@ import java.util.Map;
 import xyz.cofe.game.tank.sprite.SpriteLine;
 import xyz.cofe.game.tank.sprite.SpritesData;
 
+/**
+ * Первый игрок
+ */
 public class PlayerOne extends Player<PlayerOne> {
+    /**
+     * Конструктор
+     */
     public PlayerOne(){}
+
+    /**
+     * Конструктор копирования
+     * @param figura образец
+     */
     public PlayerOne(Figure<?> figura){
         super(figura);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public PlayerOne( PlayerOne sample ){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public PlayerOne clone(){ return new PlayerOne(this); }
 
     private static final Map<PlayerState,Map<Direction, SpriteLine>> sprites =

@@ -5,14 +5,35 @@ import xyz.cofe.game.tank.sprite.SpritesData;
 
 import java.util.Map;
 
+/**
+ * Второй игрок
+ */
 public class PlayerTwo extends Player<PlayerTwo> {
+    /**
+     * Конструктор
+     */
     public PlayerTwo(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public PlayerTwo(Figure<?> sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public PlayerTwo(PlayerTwo sample){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public PlayerTwo clone(){ return new PlayerTwo(this); }
 
     private static final Map<PlayerState,Map<Direction,SpriteLine>> sprites =

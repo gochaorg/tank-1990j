@@ -13,7 +13,15 @@ import java.util.Map;
  * Вражеский танк
  */
 public class Enemy extends AbstractGameUnit<Enemy> implements GameUnit<Enemy>, Directed<Enemy> {
+    /**
+     * Конструктор
+     */
     public Enemy(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Enemy(Figure<?> sample){
         super(sample);
         if( sample instanceof Enemy){
@@ -24,12 +32,22 @@ public class Enemy extends AbstractGameUnit<Enemy> implements GameUnit<Enemy>, D
         }
         job = null;
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Enemy(Enemy sample){
         super(sample);
         enemyState = sample.enemyState;
         direction = sample.direction;
         job = null;
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Enemy clone(){
         return new Enemy(this);
     }
@@ -51,7 +69,7 @@ public class Enemy extends AbstractGameUnit<Enemy> implements GameUnit<Enemy>, D
     public Direction direction(){
         return direction;
     }
-    @SuppressWarnings({"unchecked", "UnusedReturnValue"})
+    @SuppressWarnings({"UnusedReturnValue"})
     public Enemy direction(Direction direction){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
         currentSpriteLine().stopAnimation();
@@ -152,14 +170,12 @@ public class Enemy extends AbstractGameUnit<Enemy> implements GameUnit<Enemy>, D
         return currentSpriteLine().isAnimationRunning();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Enemy startAnimation(){
         currentSpriteLine().startAnimation();
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Enemy stopAnimation(){
         spriteLines().forEach( SpriteLine::stopAnimation );
@@ -168,22 +184,22 @@ public class Enemy extends AbstractGameUnit<Enemy> implements GameUnit<Enemy>, D
     //endregion
 
     {
-        moving.started().listen( ev -> {
-            direction(ev.event.getDirection());
-        });
+        moving.started().listen( ev -> direction(ev.event.getDirection()));
     }
 
     /**
-     * Перемещение объекта
+     * Установка задания - перемещение объекта
      * @param direction направление движения
      * @param speedPixelPerSec скорость - кол-во пикселей в секунду
      */
-    public void move(Direction direction, double speedPixelPerSec){
+    @SuppressWarnings("unused")
+    public void move( Direction direction, double speedPixelPerSec){
         if( direction==null )throw new IllegalArgumentException( "direction==null" );
         //direction(direction);
         job = moving.direction(direction).speed(speedPixelPerSec).start();
     }
 
+    @SuppressWarnings("unused")
     public Bullet createBullet(){
         var blt = new Bullet().direction(direction());
 

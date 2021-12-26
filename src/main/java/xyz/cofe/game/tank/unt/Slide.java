@@ -7,14 +7,37 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Лед/скользящаяя поверхность
  */
 public class Slide extends LevelBrick<Slide> {
+    /**
+     * Конструктор
+     */
     public Slide(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Slide(Figure<?> sample){super(sample);}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Slide(LevelBrick<?> sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Slide(Slide sample){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Slide clone(){ return new Slide(this); }
     private static final Sprite sprite;
     static {

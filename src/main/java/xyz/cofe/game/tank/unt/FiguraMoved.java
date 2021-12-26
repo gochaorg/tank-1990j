@@ -21,6 +21,9 @@ public class FiguraMoved<SELF extends Figure<SELF>> extends FiguraEvent<SELF> {
         this.to = to;
     }
 
+    /**
+     * откуда передвинута фигура
+     */
     protected Point from;
 
     /**
@@ -29,6 +32,9 @@ public class FiguraMoved<SELF extends Figure<SELF>> extends FiguraEvent<SELF> {
      */
     public Point getFrom(){ return from; }
 
+    /**
+     * куда передвинута фигура
+     */
     protected Point to;
 
     /**

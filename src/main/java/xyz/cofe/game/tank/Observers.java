@@ -39,6 +39,13 @@ public class Observers<A> extends ArrayList<Consumer1<Observers.Event<A>>> {
          */
         public final Collection<Consumer1<Observers.Event<A>>> removeListeners;
 
+        /**
+         * Конструктор
+         * @param observers "обсервер"
+         * @param event событие
+         * @param listener целевой подписчик
+         * @param removeListeners подписчики которые должны быть удалены после уведомления
+         */
         public Event(Observers<A> observers, A event, Consumer1<Observers.Event<A>> listener, Collection<Consumer1<Observers.Event<A>>> removeListeners) {
             this.observers = observers;
             this.event = event;

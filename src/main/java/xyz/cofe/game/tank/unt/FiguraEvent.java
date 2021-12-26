@@ -5,6 +5,10 @@ package xyz.cofe.game.tank.unt;
  * @param <SELF> фигура
  */
 public class FiguraEvent<SELF extends Figure<SELF>> {
+    /**
+     * Конструктор
+     * @param self фигура
+     */
     public FiguraEvent(SELF self){
         this.figura = self;
     }

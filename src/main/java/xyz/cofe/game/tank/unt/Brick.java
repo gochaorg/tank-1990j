@@ -7,14 +7,37 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Кирпичная стена
  */
 public class Brick extends LevelBrick<Brick> {
+    /**
+     * Конструктор
+     */
     public Brick(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Brick(Figure<?> sample){super(sample);}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Brick(LevelBrick<?> sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Brick(Brick sample){
         super(sample);
     }
+
+    /**
+     * Клонирование
+     * @return клон
+     */
     public Brick clone(){ return new Brick(this); }
 
     private static final Sprite sprite;

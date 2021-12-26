@@ -12,7 +12,15 @@ import java.util.Map;
  * @param <SELF> дочерний класс
  */
 public abstract class Player<SELF extends Player<SELF>> extends AbstractGameUnit<SELF> implements GameUnit<SELF>, Directed<SELF> {
+    /**
+     * Конструктор
+     */
     public Player(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Player(Figure<?> sample){
         super(sample);
         if( sample instanceof Player ){
@@ -23,12 +31,22 @@ public abstract class Player<SELF extends Player<SELF>> extends AbstractGameUnit
         }
         job = null;
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Player(Player<?> sample){
         super(sample);
         playerState = sample.playerState;
         direction = sample.direction;
         job = null;
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public abstract SELF clone();
 
     //region playerState : PlayerState

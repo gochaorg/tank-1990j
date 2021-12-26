@@ -15,11 +15,22 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.List;
 
+/**
+ * Текстовая заметка
+ */
 public class Note extends Figure<Note> {
     public final Observers<Size2D> onSizeChanged = new Observers<>();
 
     //region constructors
+    /**
+     * Конструктор
+     */
     public Note(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample1 образец
+     */
     public Note(Figure<?> sample1){
         super(sample1);
         if( sample1 instanceof Note ){
@@ -40,6 +51,11 @@ public class Note extends Figure<Note> {
             fontTitle = sample.fontTitle;
         }
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Note(Note sample){
         super(sample);
         width = sample.width;
@@ -59,6 +75,11 @@ public class Note extends Figure<Note> {
         contentTextBlock = sample.contentTextBlock;
         contentTopMargin = sample.contentTopMargin;
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     @Override
     public Note clone() {
         return new Note(this);

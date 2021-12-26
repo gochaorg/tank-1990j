@@ -7,10 +7,19 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
+/**
+ * Инструмент редактора карты
+ */
 public abstract class Tool {
     public abstract String getToolName();
 
     protected JComponent canvas;
+
+    /**
+     * Событие мыши
+     * @param canvas холст
+     * @param e событие
+     */
     public void mouseEvent(JComponent canvas, MouseEvent e){
         this.canvas = canvas;
         if( e!=null ){
@@ -43,6 +52,11 @@ public abstract class Tool {
     protected void onReleased( MouseEvent e ){
     }
 
+    /**
+     * Событие клавиатуры
+     * @param canvas холст
+     * @param e событие
+     */
     public void keyEvent(JComponent canvas, KeyEvent e){
         this.canvas = canvas;
         if( e!=null ){

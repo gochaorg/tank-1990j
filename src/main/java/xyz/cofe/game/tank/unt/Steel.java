@@ -7,13 +7,31 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Стальная стена
  */
 public class Steel extends LevelBrick<Steel> {
+    /**
+     * Конструктор
+     */
     public Steel(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Steel(Steel sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Steel(Figure<?> sample){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Steel clone(){
         return new Steel(this);
     }

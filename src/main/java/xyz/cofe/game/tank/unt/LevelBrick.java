@@ -11,13 +11,26 @@ import java.awt.*;
  * Строительный блок уровня из комбинации спрайтов 2x2
  */
 public abstract class LevelBrick<SELF extends LevelBrick<SELF>> extends Figure<SELF> implements Drawing, Rect, Moveable<SELF> {
+    /**
+     * Конструктор
+     */
     public LevelBrick(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public LevelBrick(Figure<?> sample){
         super(sample);
         if( sample instanceof LevelBrick ){
             this.state = ((LevelBrick<?>) sample).state;
         }
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public LevelBrick(LevelBrick<?> sample){
         super(sample);
         this.state = sample.state;

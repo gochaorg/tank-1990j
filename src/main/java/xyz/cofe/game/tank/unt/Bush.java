@@ -7,14 +7,37 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Куст
  */
 public class Bush extends LevelBrick<Bush> {
+    /**
+     * Конструктор
+     */
     public Bush(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Bush(Figure<?> sample){super(sample);}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Bush(LevelBrick<?> sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Bush(Bush sample){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Bush clone(){ return new Bush(this); }
 
     private static final Sprite sprite;

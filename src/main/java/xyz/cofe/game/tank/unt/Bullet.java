@@ -14,16 +14,31 @@ import java.util.Map;
 public class Bullet extends AbstractGameUnit<Bullet> implements Directed<Bullet> {
     public Bullet(){
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Bullet(Figure<?> sample){
         super(sample);
         if( sample instanceof Directed ){
             direction = ((Directed<?>)sample).direction();
         }
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Bullet(Bullet sample){
         super(sample);
         direction = sample.direction;
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Bullet clone(){ return new Bullet(this); }
 
     private static final int UP_FRAME = 0;

@@ -12,19 +12,44 @@ import xyz.cofe.gui.swing.bean.UiBean;
  * Абстрактная фигура, с координатами
  */
 public abstract class Figure<SELF extends Figure<SELF>> implements Drawing, Rect, Moveable<SELF> {
+    /**
+     * Конструктор
+     */
     public Figure(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Figure(Figure<?> sample){
         if( sample==null )throw new IllegalArgumentException( "sample==null" );
         left = sample.left();
         top = sample.top();
     }
 
+    /**
+     * Рассылать уведомление {@link FiguraMoved}
+     */
     protected boolean notification = true;
+
+    /**
+     * Возвращает флаг - Рассылать уведомление {@link FiguraMoved}
+     * @return true - рассылать
+     */
     public boolean isNotification(){ return notification; }
+
+    /**
+     * Указывает флаг - Рассылать уведомление {@link FiguraMoved}
+     * @param notification true - рассылать
+     */
     public void setNotification(boolean notification){
         this.notification = notification;
     }
 
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public abstract Figure<SELF> clone();
 
     //region left : double - Левый край объекта

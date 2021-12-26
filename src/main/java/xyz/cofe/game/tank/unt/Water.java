@@ -7,14 +7,37 @@ import xyz.cofe.game.tank.sprite.SpritesData;
  * Вода
  */
 public class Water extends LevelBrick<Water> {
+    /**
+     * Конструктор
+     */
     public Water(){}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Water(Figure<?> sample){super(sample);}
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Water(LevelBrick<?> sample){
         super(sample);
     }
+
+    /**
+     * Конструктор копирования
+     * @param sample образец
+     */
     public Water(Water sample){
         super(sample);
     }
+
+    /**
+     * Клонирование объекта
+     * @return клон
+     */
     public Water clone(){ return new Water(this); }
 
     private static final Sprite sprite;
